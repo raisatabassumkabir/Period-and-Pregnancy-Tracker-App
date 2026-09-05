@@ -246,11 +246,20 @@ const ErrorBanner = ({ message }: ErrorBannerProps) => {
   );
 };
 
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient ||
+  Constants.appOwnership === 'expo';
+
 /**
  * Mounted once in the root layout. Observes the upgrade store, which the axios
  * 402 interceptor and explicit "Go premium" buttons feed.
  */
 export const UpgradeSheet = () => {
+  if (isExpoGo) {
+    return null;
+  }
   const ref = useRef<BottomSheetModal>(null);
   const visible = useUpgrade.use.visible();
   const detail = useUpgrade.use.detail();

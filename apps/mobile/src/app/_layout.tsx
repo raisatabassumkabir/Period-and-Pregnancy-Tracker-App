@@ -82,17 +82,17 @@ export default function RootLayout() {
   );
 }
 
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient ||
+  Constants.appOwnership === 'expo';
+
 function Providers({ children }: { children: React.ReactNode }) {
   const theme = useThemeConfig();
   const paletteTokens = usePaletteTokens();
 
   return (
-    // `GestureHandlerRootView` is a third-party component, so
-    // react-native-css-interop never processes it — a `className` or a `vars()`
-    // style placed on it is silently dropped. The palette variables and the
-    // `dark` class therefore live on a plain RN `View` just inside it, which
-    // css-interop does handle. Every `bg-accent` / `text-accent-700` below
-    // resolves through that node.
     <GestureHandlerRootView style={styles.container}>
       <View
         style={vars(paletteTokens)}
@@ -101,11 +101,18 @@ function Providers({ children }: { children: React.ReactNode }) {
         <KeyboardProvider>
           <ThemeProvider value={theme}>
             <APIProvider>
-              <BottomSheetModalProvider>
-                {children}
-                <UpgradeSheet />
-                <FlashMessage position="top" />
-              </BottomSheetModalProvider>
+              {isExpoGo ? (
+                <>
+                  {children}
+                  <FlashMessage position="top" />
+                </>
+              ) : (
+                <BottomSheetModalProvider>
+                  {children}
+                  <UpgradeSheet />
+                  <FlashMessage position="top" />
+                </BottomSheetModalProvider>
+              )}
             </APIProvider>
           </ThemeProvider>
         </KeyboardProvider>
