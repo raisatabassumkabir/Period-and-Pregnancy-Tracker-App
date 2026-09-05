@@ -1,11 +1,5 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
-import { View } from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { View, Animated, Easing } from 'react-native';
 import { twMerge } from 'tailwind-merge';
 
 import { usePaletteColors } from '@/lib/theme';
@@ -25,28 +19,29 @@ export const ProgressBar = forwardRef<ProgressBarRef, Props>(
   ({ initialProgress = 0, className = '', fillColor }, ref) => {
     const palette = usePaletteColors();
     const fill = fillColor ?? palette.accent;
-    const progress = useSharedValue<number>(initialProgress ?? 0);
+    const progress = useRef(new Animated.Value(initialProgress ?? 0)).current;
+
     useImperativeHandle(ref, () => {
       return {
         setProgress: (value: number) => {
-          progress.value = withTiming(value, {
+          Animated.timing(progress, {
+            toValue: value,
             duration: 250,
             easing: Easing.inOut(Easing.quad),
-          });
+            useNativeDriver: false,
+          }).start();
         },
       };
     }, [progress]);
 
-    const style = useAnimatedStyle(() => {
-      return {
-        width: `${progress.value}%`,
-        backgroundColor: fill,
-        height: 2,
-      };
+    const width = progress.interpolate({
+      inputRange: [0, 100],
+      outputRange: ['0%', '100%'],
     });
+
     return (
       <View className={twMerge(`bg-tone-300`, className)}>
-        <Animated.View style={style} />
+        <Animated.View style={{ width, backgroundColor: fill, height: 2 }} />
       </View>
     );
   }

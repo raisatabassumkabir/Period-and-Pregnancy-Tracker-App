@@ -1,11 +1,5 @@
-import React, { useEffect } from 'react';
-import { type ViewProps } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { type ViewProps, Animated, Easing } from 'react-native';
 
 type Props = ViewProps & {
   children: React.ReactNode;
@@ -19,30 +13,38 @@ export function SlideUpCard({
   delay = 0,
   duration = 500,
   distance = 50,
+  style,
   ...props
 }: Props) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(distance);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(distance)).current;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      opacity.value = withTiming(1, { duration: duration * 0.8 });
-      translateY.value = withSpring(0, {
-        damping: 15,
-        stiffness: 100,
-      });
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: duration * 0.8,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateY, {
+          toValue: 0,
+          friction: 6,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }, delay);
 
     return () => clearTimeout(timer);
   }, [delay, duration, distance, opacity, translateY]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
   return (
-    <Animated.View style={animatedStyle} {...props}>
+    <Animated.View
+      style={[{ opacity, transform: [{ translateY }] }, style]}
+      {...props}
+    >
       {children}
     </Animated.View>
   );

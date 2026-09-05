@@ -1,11 +1,5 @@
-import React, { useEffect } from 'react';
-import { type ViewProps } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { type ViewProps, Animated, Easing } from 'react-native';
 
 type Props = ViewProps & {
   children: React.ReactNode;
@@ -19,32 +13,45 @@ export function FadeInView({
   delay = 0,
   duration = 600,
   useSpring: shouldUseSpring = false,
+  style,
   ...props
 }: Props) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (shouldUseSpring) {
-        opacity.value = withSpring(1);
-        translateY.value = withSpring(0);
+        Animated.parallel([
+          Animated.spring(opacity, { toValue: 1, useNativeDriver: true }),
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+        ]).start();
       } else {
-        opacity.value = withTiming(1, { duration });
-        translateY.value = withTiming(0, { duration });
+        Animated.parallel([
+          Animated.timing(opacity, {
+            toValue: 1,
+            duration,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
     }, delay);
 
     return () => clearTimeout(timer);
   }, [delay, duration, opacity, translateY, shouldUseSpring]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
   return (
-    <Animated.View style={animatedStyle} {...props}>
+    <Animated.View
+      style={[{ opacity, transform: [{ translateY }] }, style]}
+      {...props}
+    >
       {children}
     </Animated.View>
   );

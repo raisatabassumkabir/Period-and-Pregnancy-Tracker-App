@@ -1,14 +1,6 @@
 import { Crown } from 'lucide-react-native';
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { View, Animated, Easing } from 'react-native';
 
 import { Text } from '@/components/ui';
 import { usePaletteColors } from '@/lib/theme';
@@ -23,26 +15,27 @@ interface Props {
 
 export const PremiumBadge = ({ testID = 'premium-badge', compact }: Props) => {
   const colors = usePaletteColors();
-  const shimmer = useSharedValue(0);
+  const shimmer = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    shimmer.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1600, easing: Easing.inOut(Easing.quad) }),
-        withTiming(0, { duration: 1600, easing: Easing.inOut(Easing.quad) })
-      ),
-      -1,
-      false
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmer, { toValue: 1, duration: 1600, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(shimmer, { toValue: 0, duration: 1600, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ])
     );
+    animation.start();
+    return () => animation.stop();
   }, [shimmer]);
 
-  const style = useAnimatedStyle(() => ({
-    opacity: 0.7 + shimmer.value * 0.3,
-  }));
+  const opacity = shimmer.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.7, 1.0],
+  });
 
   return (
     <Animated.View
-      style={style}
+      style={{ opacity }}
       testID={testID}
       className={`flex-row items-center self-start rounded-full bg-accent-200 ${
         compact ? 'px-2 py-0.5' : 'px-3 py-1'
@@ -58,7 +51,7 @@ export const PremiumBadge = ({ testID = 'premium-badge', compact }: Props) => {
           compact ? 'text-xs' : 'text-sm'
         }`}
       >
-        Premium
+        PRO
       </Text>
     </Animated.View>
   );
