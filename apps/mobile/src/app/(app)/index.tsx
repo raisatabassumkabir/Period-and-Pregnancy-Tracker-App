@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Sparkles, Bell, Calendar, ChevronDown, Activity } from 'lucide-react-native';
-import { useHealthStore } from '@/store/useHealthStore';
+import { Calendar, ChevronDown, Sparkles } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+
 import { CircularPregnancyTimeline } from '@/components/dashboard/CircularPregnancyTimeline';
-import { StatusCard } from '@/components/dashboard/StatusCard';
 import { ModeSwitcherModal } from '@/components/dashboard/ModeSwitcherModal';
+import { StatusCard } from '@/components/dashboard/StatusCard';
+import { useHealthStore } from '@/store/useHealthStore';
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -34,12 +42,36 @@ export default function DashboardScreen() {
       {/* App Header */}
       <View style={styles.header}>
         <View style={styles.userSection}>
-          <Text style={styles.greetingText}>Welcome back 👋</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 2,
+            }}
+          >
+            <Image
+              source={require('../../../assets/icon.png')}
+              style={{ width: 26, height: 26, borderRadius: 8, marginRight: 8 }}
+            />
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '800',
+                color: '#FF7575',
+                letterSpacing: 0.5,
+              }}
+            >
+              HAPPY WOMEN
+            </Text>
+          </View>
           <Text style={styles.userNameText}>Sarah Jenkins</Text>
         </View>
 
         {/* Dynamic Mode Pill Switcher */}
-        <Pressable style={styles.modeChip} onPress={() => setModalVisible(true)}>
+        <Pressable
+          style={styles.modeChip}
+          onPress={() => setModalVisible(true)}
+        >
           <Sparkles size={12} color="#FF7575" style={{ marginRight: 4 }} />
           <Text style={styles.modeChipText}>
             {isPregnancy ? 'Pregnancy' : 'Cycle Tracking'}
@@ -66,7 +98,9 @@ export default function DashboardScreen() {
             <Calendar size={20} color="#A3E6C8" />
             <Text style={styles.cycleTitle}>Cycle Day 14</Text>
           </View>
-          <Text style={styles.cycleSubtitle}>Estimated Ovulation Window Today</Text>
+          <Text style={styles.cycleSubtitle}>
+            Estimated Ovulation Window Today
+          </Text>
           <View style={styles.cyclePill}>
             <Text style={styles.cyclePillText}>High Fertility Window</Text>
           </View>
@@ -75,8 +109,10 @@ export default function DashboardScreen() {
 
       {/* Section Header */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Today's Snapshot</Text>
-        <Text style={styles.sectionSubtitle}>Synced with Health Encryption</Text>
+        <Text style={styles.sectionTitle}>Today&apos;s Snapshot</Text>
+        <Text style={styles.sectionSubtitle}>
+          Synced with Health Encryption
+        </Text>
       </View>
 
       {/* Status Cards Row */}
@@ -103,7 +139,10 @@ export default function DashboardScreen() {
       </View>
 
       {/* Mode Switcher Modal */}
-      <ModeSwitcherModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <ModeSwitcherModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </ScrollView>
   );
 }
