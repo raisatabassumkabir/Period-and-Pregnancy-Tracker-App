@@ -1,13 +1,14 @@
-import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSequence,
-  withTiming,
+import { Check, Clock, Footprints, Plus, RotateCcw } from 'lucide-react-native';
+import React, { useRef } from 'react';
+import {
+  Animated,
   Easing,
-} from 'react-native-reanimated';
-import { Footprints, Plus, RotateCcw, Check, Clock } from 'lucide-react-native';
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+
 import { useHealthStore } from '@/store/useHealthStore';
 
 export const FetalActivityLogger: React.FC = () => {
@@ -20,20 +21,31 @@ export const FetalActivityLogger: React.FC = () => {
     kickLogs,
   } = useHealthStore();
 
-  const buttonScale = useSharedValue(1);
+  const buttonScale = useRef(new Animated.Value(1)).current;
 
   const handlePressKick = () => {
-    buttonScale.value = withSequence(
-      withTiming(0.92, { duration: 80, easing: Easing.ease }),
-      withTiming(1.08, { duration: 120, easing: Easing.ease }),
-      withTiming(1.0, { duration: 100, easing: Easing.ease })
-    );
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.92,
+        duration: 80,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1.08,
+        duration: 120,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1.0,
+        duration: 100,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+    ]).start();
     incrementKick();
   };
-
-  const animatedButtonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
-  }));
 
   return (
     <View style={styles.container}>
@@ -45,7 +57,9 @@ export const FetalActivityLogger: React.FC = () => {
           </View>
           <View>
             <Text style={styles.sectionTitle}>Fetal Activity Counter</Text>
-            <Text style={styles.sectionSubtitle}>Target: 10 kicks within 2 hours</Text>
+            <Text style={styles.sectionSubtitle}>
+              Target: 10 kicks within 2 hours
+            </Text>
           </View>
         </View>
 
@@ -62,7 +76,12 @@ export const FetalActivityLogger: React.FC = () => {
         <Text style={styles.countLabel}>Kicks Logged This Session</Text>
 
         {/* Kick Button */}
-        <Animated.View style={[styles.buttonWrapper, animatedButtonStyle]}>
+        <Animated.View
+          style={[
+            styles.buttonWrapper,
+            { transform: [{ scale: buttonScale }] },
+          ]}
+        >
           <Pressable style={styles.kickButton} onPress={handlePressKick}>
             <Plus size={24} color="#121212" style={{ marginRight: 6 }} />
             <Text style={styles.kickButtonText}>+ Log Kick</Text>
@@ -72,12 +91,18 @@ export const FetalActivityLogger: React.FC = () => {
         {/* Action Controls */}
         {activeKickCount > 0 && (
           <View style={styles.controlsRow}>
-            <Pressable style={styles.controlButtonSecondary} onPress={resetKickSession}>
+            <Pressable
+              style={styles.controlButtonSecondary}
+              onPress={resetKickSession}
+            >
               <RotateCcw size={14} color="#A0A0B0" style={{ marginRight: 4 }} />
               <Text style={styles.controlTextSecondary}>Reset</Text>
             </Pressable>
 
-            <Pressable style={styles.controlButtonPrimary} onPress={saveKickSession}>
+            <Pressable
+              style={styles.controlButtonPrimary}
+              onPress={saveKickSession}
+            >
               <Check size={14} color="#121212" style={{ marginRight: 4 }} />
               <Text style={styles.controlTextPrimary}>Save Session</Text>
             </Pressable>

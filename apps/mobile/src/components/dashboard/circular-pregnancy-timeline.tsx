@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react'
-import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
-import Animated, {
-  useAnimatedProps,
-  useSharedValue,
-  withSpring,
-  withRepeat,
-  withSequence,
-  withTiming,
+import { Calendar, Heart, Sparkles } from 'lucide-react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  Animated,
   Easing,
-} from 'react-native-reanimated';
-import { Heart, Sparkles, Calendar } from 'lucide-react-native';
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -26,7 +24,9 @@ export interface CircularPregnancyTimelineProps {
   onPressLogSymptoms?: () => void;
 }
 
-export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps> = ({
+export const CircularPregnancyTimeline: React.FC<
+  CircularPregnancyTimelineProps
+> = ({
   currentWeek = 24,
   currentDayInWeek = 3,
   totalWeeks = 40,
@@ -53,40 +53,62 @@ export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps>
   const circumference = 2 * Math.PI * radius;
 
   // Calculate Progress (0.0 to 1.0)
-  const progressRatio = Math.min(Math.max((currentWeek + currentDayInWeek / 7) / totalWeeks, 0.02), 1);
+  const progressRatio = Math.min(
+    Math.max((currentWeek + currentDayInWeek / 7) / totalWeeks, 0.02),
+    1
+  );
   const strokeDashoffsetTarget = circumference * (1 - progressRatio);
 
-  // Reanimated Values
-  const animatedProgress = useSharedValue(circumference);
-  const pulseScale = useSharedValue(1);
+  // React Native Core Animated Values (100% compatible with Expo Go & Web)
+  const animatedProgress = useRef(new Animated.Value(circumference)).current;
+  const pulseScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    animatedProgress.value = withTiming(strokeDashoffsetTarget, {
+    Animated.timing(animatedProgress, {
+      toValue: strokeDashoffsetTarget,
       duration: 1200,
       easing: Easing.out(Easing.cubic),
-    });
+      useNativeDriver: false,
+    }).start();
 
-    pulseScale.value = withRepeat(
-      withSequence(
-        withTiming(1.06, { duration: 1400, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1.0, { duration: 1400, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      true
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseScale, {
+          toValue: 1.06,
+          duration: 1400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseScale, {
+          toValue: 1.0,
+          duration: 1400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
     );
-  }, [strokeDashoffsetTarget]);
+    pulseAnimation.start();
 
-  const animatedCircleProps = useAnimatedProps(() => ({
-    strokeDashoffset: animatedProgress.value,
-  }));
+    return () => pulseAnimation.stop();
+  }, [animatedProgress, pulseScale, strokeDashoffsetTarget]);
 
   return (
     <View style={styles.container}>
       {/* SVG Ring Visualizer */}
       <View style={styles.ringWrapper}>
-        <Svg width={circleSize} height={circleSize} viewBox={`0 0 ${circleSize} ${circleSize}`}>
+        <Svg
+          width={circleSize}
+          height={circleSize}
+          viewBox={`0 0 ${circleSize} ${circleSize}`}
+        >
           <Defs>
-            <LinearGradient id="gradientRing" x1="0%" y1="0%" x2="100%" y2="100%">
+            <LinearGradient
+              id="gradientRing"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <Stop offset="0%" stopColor="#FF7575" stopOpacity="1" />
               <Stop offset="60%" stopColor="#FF9E9E" stopOpacity="1" />
               <Stop offset="100%" stopColor="#A3E6C8" stopOpacity="1" />
@@ -112,7 +134,7 @@ export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps>
             strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
-            animatedProps={animatedCircleProps}
+            strokeDashoffset={animatedProgress}
             strokeLinecap="round"
             transform={`rotate(-90 ${circleSize / 2} ${circleSize / 2})`}
           />
@@ -121,8 +143,17 @@ export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps>
         {/* Central Overlay Information Card */}
         <View style={styles.centerContent}>
           {/* Trimester Chip */}
-          <View style={[styles.trimesterBadge, { backgroundColor: `${trimester.color}22` }]}>
-            <Sparkles size={12} color={trimester.color} style={styles.badgeIcon} />
+          <View
+            style={[
+              styles.trimesterBadge,
+              { backgroundColor: `${trimester.color}22` },
+            ]}
+          >
+            <Sparkles
+              size={12}
+              color={trimester.color}
+              style={styles.badgeIcon}
+            />
             <Text style={[styles.trimesterText, { color: trimester.color }]}>
               {trimester.label.toUpperCase()}
             </Text>
@@ -135,7 +166,12 @@ export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps>
           </View>
 
           {/* Baby Size Graphic Indicator */}
-          <Animated.View style={[styles.babySizeContainer, { transform: [{ scale: pulseScale }] }]}>
+          <Animated.View
+            style={[
+              styles.babySizeContainer,
+              { transform: [{ scale: pulseScale }] },
+            ]}
+          >
             <View style={styles.babyIconWrapper}>
               <Heart size={16} color="#FF7575" fill="#FF7575" />
             </View>
@@ -171,10 +207,18 @@ export const CircularPregnancyTimeline: React.FC<CircularPregnancyTimelineProps>
       {/* Prominent Action Button */}
       {onPressLogSymptoms && (
         <Pressable
-          style={({ pressed }) => [styles.logButton, pressed && styles.logButtonPressed]}
+          style={({ pressed }) => [
+            styles.logButton,
+            pressed && styles.logButtonPressed,
+          ]}
           onPress={onPressLogSymptoms}
         >
-          <Heart size={18} color="#121212" fill="#121212" style={{ marginRight: 8 }} />
+          <Heart
+            size={18}
+            color="#121212"
+            fill="#121212"
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.logButtonText}>Log Kicks & Symptoms</Text>
         </Pressable>
       )}

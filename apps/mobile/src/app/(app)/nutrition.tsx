@@ -1,15 +1,26 @@
+import { Flame, Sparkles, Utensils } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Pressable, ActivityIndicator } from 'react-native';
-import { Sparkles, Utensils, Flame, ShieldCheck } from 'lucide-react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+
+import { MealItem } from '@/components/nutrition/meal-item';
 import { useHealthStore } from '@/store/useHealthStore';
-import { MealItem } from '@/components/nutrition/MealItem';
 
 export default function NutritionScreen() {
   const { meals, toggleMeal, generateNewDietPlan } = useHealthStore();
   const [generating, setGenerating] = useState(false);
 
   const completedCount = meals.filter((m) => m.completed).length;
-  const totalCalories = meals.reduce((sum, m) => sum + (m.completed ? m.calories : 0), 0);
+  const totalCalories = meals.reduce(
+    (sum, m) => sum + (m.completed ? m.calories : 0),
+    0
+  );
 
   const handleGeneratePlan = async () => {
     setGenerating(true);
@@ -23,12 +34,16 @@ export default function NutritionScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.headerTitle}>Prenatal Diet Plan</Text>
-          <Text style={styles.headerSubtitle}>Trimester 2 Tailored Micronutrients</Text>
+          <Text style={styles.headerSubtitle}>
+            Trimester 2 Tailored Micronutrients
+          </Text>
         </View>
 
         <View style={styles.badge}>
           <Utensils size={12} color="#A3E6C8" style={{ marginRight: 4 }} />
-          <Text style={styles.badgeText}>{completedCount}/{meals.length} Meals</Text>
+          <Text style={styles.badgeText}>
+            {completedCount}/{meals.length} Meals
+          </Text>
         </View>
       </View>
 
@@ -39,7 +54,9 @@ export default function NutritionScreen() {
             <Text style={styles.progressLabel}>Consumed Calories</Text>
             <View style={styles.valRow}>
               <Flame size={16} color="#FF7575" style={{ marginRight: 4 }} />
-              <Text style={styles.progressVal}>{totalCalories} / 2,200 kcal</Text>
+              <Text style={styles.progressVal}>
+                {totalCalories} / 2,200 kcal
+              </Text>
             </View>
           </View>
           <View style={styles.progressItemRight}>
@@ -69,12 +86,18 @@ export default function NutritionScreen() {
         disabled={generating}
       >
         {generating ? (
-          <ActivityIndicator size="small" color="#121212" style={{ marginRight: 8 }} />
+          <ActivityIndicator
+            size="small"
+            color="#121212"
+            style={{ marginRight: 8 }}
+          />
         ) : (
           <Sparkles size={18} color="#121212" style={{ marginRight: 8 }} />
         )}
         <Text style={styles.generateButtonText}>
-          {generating ? 'Calculating Nutritional Plan...' : 'Generate Personal Plan'}
+          {generating
+            ? 'Calculating Nutritional Plan...'
+            : 'Generate Personal Plan'}
         </Text>
       </Pressable>
 

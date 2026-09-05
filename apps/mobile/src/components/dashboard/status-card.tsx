@@ -1,6 +1,12 @@
+import {
+  Calendar,
+  ChevronRight,
+  Clock,
+  Heart,
+  Stethoscope,
+} from 'lucide-react-native';
 import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { Calendar, Heart, ChevronRight, Clock, Stethoscope } from 'lucide-react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export interface StatusCardProps {
   type: 'baby_size' | 'appointment';
@@ -27,11 +33,19 @@ export const StatusCard: React.FC<StatusCardProps> = ({
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.cardContainer, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.cardContainer,
+        pressed && styles.cardPressed,
+      ]}
       onPress={onPress}
     >
       <View style={styles.headerRow}>
-        <View style={[styles.iconWrapper, { backgroundColor: isBabySize ? '#A3E6C822' : '#FF757522' }]}>
+        <View
+          style={[
+            styles.iconWrapper,
+            { backgroundColor: isBabySize ? '#A3E6C822' : '#FF757522' },
+          ]}
+        >
           {isBabySize ? (
             <Heart size={20} color="#A3E6C8" fill="#A3E6C8" />
           ) : (
@@ -41,7 +55,9 @@ export const StatusCard: React.FC<StatusCardProps> = ({
 
         {badgeText && (
           <View style={[styles.badge, { backgroundColor: `${badgeColor}22` }]}>
-            <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
+            <Text style={[styles.badgeText, { color: badgeColor }]}>
+              {badgeText}
+            </Text>
           </View>
         )}
       </View>
@@ -55,7 +71,11 @@ export const StatusCard: React.FC<StatusCardProps> = ({
         <View style={styles.footerRow}>
           {detailPrimary && (
             <View style={styles.detailItem}>
-              {isBabySize ? <Clock size={12} color="#6E6E80" /> : <Stethoscope size={12} color="#6E6E80" />}
+              {isBabySize ? (
+                <Clock size={12} color="#6E6E80" />
+              ) : (
+                <Stethoscope size={12} color="#6E6E80" />
+              )}
               <Text style={styles.detailText}>{detailPrimary}</Text>
             </View>
           )}

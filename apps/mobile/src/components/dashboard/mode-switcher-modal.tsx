@@ -1,14 +1,18 @@
+import { Calendar, Check, Heart, X } from 'lucide-react-native';
 import React from 'react';
-import { StyleSheet, Text, View, Pressable, Modal } from 'react-native';
-import { Heart, Calendar, Check, X } from 'lucide-react-native';
-import { useHealthStore, AppMode } from '@/store/useHealthStore';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { type AppMode, useHealthStore } from '@/store/useHealthStore';
 
 export interface ModeSwitcherModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, onClose }) => {
+export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({
+  visible,
+  onClose,
+}) => {
   const { mode, setMode } = useHealthStore();
 
   const handleSelectMode = (newMode: AppMode) => {
@@ -17,7 +21,12 @@ export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, o
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <View style={styles.headerRow}>
@@ -32,7 +41,10 @@ export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, o
 
           {/* Option 1: Pregnancy Mode */}
           <Pressable
-            style={[styles.optionCard, mode === 'pregnancy' && styles.optionCardActive]}
+            style={[
+              styles.optionCard,
+              mode === 'pregnancy' && styles.optionCardActive,
+            ]}
             onPress={() => handleSelectMode('pregnancy')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#FF757522' }]}>
@@ -41,7 +53,8 @@ export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, o
             <View style={styles.optionTextContent}>
               <Text style={styles.optionTitle}>Pregnancy Tracking</Text>
               <Text style={styles.optionDescription}>
-                Weekly baby growth, trimester countdown, kick counter & fetal activity.
+                Weekly baby growth, trimester countdown, kick counter & fetal
+                activity.
               </Text>
             </View>
             {mode === 'pregnancy' && <Check size={20} color="#FF7575" />}
@@ -49,7 +62,10 @@ export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, o
 
           {/* Option 2: Cycle Tracking Mode */}
           <Pressable
-            style={[styles.optionCard, mode === 'cycle' && styles.optionCardActive]}
+            style={[
+              styles.optionCard,
+              mode === 'cycle' && styles.optionCardActive,
+            ]}
             onPress={() => handleSelectMode('cycle')}
           >
             <View style={[styles.iconBox, { backgroundColor: '#A3E6C822' }]}>
@@ -58,7 +74,8 @@ export const ModeSwitcherModal: React.FC<ModeSwitcherModalProps> = ({ visible, o
             <View style={styles.optionTextContent}>
               <Text style={styles.optionTitle}>Cycle & Period Tracking</Text>
               <Text style={styles.optionDescription}>
-                Ovulation window, period prediction, ovulation symptoms & cycle history.
+                Ovulation window, period prediction, ovulation symptoms & cycle
+                history.
               </Text>
             </View>
             {mode === 'cycle' && <Check size={20} color="#A3E6C8" />}

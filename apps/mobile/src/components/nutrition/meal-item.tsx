@@ -1,7 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { Check, Flame, Utensils } from 'lucide-react-native';
-import { MealEntry } from '@/store/useHealthStore';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { type MealEntry } from '@/store/useHealthStore';
 
 export interface MealItemProps {
   meal: MealEntry;
@@ -38,7 +39,9 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onToggle }) => {
       <View style={styles.topRow}>
         <View style={[styles.badge, { backgroundColor: `${badge.color}22` }]}>
           <Utensils size={10} color={badge.color} style={{ marginRight: 4 }} />
-          <Text style={[styles.badgeText, { color: badge.color }]}>{badge.label}</Text>
+          <Text style={[styles.badgeText, { color: badge.color }]}>
+            {badge.label}
+          </Text>
         </View>
 
         <View style={styles.calorieRow}>
@@ -47,7 +50,11 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onToggle }) => {
         </View>
       </View>
 
-      <Text style={[styles.mealTitle, isCompleted && styles.mealTitleCompleted]}>{meal.title}</Text>
+      <Text
+        style={[styles.mealTitle, isCompleted && styles.mealTitleCompleted]}
+      >
+        {meal.title}
+      </Text>
 
       <Text style={styles.mealDescription}>{meal.description}</Text>
 
@@ -59,7 +66,12 @@ export const MealItem: React.FC<MealItemProps> = ({ meal, onToggle }) => {
           {isCompleted && <Check size={14} color="#121212" strokeWidth={3} />}
         </Pressable>
 
-        <Text style={[styles.checkboxLabel, isCompleted && styles.checkboxLabelChecked]}>
+        <Text
+          style={[
+            styles.checkboxLabel,
+            isCompleted && styles.checkboxLabelChecked,
+          ]}
+        >
           {isCompleted ? 'Completed' : 'Mark as Consumed'}
         </Text>
       </View>

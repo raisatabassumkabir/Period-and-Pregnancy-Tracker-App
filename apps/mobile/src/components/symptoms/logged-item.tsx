@@ -1,16 +1,17 @@
-import React from 'react';
-import { StyleSheet, Text, View, Switch, Pressable } from 'react-native';
 import {
-  Footprints,
   Activity,
   BatteryLow,
-  ShieldAlert,
   Droplets,
-  Smile,
+  Footprints,
   Heart,
+  ShieldAlert,
+  Smile,
   Zap,
 } from 'lucide-react-native';
-import { SymptomEntry } from '@/store/useHealthStore';
+import React from 'react';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+
+import { type SymptomEntry } from '@/store/useHealthStore';
 
 export interface LoggedItemProps {
   symptom: SymptomEntry;
@@ -37,7 +38,10 @@ const getIconComponent = (iconName: string, color: string) => {
   }
 };
 
-export const LoggedItem: React.FC<LoggedItemProps> = ({ symptom, onToggle }) => {
+export const LoggedItem: React.FC<LoggedItemProps> = ({
+  symptom,
+  onToggle,
+}) => {
   const isLogged = symptom.logged;
   const accentColor = isLogged ? '#FF7575' : '#6E6E80';
 
@@ -63,22 +67,33 @@ export const LoggedItem: React.FC<LoggedItemProps> = ({ symptom, onToggle }) => 
       ]}
       onPress={() => onToggle(symptom.id)}
     >
-      <View style={[styles.iconWrapper, { backgroundColor: isLogged ? '#FF757522' : '#2A2A32' }]}>
+      <View
+        style={[
+          styles.iconWrapper,
+          { backgroundColor: isLogged ? '#FF757522' : '#2A2A32' },
+        ]}
+      >
         {getIconComponent(symptom.icon, accentColor)}
       </View>
 
       <View style={styles.textContainer}>
         <View style={styles.titleRow}>
-          <Text style={[styles.titleText, isLogged && styles.titleTextLogged]}>{symptom.name}</Text>
+          <Text style={[styles.titleText, isLogged && styles.titleTextLogged]}>
+            {symptom.name}
+          </Text>
         </View>
 
         <View style={styles.badgeRow}>
           <View style={[styles.intensityBadge, { backgroundColor: badge.bg }]}>
             <Zap size={10} color={badge.color} style={{ marginRight: 3 }} />
-            <Text style={[styles.intensityText, { color: badge.color }]}>{badge.label}</Text>
+            <Text style={[styles.intensityText, { color: badge.color }]}>
+              {badge.label}
+            </Text>
           </View>
 
-          <Text style={styles.categoryText}>{symptom.category.toUpperCase()}</Text>
+          <Text style={styles.categoryText}>
+            {symptom.category.toUpperCase()}
+          </Text>
         </View>
       </View>
 

@@ -1,9 +1,10 @@
+import { Calendar, Sparkles } from 'lucide-react-native';
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Calendar, Activity, Sparkles } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { FetalActivityLogger } from '@/components/symptoms/fetal-activity-logger';
+import { LoggedItem } from '@/components/symptoms/logged-item';
 import { useHealthStore } from '@/store/useHealthStore';
-import { LoggedItem } from '@/components/symptoms/LoggedItem';
-import { FetalActivityLogger } from '@/components/symptoms/FetalActivityLogger';
 
 export default function SymptomsScreen() {
   const { symptoms, toggleSymptom } = useHealthStore();

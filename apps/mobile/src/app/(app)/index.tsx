@@ -10,9 +10,9 @@ import {
   View,
 } from 'react-native';
 
-import { CircularPregnancyTimeline } from '@/components/dashboard/CircularPregnancyTimeline';
-import { ModeSwitcherModal } from '@/components/dashboard/ModeSwitcherModal';
-import { StatusCard } from '@/components/dashboard/StatusCard';
+import { CircularPregnancyTimeline } from '@/components/dashboard/circular-pregnancy-timeline';
+import { ModeSwitcherModal } from '@/components/dashboard/mode-switcher-modal';
+import { StatusCard } from '@/components/dashboard/status-card';
 import { useHealthStore } from '@/store/useHealthStore';
 
 export default function DashboardScreen() {
