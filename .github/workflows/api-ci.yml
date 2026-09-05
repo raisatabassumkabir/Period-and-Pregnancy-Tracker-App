@@ -1,0 +1,55 @@
+name: api-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-ci.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      # Non-superuser role created below — RLS tests must NOT skip in CI.
+      DATABASE_URL: postgres://femtech:femtech@localhost:5432/femtech
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install 3.12
+      - run: uv sync
+      - name: Create non-superuser app role (RLS must bind in CI)
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c \
+            "CREATE ROLE femtech WITH LOGIN PASSWORD 'femtech' NOSUPERUSER NOBYPASSRLS CREATEDB;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c \
+            "CREATE DATABASE femtech OWNER femtech;"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d template1 -c \
+            "CREATE EXTENSION IF NOT EXISTS vector;"
+      - run: uv run ruff check .
+      - name: Owned-queryset lint (RULE 1)
+        run: uv run python scripts/lint_owned_queries.py
+      - run: uv run pytest -v

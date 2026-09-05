@@ -1,0 +1,28 @@
+services:
+  db:
+    # pgvector preinstalled — plain postgres:16 fails on CREATE EXTENSION vector.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # Creates the NON-superuser `femtech` role the app connects as.
+      # Do not connect the app as `postgres`: superusers bypass RLS entirely
+      # (even with FORCE), which silently disables security layer 2.
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
