@@ -1,33 +1,3 @@
-/**
- * Modal
- * Dependencies:
- * - @gorhom/bottom-sheet.
- *
- * Props:
- * - All `BottomSheetModalProps` props.
- * - `title` (string | undefined): Optional title for the modal header.
- *
- * Usage Example:
- * import { Modal, useModal } from '@gorhom/bottom-sheet';
- *
- * function DisplayModal() {
- *   const { ref, present, dismiss } = useModal();
- *
- *   return (
- *     <View>
- *       <Modal
- *         snapPoints={['60%']} // optional
- *         title="Modal Title"
- *         ref={ref}
- *       >
- *         Modal Content
- *       </Modal>
- *     </View>
- *   );
- * }
- *
- */
-
 import type {
   BottomSheetBackdropProps,
   BottomSheetModalProps,
@@ -35,7 +5,6 @@ import type {
 import { BottomSheetModal, useBottomSheet } from '@gorhom/bottom-sheet';
 import * as React from 'react';
 import { BackHandler, Pressable, View } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Path, Svg } from 'react-native-svg';
 
 import { Text } from './text';
@@ -87,7 +56,6 @@ export const Modal = React.forwardRef(
       () => (modal.ref.current as BottomSheetModal) || null
     );
 
-    // A sheet index of -1 means dismissed; anything else means it is on screen.
     const handleChange = React.useCallback<
       NonNullable<BottomSheetModalProps['onChange']>
     >(
@@ -103,10 +71,6 @@ export const Modal = React.forwardRef(
       onDismiss?.();
     }, [onDismiss]);
 
-    // Android's hardware back has to close the sheet. Without this the sheet
-    // is not listening, so the press falls through to the navigator and pops
-    // the route *behind* the sheet — the screen changes while the sheet stays
-    // open. Returning true consumes the event.
     React.useEffect(() => {
       if (!isOpen) return;
       const subscription = BackHandler.addEventListener(
@@ -146,19 +110,11 @@ export const Modal = React.forwardRef(
   }
 );
 
-/**
- * Custom Backdrop
- */
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 const CustomBackdrop = ({ style }: BottomSheetBackdropProps) => {
   const { close } = useBottomSheet();
   return (
-    <AnimatedPressable
+    <Pressable
       onPress={() => close()}
-      entering={FadeIn.duration(50)}
-      exiting={FadeOut.duration(20)}
       style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.4)' }]}
     />
   );
@@ -167,15 +123,6 @@ const CustomBackdrop = ({ style }: BottomSheetBackdropProps) => {
 export const renderBackdrop = (props: BottomSheetBackdropProps) => (
   <CustomBackdrop {...props} />
 );
-
-/**
- *
- * @param detached
- * @returns
- *
- * @description
- * In case the modal is detached, we need to add some extra props to the modal to make it look like a detached modal.
- */
 
 const getDetachedProps = (detached: boolean) => {
   if (detached) {
@@ -187,10 +134,6 @@ const getDetachedProps = (detached: boolean) => {
   }
   return {} as Partial<BottomSheetModalProps>;
 };
-
-/**
- * ModalHeader
- */
 
 const ModalHeader = React.memo(({ title, dismiss }: ModalHeaderProps) => {
   return (
