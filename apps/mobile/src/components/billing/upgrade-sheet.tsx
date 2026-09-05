@@ -1,4 +1,5 @@
 import { type BottomSheetModal } from '@gorhom/bottom-sheet';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import {
   AlertCircle,
   Check,
@@ -246,8 +247,6 @@ const ErrorBanner = ({ message }: ErrorBannerProps) => {
   );
 };
 
-import Constants, { ExecutionEnvironment } from 'expo-constants';
-
 const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient ||
   Constants.appOwnership === 'expo';
@@ -257,9 +256,6 @@ const isExpoGo =
  * 402 interceptor and explicit "Go premium" buttons feed.
  */
 export const UpgradeSheet = () => {
-  if (isExpoGo) {
-    return null;
-  }
   const ref = useRef<BottomSheetModal>(null);
   const visible = useUpgrade.use.visible();
   const detail = useUpgrade.use.detail();
@@ -277,6 +273,10 @@ export const UpgradeSheet = () => {
       ref.current?.dismiss();
     }
   }, [visible]);
+
+  if (isExpoGo) {
+    return null;
+  }
 
   // When the sheet is dismissed by the user (drag/backdrop), sync store
   const handleDismiss = () => {
