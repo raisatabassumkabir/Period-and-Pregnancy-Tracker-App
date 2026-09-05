@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "about": "حول التطبيق ",
+    "account": "الحساب",
+    "app_name": "اسم التطبيق",
+    "arabic": "عربي",
+    "english": "إنجليزي",
+    "footer": "Made with care",
+    "generale": "عام",
+    "language": "لغة",
+    "links": "الروابط",
+    "logout": "تسجيل خروج",
+    "privacy": "سياسة الخصوصية",
+    "rate": "تقييم",
+    "share": "شارك",
+    "support": "الدعم",
+    "support_us": "ادعمنا",
+    "terms": "شروط الخدمة",
+    "theme": {
+      "dark": "مظلم",
+      "light": "خفيفة",
+      "system": "System",
+      "title": "سمة"
+    },
+    "palette": {
+      "title": "لوحة الألوان"
+    },
+    "title": "إعدادات",
+    "version": "إصدار",
+    "delete_account": {
+      "title": "حذف الحساب",
+      "message": "سيؤدي هذا إلى حذف حسابك وبنك الكلمات وسجل الاختبارات وربط الاشتراك نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف",
+      "done": "تم حذف حسابك.",
+      "failed": "تعذر حذف الحساب"
+    }
+  },
+  "common": {
+    "cancel": "إلغاء"
+  }
+}

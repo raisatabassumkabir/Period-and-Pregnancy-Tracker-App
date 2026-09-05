@@ -1,0 +1,18 @@
+appId: ${APP_ID}
+env:
+  EMAIL: 'e2e@test.com'
+  PASSWORD: 'password123'
+tags:
+  - util
+---
+# Signed out, the app lands on `/login`. The onboarding branch is kept for the
+# day `/onboarding` becomes reachable again; today it is simply never visible.
+- runFlow:
+    when:
+      visible:
+        id: 'onboarding-login'
+    file: onboarding.yaml
+- runFlow:
+    when:
+      visible: 'Login with password'
+    file: login.yaml

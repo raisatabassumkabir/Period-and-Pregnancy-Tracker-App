@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($f = \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-OneDrive-Desktop-Period-and-Pregnancy-Tracker-App\\\\7acfa548-d3aa-447d-8397-e8de7432ff65\\\\scratchpad\\\\pg16.zip\"; if \\(Test-Path $f\\) { \"{0:N1} MB so far\" -f \\(\\(Get-Item $f\\).Length / 1MB\\) } else { \"not started yet\" })",
+      "PowerShell($f = \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-User-OneDrive-Desktop-Period-and-Pregnancy-Tracker-App\\\\7acfa548-d3aa-447d-8397-e8de7432ff65\\\\scratchpad\\\\pg16.zip\"; \"{0:N1} MB\" -f \\(\\(Get-Item $f\\).Length / 1MB\\))"
+    ]
+  }
+}

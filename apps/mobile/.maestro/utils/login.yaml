@@ -1,0 +1,20 @@
+appId: ${APP_ID}
+env:
+  EMAIL: 'e2e@test.com'
+  PASSWORD: 'password123'
+tags:
+  - util
+---
+- tapOn:
+    id: 'email-input'
+- inputText: ${EMAIL}
+- tapOn:
+    id: 'password-input'
+- inputText: ${PASSWORD}
+- tapOn:
+    id: 'login-button'
+# The bundle has to hit the API before the tab navigator mounts.
+- extendedWaitUntil:
+    visible:
+      id: 'home-screen'
+    timeout: 30000

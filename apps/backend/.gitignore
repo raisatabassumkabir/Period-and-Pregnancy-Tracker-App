@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Env — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Django
+staticfiles/
+*.sqlite3
+
+# Node
+node_modules/
+.expo/
+
+# OS / editor
+.DS_Store
+Thumbs.db

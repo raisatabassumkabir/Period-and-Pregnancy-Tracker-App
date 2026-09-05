@@ -1,0 +1,52 @@
+appId: ${APP_ID}
+env:
+  EMAIL: 'e2e@test.com'
+  PASSWORD: 'password123'
+---
+- clearState
+- runFlow: ../utils/launch-app.yaml
+- runFlow:
+    when:
+      visible:
+        id: 'onboarding-login'
+    file: ../utils/onboarding.yaml
+- extendedWaitUntil:
+    visible: 'Login with password'
+    timeout: 60000
+
+# Submitting an empty form surfaces both zod messages.
+- tapOn:
+    id: 'login-button'
+- assertVisible: 'Enter a valid email'
+- assertVisible: 'Password must be at least 6 characters'
+
+# A malformed address keeps the email error up (re-validation is onChange
+# once the form has been submitted once).
+- tapOn:
+    id: 'email-input'
+- inputText: 'not-an-email'
+- assertVisible: 'Enter a valid email'
+
+# A valid address clears it.
+- tapOn:
+    id: 'email-input'
+- eraseText: 20
+- inputText: ${EMAIL}
+- assertNotVisible: 'Enter a valid email'
+
+# Too-short password still blocks the submit.
+- tapOn:
+    id: 'password-input'
+- inputText: '123'
+- assertVisible: 'Password must be at least 6 characters'
+
+- tapOn:
+    id: 'password-input'
+- eraseText: 10
+- inputText: ${PASSWORD}
+- tapOn:
+    id: 'login-button'
+- extendedWaitUntil:
+    visible:
+      id: 'home-screen'
+    timeout: 30000

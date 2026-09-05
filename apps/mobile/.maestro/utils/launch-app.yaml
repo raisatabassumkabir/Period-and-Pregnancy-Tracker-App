@@ -1,0 +1,49 @@
+appId: ${APP_ID}
+tags:
+  - util
+---
+# Development builds put two extra surfaces in front of the app, neither of which
+# exists in a release build:
+#   1. the expo-dev-client launcher, whenever the saved dev-server URL is gone
+#      (a `clearState` wipes it along with the rest of the app data);
+#   2. the expo dev menu, which opens itself on the first launch after an install
+#      to show its onboarding sheet. It lives in its own window, so until it is
+#      dismissed it is the *only* thing Maestro can see.
+#
+# Each branch is preceded by an optional wait: a `when:` condition is a single
+# hierarchy lookup, so without one it resolves before the surface has rendered.
+# Selectors are whole-text regexes — Maestro does not match substrings.
+- launchApp
+- extendedWaitUntil:
+    visible: 'New development server'
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      visible: 'New development server'
+    commands:
+      - tapOn: 'http://10.0.2.2:8081'
+      - extendedWaitUntil:
+          notVisible: 'New development server'
+          timeout: 90000
+# Give the JS bundle time to download and the splash screen time to clear.
+- waitForAnimationToEnd:
+    timeout: 60000
+- extendedWaitUntil:
+    visible: '.*This is the developer menu.*'
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      visible: '.*This is the developer menu.*'
+    commands:
+      - tapOn: 'Continue'
+      - waitForAnimationToEnd:
+          timeout: 10000
+- runFlow:
+    when:
+      visible: 'Element inspector'
+    commands:
+      - back
+      - waitForAnimationToEnd:
+          timeout: 10000

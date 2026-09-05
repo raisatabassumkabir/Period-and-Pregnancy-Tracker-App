@@ -1,0 +1,43 @@
+appId: ${APP_ID}
+env:
+  EMAIL: 'e2e@test.com'
+  PASSWORD: 'password123'
+---
+- runFlow: ../utils/launch-app.yaml
+- runFlow: ../utils/onboarding-and-login.yaml
+
+# A previous flow can leave the app on a pushed screen, where the tab bar is
+# not rendered. Two bounded conditional backs return to it without a loop.
+- runFlow:
+    when:
+      notVisible:
+        id: 'home-tab'
+    commands:
+      - back
+- runFlow:
+    when:
+      notVisible:
+        id: 'home-tab'
+    commands:
+      - back
+
+# Open settings → tap the upgrade card to surface the upgrade sheet.
+- tapOn:
+    id: 'settings-tab'
+- assertVisible:
+    id: 'subscription-card-upgrade'
+- tapOn:
+    id: 'subscription-card-upgrade'
+
+# Upgrade sheet shows with a title, the message, and a single CTA.
+- assertVisible:
+    id: 'upgrade-sheet-title'
+- assertVisible:
+    id: 'upgrade-sheet-cta'
+
+# Emulators without Play services get `billing-unavailable` from Play Billing; the CTA
+# surfaces that as an error banner and the sheet itself stays open.
+- tapOn:
+    id: 'upgrade-sheet-cta'
+- assertVisible:
+    id: 'upgrade-sheet-error'
