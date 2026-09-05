@@ -1,0 +1,15 @@
+flows:
+  - auth/*
+  - app/tabs.yaml
+  - app/upgrade-sheet.yaml
+
+excludeTags:
+  - util
+
+executionOrder:
+    continueOnFailure: false
+    flowsOrder:
+        - fresh-launch
+        - login-with-validation
+        - tabs
+        - upgrade-sheet

@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "about": "About",
+    "account": "Account",
+    "app_name": "App Name",
+    "arabic": "Arabic",
+    "english": "English",
+    "footer": "Made with care",
+    "generale": "General",
+    "language": "Language",
+    "links": "Links",
+    "logout": "Logout",
+    "privacy": "Privacy Policy",
+    "rate": "Rate",
+    "share": "Share",
+    "support": "Support",
+    "support_us": "Support Us",
+    "terms": "Terms of Service",
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System",
+      "title": "Theme"
+    },
+    "palette": {
+      "title": "Colour palette"
+    },
+    "title": "Settings",
+    "version": "Version",
+    "delete_account": {
+      "title": "Delete account",
+      "message": "This permanently deletes your account and all of its data. This cannot be undone.",
+      "confirm": "Delete",
+      "done": "Your account has been deleted.",
+      "failed": "Could not delete account"
+    }
+  },
+  "common": {
+    "cancel": "Cancel"
+  }
+}

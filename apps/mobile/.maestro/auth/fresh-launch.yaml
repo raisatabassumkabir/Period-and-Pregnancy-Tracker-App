@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+---
+# A wiped install has no token, so the root layout replaces `(app)` with `/login`.
+# The `/onboarding` route is never reached: nothing reads `useIsFirstTime`.
+- clearState
+- runFlow: ../utils/launch-app.yaml
+- extendedWaitUntil:
+    visible: 'Login with password'
+    timeout: 60000
+- assertVisible: 'Email address'
+- assertVisible: 'Password'
+- assertVisible:
+    id: 'login-button'
+- assertVisible: 'Register'

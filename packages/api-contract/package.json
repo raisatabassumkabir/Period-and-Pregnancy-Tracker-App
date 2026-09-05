@@ -1,0 +1,15 @@
+{
+  "name": "@repo/api-contract",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HTTP contract shared by the mobile app and whichever backend implements it (Django, Appwrite, ...).",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "sideEffects": false,
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,11 @@
+appId: ${APP_ID}
+tags:
+  - util
+---
+# Copy-independent: the welcome screen was re-skinned to the Organic system, so
+# these assert testIDs rather than the brand string they used to match on.
+- assertVisible:
+    id: 'onboarding-login'
+- tapOn:
+    id: 'onboarding-login'
+- assertVisible: 'Login with password'

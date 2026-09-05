@@ -1,0 +1,30 @@
+{
+  "name": "expo-monorepo-template",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "husky",
+    "init-app": "node scripts/init-app.js",
+    "mobile": "pnpm --filter mobile",
+    "contract": "pnpm --filter @repo/api-contract",
+    "lint": "pnpm -r --if-present lint",
+    "type-check": "pnpm -r --if-present type-check",
+    "test": "pnpm -r --if-present test",
+    "check-all": "pnpm run lint && pnpm run type-check && pnpm run test"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "react-native-css-interop@0.2.1": "patches/react-native-css-interop@0.2.1.patch"
+    }
+  }
+}

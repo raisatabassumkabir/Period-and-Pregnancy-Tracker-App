@@ -1,0 +1,28 @@
+appId: ${APP_ID}
+env:
+  EMAIL: 'e2e@test.com'
+  PASSWORD: 'password123'
+---
+- runFlow: ../utils/launch-app.yaml
+- runFlow: ../utils/onboarding-and-login.yaml
+
+# Home tab (default after login)
+- assertVisible:
+    id: 'home-tab'
+- assertVisible:
+    id: 'home-screen'
+
+# Settings tab
+- tapOn:
+    id: 'settings-tab'
+- assertVisible: 'Settings'
+- scrollUntilVisible:
+    element:
+      text: 'Logout'
+- assertVisible: 'Logout'
+
+# Back to home
+- tapOn:
+    id: 'home-tab'
+- assertVisible:
+    id: 'home-screen'

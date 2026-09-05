@@ -1,0 +1,48 @@
+# --- JS / pnpm workspace
+node_modules/
+dist/
+build/
+web-build/
+npm-debug.*
+yarn-error.log
+*.orig.*
+coverage/
+.turbo/
+
+# --- Expo / React Native (apps/mobile)
+apps/mobile/.expo/
+apps/mobile/android/
+apps/mobile/ios/
+apps/mobile/expo-env.d.ts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+play-service-account.json
+
+# --- Python / Django (apps/backend)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+db.sqlite3
+apps/backend/media/
+apps/backend/staticfiles/
+
+# --- Appwrite (apps/backend)
+apps/backend/.appwrite/
+
+# --- Environment files: commit only the *.example ones
+.env
+.env.*
+!.env.example
+
+# --- Editors / OS
+.DS_Store
+.idea/
+*.swp
