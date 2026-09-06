@@ -1,56 +1,49 @@
 import React from 'react';
-import {
-  type Control,
-  Controller,
-  type FieldValues,
-  type Path,
-} from 'react-hook-form';
-import { TextInput, type TextInputProps, View } from 'react-native';
+import type { Control, FieldValues, Path } from 'react-hook-form';
+import { useController } from 'react-hook-form';
+import type { TextInput } from 'react-native';
 
-import { usePaletteColors } from '@/lib/theme';
-
-import { Text } from './text';
+import type { NInputProps } from './input';
+import { Input } from './input';
 
 interface FormFieldProps<T extends FieldValues> extends Omit<
-  TextInputProps,
-  'value'
+  NInputProps,
+  'value' | 'onChangeText'
 > {
   control: Control<T>;
   name: Path<T>;
-  label: string;
+  /** Overrides the field's own validation message — for server errors. */
   error?: string;
+  /** Lets a screen focus this field, e.g. from the previous field's submit. */
+  inputRef?: React.Ref<TextInput>;
 }
 
-/** Labelled, react-hook-form-controlled text input with an inline error line. */
+/**
+ * A react-hook-form field wearing the shared `Input` skin. This is the only
+ * controlled text field in the app; it exists so no screen re-implements
+ * labels, focus rings or error lines.
+ */
 export function FormField<T extends FieldValues>({
   control,
   name,
-  label,
   error,
+  inputRef,
   ...inputProps
 }: FormFieldProps<T>) {
-  const colors = usePaletteColors();
+  const { field, fieldState } = useController({ control, name });
 
   return (
-    <View>
-      <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
-        {label}
-      </Text>
-      <Controller
-        control={control}
-        name={name}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            className="w-full rounded-panel border border-divider bg-surface p-4 font-body text-base text-ink"
-            placeholderTextColor={colors.tone[500]}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            {...inputProps}
-          />
-        )}
-      />
-      {error && <Text className="mt-1 text-sm text-danger-500">{error}</Text>}
-    </View>
+    <Input
+      // The caller's ref is forwarded as-is so React performs the assignment;
+      // merging it with react-hook-form's own `field.ref` would mean mutating
+      // a prop. The only thing that costs us is `form.setFocus(name)`, which
+      // no form here uses — screens chain focus through these refs instead.
+      ref={inputRef}
+      onChangeText={field.onChange}
+      onBlur={field.onBlur}
+      value={(field.value as string) ?? ''}
+      error={error ?? fieldState.error?.message}
+      {...inputProps}
+    />
   );
 }

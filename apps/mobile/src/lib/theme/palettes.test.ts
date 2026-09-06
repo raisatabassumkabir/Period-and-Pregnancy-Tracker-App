@@ -50,10 +50,22 @@ function eachPalette(fn: (tokens: PaletteTokens, label: string) => void) {
 }
 
 describe('palette structure', () => {
-  it('exposes exactly six palettes and defaults to organic', () => {
-    expect(PALETTE_IDS).toHaveLength(6);
-    expect(DEFAULT_PALETTE_ID).toBe('organic');
+  it('exposes exactly seven palettes and defaults to the Happy Women brand', () => {
+    expect(PALETTE_IDS).toHaveLength(7);
+    expect(DEFAULT_PALETTE_ID).toBe('happy');
     expect(PALETTES[DEFAULT_PALETTE_ID]).toBeDefined();
+  });
+
+  it('pins the Happy Women brand hexes', () => {
+    // The design system hands these down verbatim; drifting from them
+    // un-brands every screen at once.
+    expect(PALETTES.happy.dark['--color-bg']).toBe('18 18 18'); // #121212
+    expect(PALETTES.happy.dark['--color-accent']).toBe('255 117 117'); // #FF7575
+    expect(PALETTES.happy.swatch).toEqual({
+      accent: '#FF7575',
+      accent2: '#B9A6FF',
+      bg: '#121212',
+    });
   });
 
   it('defines every token in both modes for every palette', () => {

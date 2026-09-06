@@ -1,154 +1,91 @@
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import type { TextInput } from 'react-native';
 
 import {
-  FocusAwareStatusBar,
-  Kicker,
-  SafeAreaView,
-  Text,
-  View,
-} from '@/components/ui';
-import { FormField } from '@/components/ui/form-field';
-import { ArrowLeft } from '@/components/ui/icons';
+  AuthFooter,
+  AuthLayout,
+  EmailInput,
+  PasswordHints,
+  PasswordInput,
+} from '@/components/auth';
+import { Button, ErrorBanner, FormField } from '@/components/ui';
 import { useRegisterLogic } from '@/hooks/use-register-logic';
-import { usePaletteColors } from '@/lib';
-
-const PRESS_OPACITY = 0.85;
 
 export default function Register() {
   const router = useRouter();
   const { form, handleRegister, isSubmitting, errors } = useRegisterLogic();
-  const colors = usePaletteColors();
+  const emailRef = React.useRef<TextInput | null>(null);
+  const passwordRef = React.useRef<TextInput | null>(null);
+  const confirmRef = React.useRef<TextInput | null>(null);
 
-  // Redirects are the root layout's job — see .claude/rules/react-native.md.
+  const submit = form.handleSubmit(handleRegister);
+  const password = form.watch('password');
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas">
-      <FocusAwareStatusBar />
-      <View className="flex-row items-center p-4">
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={router.back}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          className="mr-4 rounded-full p-2 active:opacity-70"
-        >
-          <ArrowLeft color={colors.ink} />
-        </TouchableOpacity>
-      </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: 24,
-            paddingBottom: 40,
-          }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 justify-center space-y-8">
-            <View>
-              <Kicker>Get started</Kicker>
-              <Text className="mt-1 font-heading text-[30px] text-ink">
-                Create account
-              </Text>
-              <Text className="mt-2 text-[15px] text-tone-700">
-                Join us and get started in a minute.
-              </Text>
-            </View>
-            <View className="space-y-5">
-              {errors.root && (
-                <View className="mb-2 rounded-panel border border-danger-200 bg-danger-50 p-4">
-                  <Text className="font-body-semibold text-sm text-danger-600">
-                    {errors.root.message}
-                  </Text>
-                </View>
-              )}
-              <FormField
-                control={form.control}
-                name="fullName"
-                label="Full Name (Optional)"
-                placeholder="John Doe"
-                autoCapitalize="words"
-                returnKeyType="next"
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                label="Email Address"
-                placeholder="you@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
-                error={errors.email?.message}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                label="Password"
-                placeholder="••••••••"
-                secureTextEntry
-                returnKeyType="next"
-                error={errors.password?.message}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                label="Confirm Password"
-                placeholder="••••••••"
-                secureTextEntry
-                returnKeyType="done"
-                onSubmitEditing={form.handleSubmit(handleRegister)}
-                error={errors.confirmPassword?.message}
-              />
-            </View>
-            <View className="space-y-4 pt-4">
-              <TouchableOpacity
-                activeOpacity={PRESS_OPACITY}
-                onPress={form.handleSubmit(handleRegister)}
-                disabled={isSubmitting}
-                accessibilityRole="button"
-                testID="register-submit"
-                className={`w-full items-center rounded-card bg-accent py-4 ${
-                  isSubmitting ? 'opacity-70' : ''
-                }`}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color={colors.accentScale[100]} />
-                ) : (
-                  <Text className="font-body-bold text-[16px] text-accent-100">
-                    Sign up
-                  </Text>
-                )}
-              </TouchableOpacity>
-              <View className="flex-row justify-center">
-                <Text className="text-[15px] text-tone-700">
-                  Already have an account?{' '}
-                </Text>
-                <Link href="/login" asChild>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    activeOpacity={PRESS_OPACITY}
-                  >
-                    <Text className="font-body-bold text-[15px] text-accent-700">
-                      Log in
-                    </Text>
-                  </TouchableOpacity>
-                </Link>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <AuthLayout
+      testID="register-screen"
+      kicker="Get started"
+      title="Create account"
+      subtitle="Track your cycle or follow your pregnancy — private, on your terms."
+      // Onboarding `replace`s to this route, so the stack is often empty.
+      onGoBack={router.canGoBack() ? router.back : undefined}
+      footer={
+        <AuthFooter
+          question="Already have an account?"
+          linkLabel="Log in"
+          href="/login"
+          testID="register-to-login"
+        />
+      }
+    >
+      <ErrorBanner message={errors.root?.message} />
+
+      <FormField
+        control={form.control}
+        name="fullName"
+        label="Full name (optional)"
+        testID="full-name-input"
+        placeholder="Ada Lovelace"
+        autoCapitalize="words"
+        autoComplete="name"
+        returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => emailRef.current?.focus()}
+      />
+      <EmailInput
+        control={form.control}
+        inputRef={emailRef}
+        onSubmitEditing={() => passwordRef.current?.focus()}
+      />
+      <PasswordInput
+        control={form.control}
+        name="password"
+        label="Password"
+        autoComplete="new-password"
+        returnKeyType="next"
+        inputRef={passwordRef}
+        onSubmitEditing={() => confirmRef.current?.focus()}
+      />
+      <PasswordHints value={password ?? ''} />
+      <PasswordInput
+        control={form.control}
+        name="confirmPassword"
+        label="Confirm password"
+        autoComplete="new-password"
+        testID="confirm-password-input"
+        inputRef={confirmRef}
+        onSubmitEditing={submit}
+      />
+
+      <Button
+        label="Sign up"
+        size="lg"
+        className="my-0 mt-2 rounded-pill"
+        loading={isSubmitting}
+        onPress={submit}
+        testID="register-submit"
+      />
+    </AuthLayout>
   );
 }

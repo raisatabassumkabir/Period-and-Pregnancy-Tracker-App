@@ -1,4 +1,7 @@
+export { AuthFooter } from './auth-footer';
+export { AuthLayout } from './auth-layout';
 export { EmailInput } from './email-input';
-export { LoginActions } from './login-actions';
-export { LoginHeader } from './login-header';
+export { FeatureCarousel, FEATURES } from './feature-carousel';
+export { ModeStep } from './mode-step';
+export { PasswordHints } from './password-hints';
 export { PasswordInput } from './password-input';

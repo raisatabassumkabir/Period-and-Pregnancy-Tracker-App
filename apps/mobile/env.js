@@ -25,7 +25,7 @@ require('dotenv').config({
  */
 const BUNDLE_ID = 'com.example.app'; // ios bundle id
 const PACKAGE = 'com.example.app'; // android package name
-const NAME = 'AppTemplate'; // app name
+const NAME = 'Happy Women'; // app name
 const EXPO_ACCOUNT_OWNER = 'your-expo-account'; // expo account owner
 const EAS_PROJECT_ID = '00000000-0000-0000-0000-000000000000'; // eas project id
 const SCHEME = 'apptemplate'; // deep-link scheme

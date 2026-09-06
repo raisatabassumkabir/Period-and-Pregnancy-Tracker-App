@@ -52,21 +52,56 @@ Never return an error with 200.
 - Branch on `status` or `type`; never on `title`/`detail` text.
 - Client guards: `isProblemDetail`, `isPaymentRequiredProblem`, `toUpgradeDetail`.
 
+## What the Django API implements today
+
+`apps/backend` currently serves the endpoints marked **live** below. The rest of
+this document is the target contract: the types exist and the client compiles
+against them, but calling those paths returns 404 until the backend catches up.
+
+| Live endpoint | Notes |
+| --- | --- |
+| `POST auth/register/` | 201 `RegisterResponse`; optional nested `profile` |
+| `POST auth/token/` | `LoginRequest` → `TokenPairResponse` |
+| `POST auth/token/refresh/` | `RefreshTokenRequest` → `TokenPairResponse` (rotating; the old refresh is blacklisted) |
+| `GET/PUT/PATCH profiles/`, `profiles/{id}/` | `Profile` — list holds only the caller's own row |
+| `cycles/`, `cycles/{id}/` | full CRUD, `Cycle`; 409 on a duplicate `start_date` |
+| `daily-logs/`, `daily-logs/{id}/` | full CRUD, `DailyLog`; one per calendar day, 409 on a duplicate `date` |
+| `pregnancies/`, `pregnancies/{id}/` | full CRUD, `Pregnancy`; 409 on a second `active` row |
+
+Trailing slashes are required. Every list endpoint returns `PaginateQuery<T>`
+(`{ count, next, previous, results }`, page size 50, `?page=<n>`); there is no
+client-controlled page size. `temperature_celsius` is a DRF decimal and so
+crosses the wire as a **string** (`"36.60"`), in both directions.
+
+Not yet implemented: `me`, `logout`, `google`, `forgot-password`,
+`reset-password`, and everything under `payments/`. No endpoint returns 402 yet,
+though the server-side `PaymentRequired` exception is ready to raise.
+
 ## Auth
 
 Bearer JWT in `Authorization: Bearer <access_token>` on every request after
-login. The client stores the token in the device secure store.
+login. The client stores the token in the device secure store. Access tokens
+last 15 minutes; refresh tokens 30 days.
 
 | Endpoint | Request | Response |
 | --- | --- | --- |
-| `POST login` | `LoginRequest` | `LoginResponse` |
-| `POST register` | `RegisterRequest` | `RegisterResponse` (201) |
+| `POST auth/token/` **live** | `LoginRequest` | `TokenPairResponse` |
+| `POST auth/token/refresh/` **live** | `RefreshTokenRequest` | `TokenPairResponse` |
+| `POST auth/register/` **live** | `RegisterRequest` | `RegisterResponse` (201) |
 | `POST google` | `GoogleAuthRequest` | `GoogleAuthResponse` |
 | `POST forgot-password` | `ForgotPasswordRequest` | `ForgotPasswordResponse` |
 | `POST reset-password` | `ResetPasswordRequest` | `{ message }` |
 | `POST logout` | — | `LogoutResponse` |
 | `GET me` | — | `UserResponse` |
 | `DELETE me` | — | 204 (Google Play account-deletion policy) |
+
+## Health data
+
+Profiles, cycles, daily logs and pregnancies are typed in `src/health.ts`. Enum
+members (`Flow`, `Mood`, `Symptom`, `MedicalCondition`, `ProfileMode`, `Diet`,
+`BudgetTier`, `PregnancyStatus`) mirror the Django choice codes exactly — an
+unknown code is a 422 whose `errors` names the field and a count, never the
+submitted value.
 
 ## Billing
 

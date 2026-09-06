@@ -14,7 +14,10 @@ export const useRegister = createMutation<
   AxiosError<ProblemDetail>
 >({
   mutationFn: async (variables) => {
-    const response = await client.post('register', variables);
+    const response = await client.post<RegisterResponse>(
+      'auth/register/',
+      variables
+    );
     return response.data;
   },
 });

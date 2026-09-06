@@ -7,6 +7,17 @@ export interface LoginRequest {
   password: string;
 }
 
+/** `POST /api/auth/token/` and `POST /api/auth/token/refresh/` response (simplejwt pair). */
+export interface TokenPairResponse {
+  access: string;
+  refresh: string;
+}
+
+/** Refresh rotation is on: the old refresh token is blacklisted, keep both from the response. */
+export interface RefreshTokenRequest {
+  refresh: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   token_type: 'bearer';
@@ -15,13 +26,15 @@ export interface LoginResponse {
 export interface RegisterRequest {
   email: string;
   password: string;
-  full_name?: string;
+  /** Optional nested profile; validation errors come back under `errors.profile.<field>`. */
+  profile?: import('./health').ProfileWrite;
 }
 
+/** 201 body. `profile` is echoed only when it was part of the request. */
 export interface RegisterResponse {
   id: string;
   email: string;
-  message: string;
+  profile?: import('./health').Profile;
 }
 
 export interface GoogleAuthRequest {

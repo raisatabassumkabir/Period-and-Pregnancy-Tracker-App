@@ -10,7 +10,7 @@ import {
   useSegments,
 } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { vars } from 'nativewind';
+import { colorScheme, vars } from 'nativewind';
 import React, { useEffect } from 'react';
 import { LogBox, StyleSheet, View } from 'react-native';
 import FlashMessage from 'react-native-flash-message';
@@ -23,8 +23,11 @@ import {
   hydrateAuth,
   loadSelectedPalette,
   loadSelectedTheme,
+  useAppReady,
   useAuth,
+  useIsFirstTime,
   usePaletteTokens,
+  useSelectedTheme,
 } from '@/lib';
 import { registerNativeIntegrations } from '@/lib/bootstrap';
 import { useThemeConfig } from '@/lib/use-theme-config';
@@ -54,6 +57,26 @@ export default function RootLayout() {
   const navigationState = useRootNavigationState();
 
   const { status } = useAuth();
+  const [isFirstTime, , isFirstTimeReady] = useIsFirstTime();
+  const isAppReady = useAppReady();
+  const { selectedTheme } = useSelectedTheme();
+
+  // `loadSelectedTheme()` above runs at module scope and is fire-and-forget, so
+  // on a cold start nativewind can finish initialising after it and re-apply
+  // the OS scheme — leaving Settings reading "Dark" while the app renders
+  // light. Re-asserting the stored choice from inside the tree settles it.
+  useEffect(() => {
+    colorScheme.set(selectedTheme);
+  }, [selectedTheme]);
+
+  // Hold the splash until the token read, palette and router state have all
+  // landed — hiding it earlier shows an unstyled frame or the wrong screen.
+  useEffect(() => {
+    if (!isAppReady) return;
+    SplashScreen.hideAsync().catch(() => {
+      // Already hidden (a fast refresh, or a duplicate call). Nothing to do.
+    });
+  }, [isAppReady]);
 
   // The only place that redirects on auth state. Screens never do this themselves.
   useEffect(() => {
@@ -64,11 +87,21 @@ export default function RootLayout() {
     const onAuthScreen = AUTH_ROUTES.has(root);
 
     if (status === 'signOut' && inAppGroup) {
-      requestAnimationFrame(() => router.replace('/login'));
+      // Wait for the stored flag so returning users don't flash onboarding.
+      if (!isFirstTimeReady) return;
+      const target = isFirstTime ? '/onboarding' : '/login';
+      requestAnimationFrame(() => router.replace(target));
     } else if (status === 'signIn' && onAuthScreen) {
-      requestAnimationFrame(() => router.replace('/(app)/'));
+      requestAnimationFrame(() => router.replace('/(app)'));
     }
-  }, [status, segments, navigationState, router]);
+  }, [
+    status,
+    segments,
+    navigationState,
+    router,
+    isFirstTime,
+    isFirstTimeReady,
+  ]);
 
   return (
     <Providers>

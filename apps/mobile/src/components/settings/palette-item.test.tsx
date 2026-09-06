@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 
+import { clear, getItem, setItem } from '@/lib/storage';
 import { cleanup, render, screen, setup, waitFor } from '@/lib/test-utils';
 import {
   DEFAULT_PALETTE_ID,
@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 beforeEach(async () => {
-  await AsyncStorage.clear();
+  await clear();
   jest.clearAllMocks();
 });
 
@@ -61,14 +61,14 @@ describe('PaletteItem', () => {
 
     expect(usePaletteStore.getState().paletteId).toBe('rose');
     await waitFor(async () => {
-      expect(await AsyncStorage.getItem(STORAGE_KEY)).toBe('"rose"');
+      expect(await getItem<string>(STORAGE_KEY)).toBe('rose');
     });
   });
 });
 
 describe('loadSelectedPalette', () => {
   it('restores a stored palette', async () => {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify('slate'));
+    await setItem(STORAGE_KEY, 'slate');
 
     await loadSelectedPalette();
 
@@ -84,7 +84,7 @@ describe('loadSelectedPalette', () => {
 
   it('ignores a stored id this build does not know', async () => {
     // Downgrading past a palette that shipped later must not brick theming.
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify('chartreuse'));
+    await setItem(STORAGE_KEY, 'chartreuse');
 
     await loadSelectedPalette();
 

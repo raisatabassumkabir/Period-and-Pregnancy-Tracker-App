@@ -1,11 +1,17 @@
-import { SplashScreen, Tabs } from 'expo-router';
-import { House, Settings } from 'lucide-react-native';
-import React, { useCallback, useEffect } from 'react';
+import { Tabs } from 'expo-router';
+import {
+  Apple,
+  CalendarDays,
+  HeartPulse,
+  House,
+  Settings,
+  Sparkles,
+} from 'lucide-react-native';
+import React from 'react';
 
 import { useAuth, usePaletteColors } from '@/lib';
 
 const TAB_ICON_SIZE = 23;
-const SPLASH_HIDE_DELAY_MS = 1000;
 
 /**
  * Auth-gated tab bar. Add a tab by adding a file under `(app)/` and a
@@ -15,17 +21,8 @@ export default function TabLayout() {
   const status = useAuth.use.status();
   const palette = usePaletteColors();
 
-  const hideSplash = useCallback(async () => {
-    await SplashScreen.hideAsync();
-  }, []);
-  useEffect(() => {
-    if (status !== 'idle') {
-      setTimeout(() => {
-        hideSplash();
-      }, SPLASH_HIDE_DELAY_MS);
-    }
-  }, [hideSplash, status]);
-
+  // The splash is hidden by the root layout once every startup read has
+  // landed (`useAppReady`), so this layout only draws the bar.
   // Auth checks handled by Root Layout
   if (!status) return null;
   return (
@@ -49,6 +46,50 @@ export default function TabLayout() {
             <House color={color} size={TAB_ICON_SIZE} />
           ),
           tabBarButtonTestID: 'home-tab',
+        }}
+      />
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'Calendar',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <CalendarDays color={color} size={TAB_ICON_SIZE} />
+          ),
+          tabBarButtonTestID: 'calendar-tab',
+        }}
+      />
+      <Tabs.Screen
+        name="tracking"
+        options={{
+          title: 'Track',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <HeartPulse color={color} size={TAB_ICON_SIZE} />
+          ),
+          tabBarButtonTestID: 'tracking-tab',
+        }}
+      />
+      <Tabs.Screen
+        name="diet"
+        options={{
+          title: 'Diet',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Apple color={color} size={TAB_ICON_SIZE} />
+          ),
+          tabBarButtonTestID: 'diet-tab',
+        }}
+      />
+      <Tabs.Screen
+        name="assistant"
+        options={{
+          title: 'Assistant',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Sparkles color={color} size={TAB_ICON_SIZE} />
+          ),
+          tabBarButtonTestID: 'assistant-tab',
         }}
       />
       <Tabs.Screen

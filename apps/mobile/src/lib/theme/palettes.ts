@@ -22,6 +22,7 @@
  */
 
 export const PALETTE_IDS = [
+  'happy',
   'organic',
   'teal',
   'indigo',
@@ -46,9 +47,88 @@ export interface Palette {
   dark: PaletteTokens;
 }
 
-export const DEFAULT_PALETTE_ID: PaletteId = 'organic';
+export const DEFAULT_PALETTE_ID: PaletteId = 'happy';
 
 export const PALETTES: Record<PaletteId, Palette> = {
+  /**
+   * Happy Women brand palette. Authored dark-first: charcoal ground, coral
+   * accent, lavender secondary. The light ramp exists so the theme toggle
+   * still works, but `dark` is the designed surface.
+   */
+  happy: {
+    label: 'Happy Women',
+    swatch: { accent: '#FF7575', accent2: '#B9A6FF', bg: '#121212' },
+    light: {
+      '--color-bg': '255 247 247',
+      '--color-surface': '255 236 236',
+      '--color-text': '31 24 26',
+      '--color-divider': '232 214 214',
+      '--color-accent': '229 82 82',
+      '--color-accent-2': '124 104 200',
+      '--color-neutral-100': '250 246 246',
+      '--color-neutral-200': '240 232 232',
+      '--color-neutral-300': '222 212 212',
+      '--color-neutral-400': '194 182 182',
+      '--color-neutral-500': '162 150 150',
+      '--color-neutral-600': '130 120 120',
+      '--color-neutral-700': '98 90 90',
+      '--color-neutral-800': '70 64 64',
+      '--color-neutral-900': '46 42 42',
+      '--color-accent-100': '255 241 241',
+      '--color-accent-200': '255 222 222',
+      '--color-accent-300': '255 190 190',
+      '--color-accent-400': '255 150 150',
+      '--color-accent-500': '240 112 112',
+      '--color-accent-600': '210 80 80',
+      '--color-accent-700': '170 52 52',
+      '--color-accent-800': '122 34 34',
+      '--color-accent-900': '80 22 22',
+      '--color-accent-2-100': '244 240 255',
+      '--color-accent-2-200': '228 220 255',
+      '--color-accent-2-300': '206 194 255',
+      '--color-accent-2-400': '176 160 240',
+      '--color-accent-2-500': '146 128 214',
+      '--color-accent-2-600': '116 98 184',
+      '--color-accent-2-700': '88 72 150',
+      '--color-accent-2-800': '62 50 110',
+      '--color-accent-2-900': '40 32 72',
+    },
+    dark: {
+      '--color-bg': '18 18 18',
+      '--color-surface': '30 30 30',
+      '--color-text': '245 245 247',
+      '--color-divider': '46 46 46',
+      '--color-accent': '255 117 117',
+      '--color-accent-2': '185 166 255',
+      '--color-neutral-100': '18 18 18',
+      '--color-neutral-200': '30 30 30',
+      '--color-neutral-300': '44 44 44',
+      '--color-neutral-400': '64 64 64',
+      '--color-neutral-500': '92 92 92',
+      '--color-neutral-600': '128 128 128',
+      '--color-neutral-700': '168 168 168',
+      '--color-neutral-800': '208 208 208',
+      '--color-neutral-900': '240 240 240',
+      '--color-accent-100': '46 22 22',
+      '--color-accent-200': '74 30 30',
+      '--color-accent-300': '110 42 42',
+      '--color-accent-400': '150 58 58',
+      '--color-accent-500': '200 82 82',
+      '--color-accent-600': '235 100 100',
+      '--color-accent-700': '255 135 135',
+      '--color-accent-800': '255 176 176',
+      '--color-accent-900': '255 218 218',
+      '--color-accent-2-100': '30 26 48',
+      '--color-accent-2-200': '46 38 80',
+      '--color-accent-2-300': '66 54 116',
+      '--color-accent-2-400': '92 76 158',
+      '--color-accent-2-500': '124 104 200',
+      '--color-accent-2-600': '158 138 230',
+      '--color-accent-2-700': '190 172 255',
+      '--color-accent-2-800': '214 202 255',
+      '--color-accent-2-900': '236 230 255',
+    },
+  },
   organic: {
     label: 'Organic',
     swatch: { accent: '#c67139', accent2: '#7a8a5e', bg: '#f5ead8' },

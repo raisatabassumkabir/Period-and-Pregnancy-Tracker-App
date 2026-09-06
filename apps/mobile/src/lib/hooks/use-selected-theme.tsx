@@ -5,6 +5,8 @@ import { getItem, setItem } from '../storage';
 
 const SELECTED_THEME = 'SELECTED_THEME';
 export type ColorSchemeType = 'light' | 'dark' | 'system';
+/** Happy Women is designed dark-first; the OS setting only applies once opted into. */
+const DEFAULT_THEME: ColorSchemeType = 'dark';
 /**
  * this hooks should only be used while selecting the theme
  * This hooks will return the selected theme which is stored in AsyncStorage
@@ -18,7 +20,7 @@ export const useSelectedTheme = () => {
 
   useEffect(() => {
     getItem<string>(SELECTED_THEME).then((storedTheme) => {
-      const themeValue = (storedTheme ?? 'system') as ColorSchemeType;
+      const themeValue = (storedTheme ?? DEFAULT_THEME) as ColorSchemeType;
       setThemeState(themeValue);
     });
   }, []);
@@ -32,13 +34,11 @@ export const useSelectedTheme = () => {
     [setColorScheme]
   );
 
-  const selectedTheme = (theme ?? 'system') as ColorSchemeType;
+  const selectedTheme = (theme ?? DEFAULT_THEME) as ColorSchemeType;
   return { selectedTheme, setSelectedTheme } as const;
 };
-// to be used in the root file to load the selected theme from AsyncStorage
+// to be used in the root file to load the selected theme from storage
 export const loadSelectedTheme = async () => {
   const theme = await getItem<string>(SELECTED_THEME);
-  if (theme !== null) {
-    colorScheme.set(theme as ColorSchemeType);
-  }
+  colorScheme.set((theme ?? DEFAULT_THEME) as ColorSchemeType);
 };

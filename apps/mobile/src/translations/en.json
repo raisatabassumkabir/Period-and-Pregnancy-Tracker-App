@@ -37,5 +37,77 @@
   },
   "common": {
     "cancel": "Cancel"
+  },
+  "diet": {
+    "title": "Meal plan",
+    "subtitle": "Trimester-appropriate nutrition ideas",
+    "disclaimer": "General guidance only. Follow your clinician's advice for your own pregnancy.",
+    "trimesters": {
+      "first": "First",
+      "second": "Second",
+      "third": "Third"
+    },
+    "slots": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack"
+    },
+    "plans": {
+      "t1": {
+        "breakfast": {
+          "name": "Fortified porridge with berries",
+          "focus": "Folate and slow-release energy for early development"
+        },
+        "lunch": {
+          "name": "Lentil soup with wholegrain bread",
+          "focus": "Plant iron with fibre, gentle on a queasy stomach"
+        },
+        "dinner": {
+          "name": "Baked salmon with steamed greens",
+          "focus": "Omega-3 and folate; keep fish fully cooked"
+        },
+        "snack": {
+          "name": "Yoghurt with almonds",
+          "focus": "Calcium and protein between small, frequent meals"
+        }
+      },
+      "t2": {
+        "breakfast": {
+          "name": "Eggs on wholegrain toast with spinach",
+          "focus": "Iron and protein as blood volume rises"
+        },
+        "lunch": {
+          "name": "Chickpea and quinoa bowl",
+          "focus": "Complete protein with iron-absorbing vitamin C"
+        },
+        "dinner": {
+          "name": "Lean beef or bean stew with brown rice",
+          "focus": "Iron and zinc for rapid growth"
+        },
+        "snack": {
+          "name": "Cheese with dried apricots",
+          "focus": "Calcium and iron for bone development"
+        }
+      },
+      "t3": {
+        "breakfast": {
+          "name": "Oats with chia, banana and milk",
+          "focus": "Fibre and calcium; helps with late-pregnancy digestion"
+        },
+        "lunch": {
+          "name": "Grilled chicken or tofu salad",
+          "focus": "Protein without heaviness as stomach space shrinks"
+        },
+        "dinner": {
+          "name": "Vegetable and lentil curry with rice",
+          "focus": "Steady energy, iron and fluid"
+        },
+        "snack": {
+          "name": "Dates with a handful of walnuts",
+          "focus": "Energy-dense and rich in fibre"
+        }
+      }
+    }
   }
 }

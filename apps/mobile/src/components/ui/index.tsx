@@ -1,17 +1,21 @@
 import { cssInterop } from 'nativewind';
 import Svg from 'react-native-svg';
 
+export * from './brand';
 export * from './button';
 export * from './checkbox';
 export { default as colors } from './colors';
 export * from './error-banner';
 export * from './focus-aware-status-bar';
 export * from './form-field';
+export * from './glass-card';
+export * from './gradient-backdrop';
 export * from './image';
 export * from './input';
 export * from './kicker';
 export * from './list';
 export * from './modal';
+export * from './option-pills';
 export * from './pill';
 export * from './progress-bar';
 export * from './progress-track';

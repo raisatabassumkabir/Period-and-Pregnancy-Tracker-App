@@ -1,5 +1,6 @@
 export * from './arrow-left';
 export * from './arrow-right';
+export * from './baby-stage';
 export * from './caret-down';
 export * from './eye';
 export * from './eye-off';
@@ -12,4 +13,5 @@ export * from './settings';
 export * from './share';
 export * from './style';
 export * from './support';
+export * from './uterus';
 export * from './website';

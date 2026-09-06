@@ -18,8 +18,10 @@ export const useIsFirstTime = () => {
     setIsFirstTimeState(value);
   };
 
+  // Third element: false until the stored value has loaded, so the root
+  // layout can hold its redirect instead of flashing onboarding at returners.
   if (isFirstTime === null) {
-    return [true, setIsFirstTime] as const;
+    return [true, setIsFirstTime, false] as const;
   }
-  return [isFirstTime, setIsFirstTime] as const;
+  return [isFirstTime, setIsFirstTime, true] as const;
 };

@@ -1,16 +1,18 @@
-import { Env } from '@env';
 import { useRouter } from 'expo-router';
 import React from 'react';
 
+import { FeatureCarousel, ModeStep } from '@/components/auth';
 import {
+  BrandLockup,
   FocusAwareStatusBar,
-  Kicker,
+  GradientBackdrop,
   Pressable,
   SafeAreaView,
   Text,
   View,
 } from '@/components/ui';
 import { useIsFirstTime } from '@/lib';
+import { useTrackingMode } from '@/lib/health';
 
 type ButtonVariant = 'primary' | 'secondary' | 'link';
 
@@ -26,11 +28,13 @@ const BUTTON_STYLES: Record<
   { container: string; label: string }
 > = {
   primary: {
-    container: 'mb-3 w-full items-center rounded-card bg-accent px-6 py-4',
+    container:
+      'mb-3 h-14 w-full items-center justify-center rounded-pill bg-accent px-6',
     label: 'font-body-bold text-[17px] text-accent-100',
   },
   secondary: {
-    container: 'mb-4 w-full items-center rounded-card bg-surface px-6 py-4',
+    container:
+      'mb-4 h-14 w-full items-center justify-center rounded-pill border border-black/5 bg-white/60 px-6 dark:border-white/10 dark:bg-white/5',
     label: 'font-body-bold text-[17px] text-ink',
   },
   link: {
@@ -38,6 +42,8 @@ const BUTTON_STYLES: Record<
     label: 'font-body-semibold text-[15px] text-accent-700',
   },
 };
+
+const LOCKUP_MARK_SIZE = 44;
 
 function OnboardingButton({
   label,
@@ -94,39 +100,54 @@ function OnboardingActions({
   );
 }
 
+type OnboardingStep = 'welcome' | 'mode';
+
 /**
- * Pre-auth welcome. Not on the default path: the root layout sends a
- * signed-out user straight to `/login`. Route here from `useIsFirstTime`
- * if the app wants a welcome step.
+ * First-launch flow: feature carousel → mode choice → login/register. The root
+ * layout routes signed-out first-timers here via `useIsFirstTime`; every exit
+ * clears the flag so later launches go straight to `/login`.
  */
 export default function Onboarding() {
-  const [_, setIsFirstTime] = useIsFirstTime();
+  const [, setIsFirstTime] = useIsFirstTime();
+  const [mode, setMode] = useTrackingMode();
+  const [step, setStep] = React.useState<OnboardingStep>('welcome');
   const router = useRouter();
 
-  const handleSkip = () => {
-    setIsFirstTime(false);
-    router.replace('/');
+  const finish = async (destination: '/login' | '/register' | '/') => {
+    await setIsFirstTime(false);
+    router.replace(destination);
   };
 
   return (
-    <View className="flex-1 bg-canvas">
+    <View className="flex-1 bg-canvas" testID="onboarding-screen">
+      <GradientBackdrop />
       <FocusAwareStatusBar />
       <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center px-6">
-          <Kicker>Welcome</Kicker>
-          <Text className="mt-3 text-center font-heading text-[44px] text-accent">
-            {Env.NAME}
-          </Text>
-          <View className="mt-2 h-1.5 w-36 rounded-full bg-accent2-600" />
-          <Text className="mt-5 max-w-[280px] text-center text-[16px] text-tone-700">
-            One sentence about what this app does for the person holding it.
-          </Text>
+        <View className="items-center pt-4">
+          <BrandLockup markSize={LOCKUP_MARK_SIZE} />
         </View>
-        <OnboardingActions
-          onLogin={() => router.push('/login')}
-          onGetStarted={() => router.push('/register')}
-          onSkip={handleSkip}
-        />
+        <View className="flex-1 justify-center">
+          {step === 'welcome' ? <FeatureCarousel /> : null}
+          {step === 'mode' ? (
+            <ModeStep value={mode} onChange={setMode} />
+          ) : null}
+        </View>
+        {step === 'welcome' ? (
+          <View className="px-6 pb-6">
+            <OnboardingButton
+              label="Continue"
+              onPress={() => setStep('mode')}
+              variant="primary"
+              testID="onboarding-continue"
+            />
+          </View>
+        ) : (
+          <OnboardingActions
+            onLogin={() => finish('/login')}
+            onGetStarted={() => finish('/register')}
+            onSkip={() => finish('/')}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

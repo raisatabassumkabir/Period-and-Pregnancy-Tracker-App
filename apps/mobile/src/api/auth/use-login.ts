@@ -2,15 +2,18 @@ import type { AxiosError } from 'axios';
 import { createMutation } from 'react-query-kit';
 
 import { client } from '../common';
-import type { LoginRequest, LoginResponse, ProblemDetail } from '../types';
+import type { LoginRequest, ProblemDetail, TokenPairResponse } from '../types';
 
 export const useLogin = createMutation<
-  LoginResponse,
+  TokenPairResponse,
   LoginRequest,
   AxiosError<ProblemDetail>
 >({
   mutationFn: async (variables) => {
-    const response = await client.post('login', variables);
+    const response = await client.post<TokenPairResponse>(
+      'auth/token/',
+      variables
+    );
     return response.data;
   },
 });

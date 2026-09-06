@@ -68,11 +68,13 @@ module.exports = {
       fontFamily: {
         inter: ['Inter'],
         // Referenced by PostScript name, which matches each file's basename —
-        // the one spelling both iOS and Android resolve.
-        heading: ['Caprasimo-Regular'],
-        body: ['Figtree-Regular'],
-        'body-semibold': ['Figtree-SemiBold'],
-        'body-bold': ['Figtree-Bold'],
+        // the one spelling both iOS and Android resolve. Happy Women uses one
+        // rounded family (Nunito) at four weights; the role names stay the
+        // same so no screen needed a className change to adopt it.
+        heading: ['Nunito-ExtraBold'],
+        body: ['Nunito-Regular'],
+        'body-semibold': ['Nunito-SemiBold'],
+        'body-bold': ['Nunito-Bold'],
       },
       colors: {
         ...colors,
@@ -84,6 +86,8 @@ module.exports = {
         tile: '8px',
         panel: '16px',
         card: '28px',
+        /** Fully rounded regardless of box size — pill buttons and day cells. */
+        pill: '999px',
       },
     },
   },

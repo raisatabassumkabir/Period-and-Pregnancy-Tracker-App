@@ -7,6 +7,14 @@ import { ClientEnv, Env } from './env';
 /** Rewritten by `pnpm init-app`; must match the project slug on expo.dev. */
 const SLUG = 'app-template';
 
+/**
+ * Brand charcoal — the same value as `PALETTES.happy.dark['--color-bg']` in
+ * `src/lib/theme/palettes.ts`. Sharing it means the splash, the adaptive-icon
+ * ground and the first painted screen are one continuous surface, so the
+ * handover from native splash to JS has no visible seam.
+ */
+const BRAND_BACKGROUND = '#121212';
+
 const appIconBadgeConfig: AppIconBadgeConfig = {
   enabled: Env.APP_ENV !== 'production',
   badges: [
@@ -58,7 +66,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#2E3C4B',
+      backgroundColor: BRAND_BACKGROUND,
     },
     package: Env.PACKAGE,
     permissions: ['INTERNET'],
@@ -82,9 +90,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#2E3C4B',
+        backgroundColor: BRAND_BACKGROUND,
         image: './assets/splash-icon.png',
-        imageWidth: 150,
+        imageWidth: 180,
+        // `contain` keeps the mark's aspect ratio on every screen density;
+        // the artwork is transparent so `backgroundColor` shows through.
+        resizeMode: 'contain',
+        // The app is dark-first, so the dark variant is the same artwork
+        // rather than an inverted one.
+        dark: {
+          backgroundColor: BRAND_BACKGROUND,
+          image: './assets/splash-icon.png',
+          imageWidth: 180,
+          resizeMode: 'contain',
+        },
       },
     ],
     [
@@ -92,10 +111,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         fonts: [
           './assets/fonts/Inter.ttf',
-          './assets/fonts/Caprasimo-Regular.ttf',
-          './assets/fonts/Figtree-Regular.ttf',
-          './assets/fonts/Figtree-SemiBold.ttf',
-          './assets/fonts/Figtree-Bold.ttf',
+          // Happy Women type: one rounded family at four weights. Files are
+          // named by PostScript name so `tailwind.config.js` can reference
+          // them by basename on both platforms.
+          './assets/fonts/Nunito-Regular.ttf',
+          './assets/fonts/Nunito-SemiBold.ttf',
+          './assets/fonts/Nunito-Bold.ttf',
+          './assets/fonts/Nunito-ExtraBold.ttf',
         ],
       },
     ],

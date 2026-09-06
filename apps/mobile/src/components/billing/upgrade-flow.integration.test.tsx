@@ -58,6 +58,7 @@ const renderApp = () => {
   );
 };
 
+/** Builds the RFC 9457 402 body the backend actually sends (CONTRACT.md §402). */
 const fire402 = async (detail: {
   message: string;
   feature: string;
@@ -65,7 +66,20 @@ const fire402 = async (detail: {
   limit?: number;
 }) => {
   const onRejected = getRejectHandler();
-  const error = { response: { status: 402, data: { detail } } };
+  const error = {
+    response: {
+      status: 402,
+      data: {
+        type: 'https://apiguide.dev/status-codes/402/',
+        title: 'Payment Required',
+        status: 402,
+        detail: detail.message,
+        feature: detail.feature,
+        current_usage: detail.current_usage,
+        limit: detail.limit,
+      },
+    },
+  };
   await onRejected(error).catch(() => {});
 };
 

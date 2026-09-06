@@ -1,6 +1,25 @@
 module.exports = {
   white: '#ffffff',
   black: '#000000',
+  /**
+   * Happy Women cycle-state colours. Deliberately fixed hexes rather than
+   * palette variables: the calendar legend, ring segments and insight dots
+   * must mean the same thing in every palette and both themes.
+   */
+  cycle: {
+    period: '#FF7575',
+    fertile: '#98FB98',
+    ovulation: '#89CFF0',
+    lavender: '#B9A6FF',
+  },
+  /** Mood faces on the symptom logger and calendar cells. */
+  mood: {
+    great: '#FFD166',
+    good: '#98FB98',
+    neutral: '#FF7575',
+    low: '#EF5350',
+    bad: '#B39DDB',
+  },
   // Brand colors matching memli design
   brand: {
     50: '#E8EEF4',
