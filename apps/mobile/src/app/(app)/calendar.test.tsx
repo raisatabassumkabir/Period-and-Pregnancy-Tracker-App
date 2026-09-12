@@ -60,7 +60,6 @@ describe('Calendar', () => {
     mockDailyLogs(undefined, true);
     setup(<Calendar />);
 
-    expect(screen.getByTestId('calendar-demo-pill')).toBeOnTheScreen();
     expect(screen.getByTestId('calendar-month-grid')).toBeOnTheScreen();
   });
 

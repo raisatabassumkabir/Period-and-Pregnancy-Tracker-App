@@ -84,6 +84,12 @@ class Profile(TimestampedModel):
     budget_tier = models.CharField(
         max_length=16, choices=BudgetTier.choices, default=BudgetTier.UNSPECIFIED
     )
+
+    height = models.FloatField(null=True, blank=True)
+    weight = models.FloatField(null=True, blank=True)
+    goals = models.JSONField(default=list, blank=True)
+    source = models.CharField(max_length=64, blank=True, default="")
+
     # Values validated against apps.core.constants.CONDITION_TAXONOMY in the
     # serializer (e.g. ["pcos"]). JSONB: read whole, filtered rarely.
     medical_conditions = models.JSONField(default=list, blank=True)

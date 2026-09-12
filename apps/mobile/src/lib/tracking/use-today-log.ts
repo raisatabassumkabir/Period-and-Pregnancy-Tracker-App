@@ -2,9 +2,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
 import { useDailyLogs, useSaveDailyLog } from '@/api/cycles';
-import type { Flow, Mood, Symptom } from '@/api/cycles/types';
+import type { DailyLog, Flow, Mood, Symptom } from '@/api/cycles/types';
+import type { PaginateQuery } from '@/api/types';
 import { isProblemDetail } from '@/api/types';
 import { getItem, setItem, STORAGE_KEYS } from '@/lib/storage';
+import { useHealthStore } from '@/store/useHealthStore';
 
 import { todayDateString } from '../health';
 import type { Discharge, DischargeLogs } from './discharge';
@@ -27,9 +29,9 @@ const EMPTY_DRAFT: DailyLogDraft = {
 };
 
 /**
- * Today's log as an editable draft. The server allows one log per calendar
- * day, so an existing entry is PATCHed by id rather than POSTed again.
- * Discharge has no server column yet and rides along in local storage.
+ * Today's log as an editable draft. Persists locally to MMKV for offline and
+ * instant UI updates across the app (Calendar, Dashboard, Insights), and syncs
+ * with the backend server when available.
  */
 export function useTodayLog() {
   const today = todayDateString();
@@ -37,7 +39,17 @@ export function useTodayLog() {
   const logsQuery = useDailyLogs();
   const saveMutation = useSaveDailyLog();
 
-  const existing = logsQuery.data?.results.find((log) => log.date === today);
+  const [localLogs, setLocalLogs] = React.useState<Record<string, DailyLog>>({});
+
+  React.useEffect(() => {
+    getItem<Record<string, DailyLog>>(STORAGE_KEYS.LOCAL_DAILY_LOGS).then((stored) => {
+      if (stored) setLocalLogs(stored);
+    });
+  }, []);
+
+  const serverLogs = logsQuery.data?.results ?? [];
+  const existing =
+    serverLogs.find((log) => log.date === today) ?? localLogs[today];
 
   const [draft, setDraft] = React.useState<DailyLogDraft>(EMPTY_DRAFT);
   const [hydratedFrom, setHydratedFrom] = React.useState<string | null>(null);
@@ -92,20 +104,74 @@ export function useTodayLog() {
 
   const save = React.useCallback(async () => {
     const { discharge, ...serverFields } = draft;
-    const saved = await saveMutation.mutateAsync({
-      id: existing?.id,
+
+    const newLog: DailyLog = {
+      id: existing?.id ?? `local-${Date.now()}`,
       date: today,
-      ...serverFields,
-    });
-    const stored =
+      flow: serverFields.flow,
+      mood: serverFields.mood,
+      symptoms: serverFields.symptoms,
+      notes: serverFields.notes,
+      temperature_celsius: existing?.temperature_celsius ?? null,
+      created_at: existing?.created_at ?? new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // 1. Save locally to MMKV encrypted store
+    const storedLocalLogs =
+      (await getItem<Record<string, DailyLog>>(STORAGE_KEYS.LOCAL_DAILY_LOGS)) ?? {};
+    const updatedLocalLogs = { ...storedLocalLogs, [today]: newLog };
+    await setItem(STORAGE_KEYS.LOCAL_DAILY_LOGS, updatedLocalLogs);
+    setLocalLogs(updatedLocalLogs);
+
+    // Save discharge
+    const storedDischarge =
       (await getItem<DischargeLogs>(STORAGE_KEYS.DISCHARGE_LOGS)) ?? {};
     await setItem(STORAGE_KEYS.DISCHARGE_LOGS, {
-      ...stored,
+      ...storedDischarge,
       [today]: discharge,
     });
-    await queryClient.invalidateQueries({ queryKey: ['daily-logs'] });
+
+    // 2. Optimistically update React Query cache so Dashboard & Calendar update immediately
+    queryClient.setQueryData<PaginateQuery<DailyLog>>(['daily-logs'], (old) => {
+      const currentResults = old?.results ?? [];
+      const filtered = currentResults.filter((l) => l.date !== today);
+      return {
+        count: (old?.count ?? 0) + (currentResults.some((l) => l.date === today) ? 0 : 1),
+        next: old?.next ?? null,
+        previous: old?.previous ?? null,
+        results: [newLog, ...filtered],
+      };
+    });
+
+    // 3. Sync to health store for instant UI feedback
+    const healthStore = useHealthStore.getState();
+    if (healthStore.toggleSymptom) {
+      serverFields.symptoms.forEach((sym) => {
+        const found = healthStore.symptoms.find((s) =>
+          s.name.toLowerCase().includes(sym.replace('_', ' '))
+        );
+        if (found && !found.logged) {
+          healthStore.toggleSymptom(found.id);
+        }
+      });
+    }
+
+    // 4. Try syncing with backend server if available
+    let saved = newLog;
+    try {
+      saved = await saveMutation.mutateAsync({
+        id: existing?.id && !existing.id.startsWith('local-') ? existing.id : undefined,
+        date: today,
+        ...serverFields,
+      });
+      queryClient.invalidateQueries({ queryKey: ['daily-logs'] });
+    } catch {
+      // Local save already succeeded; offline/demo fallback active
+    }
+
     return saved;
-  }, [draft, existing?.id, queryClient, saveMutation, today]);
+  }, [draft, existing?.id, existing?.created_at, queryClient, saveMutation, today]);
 
   const errorBody = saveMutation.error?.response?.data;
 
@@ -119,7 +185,6 @@ export function useTodayLog() {
     isSaving: saveMutation.isPending,
     isLoading: logsQuery.isPending,
     hasExistingLog: existing !== undefined,
-    // `detail` is a safe human sentence on every problem body.
     saveError: isProblemDetail(errorBody) ? errorBody.detail : undefined,
   };
 }

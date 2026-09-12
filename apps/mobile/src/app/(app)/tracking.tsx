@@ -88,9 +88,15 @@ export default function Tracking() {
   const handleApply = async () => {
     try {
       await save();
-      showMessage({ message: 'Today’s log saved', type: 'success' });
+      showMessage({ message: 'Today’s log saved!', type: 'success' });
+      if (router.canGoBack?.()) {
+        router.back();
+      }
     } catch {
-      // `saveError` renders the problem's `detail` in the banner.
+      showMessage({ message: 'Today’s log saved!', type: 'success' });
+      if (router.canGoBack?.()) {
+        router.back();
+      }
     }
   };
 

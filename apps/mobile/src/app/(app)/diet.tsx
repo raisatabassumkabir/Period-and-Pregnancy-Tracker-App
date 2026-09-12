@@ -27,6 +27,8 @@ function trimesterOptions(): readonly SegmentOption<Trimester>[] {
 }
 
 /** Localized meal plan, defaulting to the trimester of the active pregnancy. */
+import { AppHeader } from '@/components/ui/app-header';
+
 export default function Diet() {
   const { data } = usePregnancies();
   const progress = derivePregnancyProgress(activePregnancy(data));
@@ -38,11 +40,8 @@ export default function Diet() {
     <View className="flex-1 bg-canvas" testID="diet-screen">
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']}>
-        <View className="px-4 pt-3">
-          <ScreenHeader title={translate('diet.title')} />
-          <Text className="text-[13px] text-tone-600">
-            {translate('diet.subtitle')}
-          </Text>
+        <View className="px-4 pt-2">
+          <AppHeader title={translate('diet.title')} />
         </View>
       </SafeAreaView>
 

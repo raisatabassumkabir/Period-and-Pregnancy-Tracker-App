@@ -46,6 +46,10 @@ export interface Profile {
   timezone: string;
   diet: DietPreference;
   budget_tier: BudgetTier;
+  height: number | null;
+  weight: number | null;
+  goals: string[];
+  source: string;
   medical_conditions: MedicalCondition[];
   created_at: string;
   updated_at: string;
@@ -61,6 +65,10 @@ export type ProfileWrite = Partial<
     | 'timezone'
     | 'diet'
     | 'budget_tier'
+    | 'height'
+    | 'weight'
+    | 'goals'
+    | 'source'
     | 'medical_conditions'
   >
 >;

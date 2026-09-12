@@ -1,19 +1,19 @@
-import { useRouter } from 'expo-router';
+import { User } from 'lucide-react-native';
 import React from 'react';
-import { ActivityIndicator, Modal, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { Modal, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 
-import { useMe } from '@/api/auth';
-import { usePaymentSubscriptionStatus } from '@/api/billing/use-subscription-status';
 import type {
   DietPreference,
   MedicalCondition,
   ProfileMode,
 } from '@/api/types';
-import { Button, Pill, Pressable, Text, View } from '@/components/ui';
+import { Button, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
-const LOGIN_ROUTE = '/login';
+import { Item } from './item';
+
+const ICON_SIZE = 18;
 
 const MODE_LABELS: Record<ProfileMode, string> = {
   cycle_tracking: 'Cycle Tracking',
@@ -43,22 +43,9 @@ const MEDICAL_CONDITIONS_LIST: { id: MedicalCondition; label: string }[] = [
   { id: 'hypertension', label: 'Hypertension' },
 ];
 
-function Avatar({ initial }: { initial: string }) {
-  return (
-    <View className="size-[58px] items-center justify-center rounded-full bg-accent">
-      <Text className="font-heading text-[24px] text-accent-100">
-        {initial}
-      </Text>
-    </View>
-  );
-}
-
-export const ProfileHeader = () => {
-  const { data: user, isLoading: isLoadingUser } = useMe();
+export const PersonalizationItem = () => {
   const { profile, updateProfile } = usePersonalizationProfile();
-  const { data: subscription } = usePaymentSubscriptionStatus();
   const palette = usePaletteColors();
-  const router = useRouter();
   const [modalVisible, setModalVisible] = React.useState(false);
 
   // Form State
@@ -99,62 +86,17 @@ export const ProfileHeader = () => {
     setModalVisible(false);
   };
 
-  if (isLoadingUser && !profile.fullName) {
-    return (
-      <View
-        testID="profile-header-loading"
-        className="items-center rounded-card bg-surface p-6"
-      >
-        <ActivityIndicator size="small" color={palette.accent} />
-      </View>
-    );
-  }
-
-  const isPremium = subscription?.is_premium ?? false;
-  const displayName = profile.fullName || user?.full_name || 'Happy User';
-  const initial = displayName.charAt(0).toUpperCase();
+  const summaryText = `${profile.fullName || 'User'}, ${profile.age} yrs`;
 
   return (
     <>
-      <Pressable
-        testID="profile-header"
+      <Item
+        testID="personalization-item"
         onPress={() => setModalVisible(true)}
-        className="flex-row items-center gap-4 rounded-card bg-surface p-4 active:opacity-80"
-      >
-        <Avatar initial={initial} />
-        <View className="flex-1">
-          <Text className="font-heading text-[19px] text-ink" numberOfLines={1}>
-            {displayName}
-          </Text>
-          <Text className="mt-0.5 text-[13px] text-tone-700" numberOfLines={1}>
-            Age: {profile.age} yrs • DOB: {profile.dateOfBirth}
-          </Text>
-          <View className="mt-2 flex-row items-center gap-2">
-            <Pill
-              label={isPremium ? 'Premium plan' : 'Free plan'}
-              tone={isPremium ? 'accent-soft' : 'neutral'}
-              strong={isPremium}
-            >
-              <View
-                className={`size-[7px] rounded-full ${
-                  isPremium ? 'bg-accent' : 'bg-accent2-600'
-                }`}
-              />
-            </Pill>
-
-            {!user && (
-              <Pressable
-                onPress={() => router.push(LOGIN_ROUTE)}
-                className="rounded-full bg-accent/15 px-2.5 py-0.5"
-              >
-                <Text className="font-body-semibold text-[11px] text-accent">
-                  Sign In
-                </Text>
-              </Pressable>
-            )}
-          </View>
-        </View>
-      </Pressable>
+        icon={<User size={ICON_SIZE} color={palette.accent} />}
+        text="settings.profile_options"
+        value={summaryText}
+      />
 
       <Modal
         visible={modalVisible}

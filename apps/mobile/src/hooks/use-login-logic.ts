@@ -10,14 +10,6 @@ import { loginSchema } from './auth-schemas';
 
 const LOGIN_FIELDS = ['email', 'password'] as const;
 
-/**
- * Login form state, submission and error mapping.
- *
- * On success it only calls `signIn`, which persists the token pair to
- * expo-secure-store and flips the auth store. The root layout in
- * `src/app/_layout.tsx` observes that and swaps the auth stack for the app
- * stack — screens never navigate on auth themselves.
- */
 export const useLoginLogic = () => {
   const signIn = useAuth.use.signIn();
   const loginMutation = useLogin();

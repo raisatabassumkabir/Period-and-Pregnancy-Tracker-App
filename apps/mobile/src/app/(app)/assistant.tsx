@@ -36,6 +36,8 @@ function keyExtractor(item: ChatMessage): string {
 }
 
 /** Fully offline, rule-based Q&A over the user's own (or demo) health data. */
+import { AppHeader } from '@/components/ui/app-header';
+
 export default function Assistant() {
   const { messages, send, isSending, context } = useAssistantChat();
   const [draft, setDraft] = React.useState('');
@@ -50,8 +52,8 @@ export default function Assistant() {
     <View className="flex-1 bg-canvas" testID="assistant-screen">
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']}>
-        <View className="px-4 pt-3">
-          <ScreenHeader title="Assistant" />
+        <View className="px-4 pt-2">
+          <AppHeader title="Assistant" />
           <View className="mt-2 flex-row gap-2">
             <Pill label="On-device guide" tone="accent2-soft" />
             {context.isDemoData && <Pill label="Demo data" />}

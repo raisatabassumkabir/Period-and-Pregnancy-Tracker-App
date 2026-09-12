@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useCycles, useDailyLogs } from '@/api/cycles';
 import { MonthGrid } from '@/components/calendar';
+import { AppHeader } from '@/components/ui/app-header';
 import {
   FocusAwareStatusBar,
   Pill,
@@ -77,23 +78,14 @@ export default function Calendar() {
   const goToMonth = (monthIndex: number) =>
     setVisibleMonth((month) => new Date(month.getFullYear(), monthIndex, 1));
 
+
+
   return (
     <View className="flex-1 bg-canvas" testID="calendar-screen">
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']}>
-        <View className="px-4 pt-3">
-          <ScreenHeader
-            title="Calendar"
-            right={
-              isDemo ? (
-                <Pill
-                  label="Demo data"
-                  tone="accent2-soft"
-                  testID="calendar-demo-pill"
-                />
-              ) : undefined
-            }
-          />
+        <View className="px-4 pt-2">
+          <AppHeader title="Calendar" />
         </View>
       </SafeAreaView>
 

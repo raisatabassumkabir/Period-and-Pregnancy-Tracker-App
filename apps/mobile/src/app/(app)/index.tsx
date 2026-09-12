@@ -37,68 +37,10 @@ import {
 } from '@/lib/health';
 import { usePaletteColors } from '@/lib/theme';
 
-const AVATAR_ICON_SIZE = 20;
-const BELL_ICON_SIZE = 22;
+import { AppHeader } from '@/components/ui/app-header';
+
 const ACTION_ICON_SIZE = 18;
-const SETTINGS_ROUTE = '/(app)/settings';
 const TRACKING_ROUTE = '/(app)/tracking';
-
-function AvatarButton({ fullName }: { fullName: string | null | undefined }) {
-  const router = useRouter();
-  const palette = usePaletteColors();
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Open settings"
-      testID="settings-avatar"
-      onPress={() => router.push(SETTINGS_ROUTE)}
-      className="size-[46px] items-center justify-center rounded-full bg-accent-200"
-    >
-      {fullName ? (
-        <Text className="font-body-bold text-lg text-accent-800">
-          {fullName.charAt(0).toUpperCase()}
-        </Text>
-      ) : (
-        <User size={AVATAR_ICON_SIZE} color={palette.accentScale[800]} />
-      )}
-    </Pressable>
-  );
-}
-
-function TopBar() {
-  const { data: user } = useMe();
-  const { data: subscription } = usePaymentSubscriptionStatus({
-    refetchOnWindowFocus: true,
-  });
-  const palette = usePaletteColors();
-
-  const firstName = user?.full_name?.split(' ')[0] || 'there';
-  const isPremium = subscription?.is_premium ?? false;
-
-  return (
-    <View className="flex-row items-center gap-3">
-      <AvatarButton fullName={user?.full_name} />
-      <View className="flex-1">
-        <Text className="font-body-semibold text-[13px] text-tone-600">
-          Welcome back!
-        </Text>
-        <View className="flex-row items-center gap-2">
-          <Text className="font-heading text-[22px] text-ink">Hello,</Text>
-          <Text className="font-heading text-[22px] text-ink">{firstName}</Text>
-          {isPremium && <PremiumBadge compact />}
-        </View>
-      </View>
-      <View
-        className="size-[46px] items-center justify-center rounded-full bg-surface"
-        testID="notifications-bell"
-        accessibilityLabel="Notifications"
-      >
-        <Bell size={BELL_ICON_SIZE} color={palette.ink} />
-      </View>
-    </View>
-  );
-}
 
 function LogActionButton({ label }: { label: string }) {
   const router = useRouter();
@@ -247,8 +189,8 @@ export default function Home() {
     <View className="flex-1 bg-canvas" testID="home-screen">
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']}>
-        <View className="px-4 pt-3">
-          <TopBar />
+        <View className="px-4 pt-2">
+          <AppHeader />
         </View>
       </SafeAreaView>
       <ScrollView

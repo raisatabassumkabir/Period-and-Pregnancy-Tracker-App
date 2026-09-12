@@ -35,6 +35,10 @@ export const STORAGE_KEYS = {
   TRACKING_MODE: '@app/tracking_mode',
   /** Discharge per calendar day. `DailyLog` has no column for it yet. */
   DISCHARGE_LOGS: '@app/discharge_logs',
+  /** Daily logs saved locally for offline / instant UI updates. */
+  LOCAL_DAILY_LOGS: '@app/local_daily_logs',
+  /** User personalization profile (name, age/DOB, mode, diet, medical conditions). */
+  PERSONALIZATION_PROFILE: '@app/personalization_profile',
 } as const;
 
 let storePromise: Promise<MMKV> | null = null;

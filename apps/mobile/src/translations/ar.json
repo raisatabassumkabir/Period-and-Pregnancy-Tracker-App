@@ -2,6 +2,8 @@
   "settings": {
     "about": "حول التطبيق ",
     "account": "الحساب",
+    "profile_title": "التخصيص والملف الشخصي",
+    "profile_options": "التخصيص",
     "app_name": "اسم التطبيق",
     "arabic": "عربي",
     "english": "إنجليزي",

@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import {
   Apple,
   CalendarDays,
@@ -10,20 +10,22 @@ import {
 import React from 'react';
 
 import { useAuth, usePaletteColors } from '@/lib';
+import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
 const TAB_ICON_SIZE = 23;
 
-/**
- * Auth-gated tab bar. Add a tab by adding a file under `(app)/` and a
- * `Tabs.Screen` here; hide a route from the bar with `href: null`.
- */
 export default function TabLayout() {
   const status = useAuth.use.status();
   const palette = usePaletteColors();
+  const { profile, isLoading } = usePersonalizationProfile();
+  const router = useRouter();
 
-  // The splash is hidden by the root layout once every startup read has
-  // landed (`useAppReady`), so this layout only draws the bar.
-  // Auth checks handled by Root Layout
+  React.useEffect(() => {
+    if (status === 'signIn' && !isLoading && !profile.fullName) {
+      requestAnimationFrame(() => router.replace('/setup-profile'));
+    }
+  }, [status, isLoading, profile.fullName, router]);
+
   if (!status) return null;
   return (
     <Tabs
@@ -95,12 +97,30 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          href: null,
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Settings color={color} size={TAB_ICON_SIZE} />
-          ),
           tabBarButtonTestID: 'settings-tab',
+        }}
+      />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="symptoms"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="nutrition"
+        options={{
+          href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

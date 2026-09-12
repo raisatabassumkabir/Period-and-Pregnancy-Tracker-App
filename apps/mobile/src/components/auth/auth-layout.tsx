@@ -4,9 +4,7 @@ import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import {
   BrandLockup,
   FocusAwareStatusBar,
-  GlassCard,
   GradientBackdrop,
-  Kicker,
   Pressable,
   SafeAreaView,
   Text,
@@ -17,26 +15,20 @@ import { usePaletteColors } from '@/lib/theme';
 
 const SCROLL_CONTENT = {
   flexGrow: 1,
-  paddingHorizontal: 20,
-  paddingBottom: 32,
+  paddingHorizontal: 22,
+  paddingBottom: 36,
 } as const;
 
 interface Props {
   kicker: string;
   title: string;
   subtitle: string;
-  /** Omit when there is no history to pop — the arrow is then hidden. */
   onGoBack?: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
   testID?: string;
 }
 
-/**
- * The shell both auth screens share: gradient backdrop, brand lockup, a title
- * block, the form inside a glass panel, and a footer link. Keeping it in one
- * place is what makes login and register read as the same product.
- */
 export function AuthLayout({
   kicker,
   title,
@@ -60,7 +52,7 @@ export function AuthLayout({
               accessibilityLabel="Go back"
               testID="auth-back"
               onPress={onGoBack}
-              className="size-10 items-center justify-center rounded-full active:opacity-70"
+              className="size-10 items-center justify-center rounded-full bg-surface/40 border border-divider active:opacity-70"
             >
               <ArrowLeft color={palette.ink} />
             </Pressable>
@@ -76,21 +68,31 @@ export function AuthLayout({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View className="items-center pb-7 pt-1">
+            {/* Header Lockup */}
+            <View className="items-center pb-6 pt-2">
               <BrandLockup testID="auth-brand" />
             </View>
 
-            <View className="mb-5 px-1">
-              <Kicker>{kicker}</Kicker>
-              <Text className="mt-1.5 font-heading text-[30px] text-ink">
+            {/* Title & Subtitle */}
+            <View className="mb-6 px-1">
+              <Text className="font-body-bold text-[12px] uppercase tracking-widest text-accent">
+                {kicker}
+              </Text>
+              <Text className="mt-1 font-heading text-[32px] text-ink">
                 {title}
               </Text>
-              <Text className="mt-2 text-[15px] leading-6 text-tone-700">
+              <Text className="mt-1.5 font-body text-[15px] leading-6 text-tone-700">
                 {subtitle}
               </Text>
             </View>
 
-            <GlassCard testID="auth-form-card">{children}</GlassCard>
+            {/* Modern Card Container */}
+            <View
+              testID="auth-form-card"
+              className="rounded-card border border-white/10 bg-surface/90 p-5 shadow-lg"
+            >
+              {children}
+            </View>
 
             {footer ? <View className="mt-7">{footer}</View> : null}
           </ScrollView>

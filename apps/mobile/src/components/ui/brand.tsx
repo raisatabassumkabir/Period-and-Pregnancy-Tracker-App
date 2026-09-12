@@ -2,7 +2,7 @@ import { Env } from '@env';
 import * as React from 'react';
 import { View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
-import Svg, { G, Path } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 import { usePaletteColors } from '@/lib/theme';
 
@@ -10,68 +10,82 @@ import { Text } from './text';
 
 const DEFAULT_MARK_SIZE = 64;
 
-/** One petal, drawn upright from the shared base point; the others are rotations. */
-const PETAL_PATH = 'M32 50C25 41.5 24 27.5 32 13C40 27.5 39 41.5 32 50Z';
-const PETAL_BASE = '32, 50';
-/** Degrees off vertical for the inner and outer petal pairs. */
-const INNER_PETAL_ANGLE = 27;
-const OUTER_PETAL_ANGLE = 54;
-const OUTER_PETAL_OPACITY = 0.72;
-/** Shallow leaf the flower sits on. */
-const BASE_PATH = 'M15 51C22 59 42 59 49 51C42 56 22 56 15 51Z';
-
 interface BrandMarkProps extends SvgProps {
   size?: number;
-  /** Defaults to the palette accent so the mark follows the active theme. */
+  /** Primary accent color (Coral/Pink). Defaults to palette accent. */
   color?: string;
+  /** Secondary accent color (Lavender/Purple). Defaults to palette accent-2. */
+  secondaryColor?: string;
 }
 
 /**
- * The Happy Women mark: a five-petal lotus — a wellness symbol with no
- * religious or medical connotations. Outer petals are lighter so the shape
- * reads as layered rather than as a flat silhouette.
- *
- * The launcher/splash raster is drawn from the same geometry by
- * `scripts/generate-brand-assets.cjs` — change one, re-run the other.
+ * The Happy Women mark: an elegant, flowing tulip/lotus line-art logo —
+ * matching the brand theme with Coral Pink and Soft Lavender Purple curves,
+ * topped with a delicate seed sparkle.
  */
 export function BrandMark({
   size = DEFAULT_MARK_SIZE,
   color,
+  secondaryColor,
   ...props
 }: BrandMarkProps) {
   const palette = usePaletteColors();
-  const fill = color ?? palette.accent;
+  const pink = color ?? palette.accent;
+  const purple = secondaryColor ?? color ?? palette.accent2;
 
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64" fill="none" {...props}>
-      <G opacity={OUTER_PETAL_OPACITY}>
-        <Path
-          d={PETAL_PATH}
-          fill={fill}
-          rotation={-OUTER_PETAL_ANGLE}
-          origin={PETAL_BASE}
-        />
-        <Path
-          d={PETAL_PATH}
-          fill={fill}
-          rotation={OUTER_PETAL_ANGLE}
-          origin={PETAL_BASE}
-        />
-      </G>
+      {/* Top central pointed arch petal */}
       <Path
-        d={PETAL_PATH}
-        fill={fill}
-        rotation={-INNER_PETAL_ANGLE}
-        origin={PETAL_BASE}
+        d="M 26 28 C 28 19 32 12 32 12 C 32 12 36 19 38 28"
+        stroke={pink}
+        strokeWidth={2.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
+
+      {/* Top inner seed dot & sparkle rays */}
+      <Circle cx={32} cy={26} r={1.2} fill={pink} />
       <Path
-        d={PETAL_PATH}
-        fill={fill}
-        rotation={INNER_PETAL_ANGLE}
-        origin={PETAL_BASE}
+        d="M 32 23 V 20.5 M 29.5 24 L 27.5 22 M 34.5 24 L 36.5 22"
+        stroke={pink}
+        strokeWidth={1.8}
+        strokeLinecap="round"
       />
-      <Path d={PETAL_PATH} fill={fill} />
-      <Path d={BASE_PATH} fill={fill} opacity={OUTER_PETAL_OPACITY} />
+
+      {/* Left flowing leaf / stem curve */}
+      <Path
+        d="M 15 41 C 18 42 22 47 28 54"
+        stroke={pink}
+        strokeWidth={2.8}
+        strokeLinecap="round"
+      />
+
+      {/* Left main petal */}
+      <Path
+        d="M 29 51 C 21 43 18 28 23 21 C 27 17 33 22 34 32"
+        stroke={pink}
+        strokeWidth={2.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* Right main petal and sweeping bottom loop */}
+      <Path
+        d="M 32 30 C 35 22 42 21 46 25 C 48 30 42 39 33 46 C 27 51 25 57 29 60 C 35 62 43 60 48 54 C 53 48 55 42 54 38"
+        stroke={purple}
+        strokeWidth={2.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      {/* Inner sweeping pink accent inside bottom loop */}
+      <Path
+        d="M 32 52 C 37 54 42 53 45 49"
+        stroke={pink}
+        strokeWidth={2.5}
+        strokeLinecap="round"
+      />
     </Svg>
   );
 }

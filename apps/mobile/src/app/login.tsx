@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
 
@@ -8,11 +9,13 @@ import {
   EmailInput,
   PasswordInput,
 } from '@/components/auth';
-import { Button, ErrorBanner } from '@/components/ui';
+import { Button, ErrorBanner, Pressable, Text, View } from '@/components/ui';
 import { useLoginLogic } from '@/hooks/use-login-logic';
+import { usePaletteColors } from '@/lib';
 
 export default function Login() {
   const router = useRouter();
+  const palette = usePaletteColors();
   const { form, handleLogin, isSubmitting, errors } = useLoginLogic();
   const passwordRef = React.useRef<TextInput | null>(null);
 
@@ -21,11 +24,9 @@ export default function Login() {
   return (
     <AuthLayout
       testID="login-screen"
-      kicker="Welcome back"
+      kicker="WELCOME BACK"
       title="Log in"
-      subtitle="Pick up where you left off — your data stays private to you."
-      // Login is the root of the stack when the gate redirects here, so there
-      // is often nothing to pop.
+      subtitle="Pick up where you left off — your health data stays private and secure."
       onGoBack={router.canGoBack() ? router.back : undefined}
       footer={
         <AuthFooter
@@ -42,6 +43,7 @@ export default function Login() {
         control={form.control}
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
+
       <PasswordInput
         control={form.control}
         name="password"
@@ -54,7 +56,7 @@ export default function Login() {
       <Button
         label="Log in"
         size="lg"
-        className="my-0 mt-2 rounded-pill"
+        className="my-0 mt-3 rounded-pill"
         loading={isSubmitting}
         onPress={submit}
         testID="login-button"

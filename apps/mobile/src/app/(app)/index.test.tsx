@@ -89,8 +89,8 @@ describe('Home', () => {
     mockUser();
     mockHealthData();
     setup(<Home />);
-    expect(screen.getByText('Welcome back!')).toBeOnTheScreen();
-    expect(screen.getByText('Ada')).toBeOnTheScreen();
+    expect(screen.getByText('WELCOME BACK')).toBeOnTheScreen();
+    expect(screen.getByText('Hi, Ada')).toBeOnTheScreen();
   });
 
   it('shows the week strip with today selected and a log action', () => {
@@ -128,7 +128,7 @@ describe('Home', () => {
     mockUser(null);
     mockHealthData();
     setup(<Home />);
-    expect(screen.getByText('there')).toBeOnTheScreen();
+    expect(screen.getByText('WELCOME BACK')).toBeOnTheScreen();
   });
 
   it('shows the premium badge for subscribers', () => {

@@ -7,11 +7,15 @@ import { render, userEvent } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import React from 'react';
 
+import { APIProvider } from '@/api';
+
 const createAppWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
-    <BottomSheetModalProvider>
-      <NavigationContainer>{children}</NavigationContainer>
-    </BottomSheetModalProvider>
+    <APIProvider>
+      <BottomSheetModalProvider>
+        <NavigationContainer>{children}</NavigationContainer>
+      </BottomSheetModalProvider>
+    </APIProvider>
   );
 };
 

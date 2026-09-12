@@ -8,6 +8,7 @@ import {
   LanguageItem,
   LogoutButton,
   PaletteItem,
+  PersonalizationItem,
   ProfileHeader,
   SettingsLinks,
   ThemeItem,
@@ -47,6 +48,10 @@ export default function Settings() {
           <ProfileHeader />
         </View>
         <SubscriptionCard />
+
+        <ItemsContainer title="settings.profile_title">
+          <PersonalizationItem />
+        </ItemsContainer>
 
         <ItemsContainer title="settings.generale">
           <LanguageItem />

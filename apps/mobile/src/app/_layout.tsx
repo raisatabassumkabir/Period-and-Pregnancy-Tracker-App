@@ -87,11 +87,11 @@ export default function RootLayout() {
     const onAuthScreen = AUTH_ROUTES.has(root);
 
     if (status === 'signOut' && inAppGroup) {
-      // Wait for the stored flag so returning users don't flash onboarding.
       if (!isFirstTimeReady) return;
       const target = isFirstTime ? '/onboarding' : '/login';
       requestAnimationFrame(() => router.replace(target));
     } else if (status === 'signIn' && onAuthScreen) {
+      // Allow setup-profile to stay mounted if user just registered
       requestAnimationFrame(() => router.replace('/(app)'));
     }
   }, [
@@ -107,6 +107,7 @@ export default function RootLayout() {
     <Providers>
       <Stack>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
+        <Stack.Screen name="setup-profile" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />

@@ -10,13 +10,6 @@ import { registerSchema } from './auth-schemas';
 
 const REGISTER_FIELDS = ['email', 'password'] as const;
 
-/**
- * Register form state, submission and error mapping.
- *
- * `POST auth/register/` returns the user, not a token pair, so a login call
- * follows immediately; `signIn` then persists the tokens and the root layout
- * performs the stack swap.
- */
 export const useRegisterLogic = () => {
   const signIn = useAuth.use.signIn();
   const registerMutation = useRegister();
@@ -37,8 +30,6 @@ export const useRegisterLogic = () => {
 
   const handleRegister = async (values: RegisterFormValues) => {
     try {
-      // The backend derives identity from email only; the optional full name
-      // stays client-side until a profile field exists for it.
       await registerMutation.mutateAsync({
         email: values.email.trim(),
         password: values.password,

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
 
@@ -9,11 +10,13 @@ import {
   PasswordHints,
   PasswordInput,
 } from '@/components/auth';
-import { Button, ErrorBanner, FormField } from '@/components/ui';
+import { Button, ErrorBanner, FormField, Pressable, Text, View } from '@/components/ui';
 import { useRegisterLogic } from '@/hooks/use-register-logic';
+import { usePaletteColors } from '@/lib';
 
 export default function Register() {
   const router = useRouter();
+  const palette = usePaletteColors();
   const { form, handleRegister, isSubmitting, errors } = useRegisterLogic();
   const emailRef = React.useRef<TextInput | null>(null);
   const passwordRef = React.useRef<TextInput | null>(null);
@@ -25,10 +28,9 @@ export default function Register() {
   return (
     <AuthLayout
       testID="register-screen"
-      kicker="Get started"
+      kicker="GET STARTED"
       title="Create account"
-      subtitle="Track your cycle or follow your pregnancy — private, on your terms."
-      // Onboarding `replace`s to this route, so the stack is often empty.
+      subtitle="Track your cycle or follow your pregnancy — private, personalized, on your terms."
       onGoBack={router.canGoBack() ? router.back : undefined}
       footer={
         <AuthFooter
@@ -46,18 +48,20 @@ export default function Register() {
         name="fullName"
         label="Full name (optional)"
         testID="full-name-input"
-        placeholder="Ada Lovelace"
+        placeholder="Happy User"
         autoCapitalize="words"
         autoComplete="name"
         returnKeyType="next"
         submitBehavior="submit"
         onSubmitEditing={() => emailRef.current?.focus()}
       />
+
       <EmailInput
         control={form.control}
         inputRef={emailRef}
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
+
       <PasswordInput
         control={form.control}
         name="password"
@@ -67,7 +71,9 @@ export default function Register() {
         inputRef={passwordRef}
         onSubmitEditing={() => confirmRef.current?.focus()}
       />
+
       <PasswordHints value={password ?? ''} />
+
       <PasswordInput
         control={form.control}
         name="confirmPassword"
@@ -81,7 +87,7 @@ export default function Register() {
       <Button
         label="Sign up"
         size="lg"
-        className="my-0 mt-2 rounded-pill"
+        className="my-0 mt-3 rounded-pill"
         loading={isSubmitting}
         onPress={submit}
         testID="register-submit"

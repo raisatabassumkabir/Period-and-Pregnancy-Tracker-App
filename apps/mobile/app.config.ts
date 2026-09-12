@@ -16,7 +16,7 @@ const SLUG = 'app-template';
 const BRAND_BACKGROUND = '#121212';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
-  enabled: Env.APP_ENV !== 'production',
+  enabled: false,
   badges: [
     {
       text: Env.APP_ENV,
