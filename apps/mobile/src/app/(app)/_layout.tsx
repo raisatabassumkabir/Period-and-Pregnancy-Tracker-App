@@ -21,10 +21,10 @@ export default function TabLayout() {
   const router = useRouter();
 
   React.useEffect(() => {
-    if (status === 'signIn' && !isLoading && !profile.fullName) {
-      requestAnimationFrame(() => router.replace('/setup-profile'));
+    if (status === 'signIn' && !isLoading && !profile.hasCompletedOnboarding) {
+      requestAnimationFrame(() => router.replace('/onboarding'));
     }
-  }, [status, isLoading, profile.fullName, router]);
+  }, [status, isLoading, profile.hasCompletedOnboarding, router]);
 
   if (!status) return null;
   return (

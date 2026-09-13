@@ -13,7 +13,7 @@ const SLUG = 'app-template';
  * ground and the first painted screen are one continuous surface, so the
  * handover from native splash to JS has no visible seam.
  */
-const BRAND_BACKGROUND = '#121212';
+const BRAND_BACKGROUND = '#FCF8F5';
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
   enabled: false,

@@ -7,6 +7,7 @@ import {
   AuthFooter,
   AuthLayout,
   EmailInput,
+  GoogleButton,
   PasswordHints,
   PasswordInput,
 } from '@/components/auth';
@@ -85,12 +86,28 @@ export default function Register() {
       />
 
       <Button
-        label="Sign up"
+        label="Create Account"
         size="lg"
-        className="my-0 mt-3 rounded-pill"
+        className="my-0 mt-4 h-14 rounded-pill"
         loading={isSubmitting}
         onPress={submit}
         testID="register-submit"
+      />
+
+      <View className="my-4 flex-row items-center">
+        <View className="h-[1px] flex-1 bg-[#F0E5E1]" />
+        <Text className="mx-3 font-body-semibold text-[13px] text-[#8C8C8C]">
+          or
+        </Text>
+        <View className="h-[1px] flex-1 bg-[#F0E5E1]" />
+      </View>
+
+      <GoogleButton
+        label="Continue with Google"
+        testID="google-register-button"
+        onPress={() => {
+          // Trigger Google sign-up
+        }}
       />
     </AuthLayout>
   );

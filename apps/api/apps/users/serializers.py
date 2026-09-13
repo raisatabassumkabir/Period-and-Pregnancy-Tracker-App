@@ -20,6 +20,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "budget_tier",
             "height",
             "weight",
+            "average_cycle_length",
+            "average_period_duration",
             "goals",
             "source",
             "medical_conditions",

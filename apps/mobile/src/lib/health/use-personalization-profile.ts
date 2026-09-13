@@ -15,11 +15,16 @@ export interface PersonalizationProfile {
   age: number;
   height: string;
   weight: string;
+  averageCycleLength: number;
+  averagePeriodDuration: number;
   mode: ProfileMode;
   diet: DietPreference;
   medicalConditions: MedicalCondition[];
   goals: string[];
   source: string;
+  hasCompletedOnboarding?: boolean;
+  appIntent?: 'myself' | 'partner';
+  partnerCode?: string;
 }
 
 export const DEFAULT_PERSONALIZATION_PROFILE: PersonalizationProfile = {
@@ -28,11 +33,16 @@ export const DEFAULT_PERSONALIZATION_PROFILE: PersonalizationProfile = {
   age: 28,
   height: '',
   weight: '',
+  averageCycleLength: 28,
+  averagePeriodDuration: 5,
   mode: 'cycle_tracking',
   diet: 'unspecified',
   medicalConditions: [],
   goals: [],
   source: '',
+  hasCompletedOnboarding: false,
+  appIntent: 'myself',
+  partnerCode: '',
 };
 
 export function calculateAge(dobString: string): number {
@@ -73,7 +83,10 @@ export function usePersonalizationProfile() {
   }, []);
 
   const updateProfile = React.useCallback(
-    async (updates: Partial<PersonalizationProfile>) => {
+    async (
+      updates: Partial<PersonalizationProfile>,
+      options?: { silent?: boolean }
+    ) => {
       setProfile((current) => {
         const nextDob = updates.dateOfBirth ?? current.dateOfBirth;
         const nextAge = updates.dateOfBirth
@@ -98,10 +111,12 @@ export function usePersonalizationProfile() {
         return next;
       });
 
-      showMessage({
-        message: 'Personalization profile updated!',
-        type: 'success',
-      });
+      if (!options?.silent) {
+        showMessage({
+          message: 'Personalization profile updated!',
+          type: 'success',
+        });
+      }
     },
     [setHealthMode]
   );

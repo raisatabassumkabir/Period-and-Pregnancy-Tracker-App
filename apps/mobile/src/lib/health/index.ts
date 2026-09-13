@@ -4,5 +4,7 @@ export * from './cycle-phase';
 export * from './dates';
 export * from './demo-fallback';
 export * from './demo-seed';
+export * from './medical-insights';
 export * from './pregnancy-insights';
+export * from './use-personalization-profile';
 export * from './use-tracking-mode';

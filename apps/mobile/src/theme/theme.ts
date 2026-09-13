@@ -1,6 +1,6 @@
 /**
- * Restyle Theme Configuration for Reproductive Health App
- * Modern Dark Mode Aesthetic (#121212) with Coral, Mint, and Lavender Accents
+ * Theme Configuration for "Happy Women"
+ * Polished Pastel Soft-UI Aesthetic: Warm Cream, Pure White Cards, Coral & Pastel Accents
  */
 
 // Helper to construct a typed Restyle-compatible theme object
@@ -8,58 +8,81 @@ export function createTheme<T extends Record<string, any>>(themeObject: T): T {
   return themeObject;
 }
 
-const palette = {
-  // Primary Dark Surfaces & Canvas
-  charcoalDark: '#121212',
-  charcoalCard: '#1E1E24',
-  charcoalElevated: '#2A2A32',
-  charcoalBorder: '#33333E',
+export const palette = {
+  // Canvas & Container Ground
+  creamBackground: '#FCF8F5',
+  pureWhite: '#FFFFFF',
+  cardBackground: '#FFFFFF',
+  elevatedBackground: '#FFFFFF',
+  softBorder: '#F0E5E1',
 
-  // Brand & Accent Colors
-  coralPrimary: '#FF7575',
-  coralLight: '#FF9E9E',
-  coralMuted: '#522A2A',
+  // Primary Accent
+  coralPrimary: '#FF9FA8',
+  coralLight: '#FFD6DA',
+  coralMuted: '#FFF0F2',
+  coralDark: '#E87D88',
 
-  mintSecondary: '#A3E6C8',
-  mintMuted: '#244839',
+  // Secondary FemTech Pastel Accents
+  pastelBlue: '#B5D3F8',
+  pastelBlueLight: '#DCEBFC',
 
-  lavenderSecondary: '#D7BBF5',
-  lavenderMuted: '#433458',
+  mintGreen: '#C6F1D6',
+  mintGreenLight: '#E8FAF0',
 
-  // Functional & Feedback Colors
-  errorRed: '#FF4D4D',
-  warningAmber: '#FFB800',
-  successGreen: '#4CD964',
+  softYellow: '#FBE3A1',
+  softYellowLight: '#FDF3D5',
 
-  // Text & Neutral Scales
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A0A0B0',
-  textMuted: '#6E6E80',
-  textInverse: '#121212',
+  pastelLavender: '#E2C6F1',
+  pastelLavenderLight: '#F5ECFA',
 
-  // Transparent overlays
-  overlayDark: 'rgba(0, 0, 0, 0.6)',
+  // Functional Feedback Colors
+  errorRed: '#FF6B6B',
+  warningAmber: '#FBE3A1',
+  successGreen: '#7ADBB0',
+  shadowTone: '#F0E5E1',
+
+  // Typography Neutrals (Strictly no harsh pure black)
+  textPrimary: '#4A4A4A',
+  textSecondary: '#8C8C8C',
+  textMuted: '#AFAFAF',
+  textInverse: '#FFFFFF',
+
+  // Overlays
+  overlay: 'rgba(74, 74, 74, 0.4)',
   transparent: 'transparent',
 };
 
 export const theme = createTheme({
   colors: {
-    // Backgrounds
-    mainBackground: palette.charcoalDark,
-    cardBackground: palette.charcoalCard,
-    elevatedBackground: palette.charcoalElevated,
-    borderColor: palette.charcoalBorder,
+    // Backgrounds & Borders
+    mainBackground: palette.creamBackground,
+    cardBackground: palette.cardBackground,
+    elevatedBackground: palette.elevatedBackground,
+    borderColor: palette.softBorder,
 
-    // Accents
+    // Primary Coral Accent
     primaryCoral: palette.coralPrimary,
     primaryCoralLight: palette.coralLight,
     primaryCoralMuted: palette.coralMuted,
+    primaryCoralDark: palette.coralDark,
 
-    secondaryMint: palette.mintSecondary,
-    secondaryMintMuted: palette.mintMuted,
+    // Secondary Pastel Accents
+    secondaryPastelBlue: palette.pastelBlue,
+    secondaryPastelBlueLight: palette.pastelBlueLight,
 
-    secondaryLavender: palette.lavenderSecondary,
-    secondaryLavenderMuted: palette.lavenderMuted,
+    secondaryMintGreen: palette.mintGreen,
+    secondaryMintGreenLight: palette.mintGreenLight,
+
+    secondarySoftYellow: palette.softYellow,
+    secondarySoftYellowLight: palette.softYellowLight,
+
+    secondaryPastelLavender: palette.pastelLavender,
+
+    // Legacy alias support for components using secondaryMint/secondaryLavender
+    secondaryMint: palette.mintGreen,
+    secondaryMintMuted: palette.mintGreenLight,
+    secondaryLavender: palette.pastelLavender,
+    secondaryLavenderMuted: palette.pastelLavenderLight,
 
     // Typography Neutral Colors
     textPrimary: palette.textPrimary,
@@ -67,11 +90,12 @@ export const theme = createTheme({
     textMuted: palette.textMuted,
     textInverse: palette.textInverse,
 
-    // Statuses
+    // Statuses & Shadows
     error: palette.errorRed,
     warning: palette.warningAmber,
     success: palette.successGreen,
-    overlay: palette.overlayDark,
+    shadow: palette.shadowTone,
+    overlay: palette.overlay,
     transparent: palette.transparent,
   },
 
@@ -90,69 +114,96 @@ export const theme = createTheme({
   // Border Radius Scale
   borderRadii: {
     none: 0,
-    s: 6,
-    m: 12,
-    l: 20,
-    xl: 28,
+    s: 8,
+    m: 16,
+    card: 24,
+    l: 24,
+    xl: 32,
+    pill: 999,
     full: 9999,
   },
 
-  // Typography System (Scale & Intent)
+  // Diffuse Drop Shadows
+  shadows: {
+    card: {
+      shadowColor: palette.shadowTone,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.8,
+      shadowRadius: 15,
+      elevation: 4,
+    },
+    button: {
+      shadowColor: palette.coralPrimary,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+      elevation: 3,
+    },
+    subtle: {
+      shadowColor: palette.shadowTone,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.6,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+  },
+
+  // Typography System (Scale & Intent) - Using friendly rounded font
   textVariants: {
     h1: {
-      fontFamily: 'Poppins-Bold',
+      fontFamily: 'Nunito-Bold',
       fontSize: 28,
       lineHeight: 36,
       color: 'textPrimary',
     },
     h2: {
-      fontFamily: 'Poppins-SemiBold',
+      fontFamily: 'Nunito-Bold',
       fontSize: 22,
       lineHeight: 28,
       color: 'textPrimary',
     },
     h3: {
-      fontFamily: 'Poppins-SemiBold',
+      fontFamily: 'Nunito-SemiBold',
       fontSize: 18,
       lineHeight: 24,
       color: 'textPrimary',
     },
     bodyLarge: {
-      fontFamily: 'Poppins-Regular',
+      fontFamily: 'Nunito-Regular',
       fontSize: 16,
       lineHeight: 24,
       color: 'textPrimary',
     },
     bodyMedium: {
-      fontFamily: 'Poppins-Regular',
+      fontFamily: 'Nunito-Regular',
       fontSize: 14,
       lineHeight: 20,
       color: 'textSecondary',
     },
     bodySmall: {
-      fontFamily: 'Poppins-Regular',
+      fontFamily: 'Nunito-Regular',
       fontSize: 12,
       lineHeight: 16,
       color: 'textMuted',
     },
     caption: {
-      fontFamily: 'Poppins-Medium',
+      fontFamily: 'Nunito-SemiBold',
       fontSize: 11,
       lineHeight: 14,
       color: 'textMuted',
       textTransform: 'uppercase',
     },
     badge: {
-      fontFamily: 'Poppins-SemiBold',
+      fontFamily: 'Nunito-Bold',
       fontSize: 10,
       lineHeight: 12,
       color: 'textInverse',
     },
     button: {
-      fontFamily: 'Poppins-SemiBold',
+      fontFamily: 'Nunito-Bold',
       fontSize: 16,
       lineHeight: 20,
-      color: 'textPrimary',
+      color: 'textInverse',
     },
   },
 

@@ -37,6 +37,7 @@ const save = jest.fn();
 const toggleSymptom = jest.fn();
 const setFlow = jest.fn();
 const setDischarge = jest.fn();
+const setSexualHealth = jest.fn();
 
 const mockLog = (overrides: Partial<ReturnType<typeof useTodayLog>> = {}) => {
   mockedUseTodayLog.mockReturnValue({
@@ -46,10 +47,13 @@ const mockLog = (overrides: Partial<ReturnType<typeof useTodayLog>> = {}) => {
       symptoms: [],
       notes: '',
       discharge: 'unspecified',
+      intercourseLogged: false,
+      contraceptionUsed: [],
     },
     setFlow,
     setMood: jest.fn(),
     setDischarge,
+    setSexualHealth,
     toggleSymptom,
     save,
     isSaving: false,
@@ -66,13 +70,15 @@ afterEach(() => {
 });
 
 describe('Tracking', () => {
-  it('renders the symptom, mood, flow and discharge sections', () => {
+  it('renders the symptom, mood, flow, discharge, and sexual health sections', () => {
     mockLog();
     setup(<Tracking />);
     expect(screen.getByTestId('symptom-picker')).toBeOnTheScreen();
     expect(screen.getByTestId('mood-selector')).toBeOnTheScreen();
     expect(screen.getByTestId('flow-selector')).toBeOnTheScreen();
     expect(screen.getByTestId('discharge-selector')).toBeOnTheScreen();
+    expect(screen.getByTestId('sexual-health-selector')).toBeOnTheScreen();
+    expect(screen.getByText('SEXUAL HEALTH')).toBeOnTheScreen();
   });
 
   it('selects a flow pill and a discharge pill', async () => {
@@ -117,5 +123,13 @@ describe('Tracking', () => {
     mockLog();
     setup(<Tracking />);
     expect(screen.getByTestId('kick-count')).toHaveTextContent('3');
+  });
+
+  it('selects sexual health pills and toggles protection tags', async () => {
+    mockLog();
+    const { user } = setup(<Tracking />);
+    expect(screen.getByText('SEXUAL HEALTH')).toBeOnTheScreen();
+    await user.press(screen.getByTestId('sexual-health-condom'));
+    expect(setSexualHealth).toHaveBeenCalledWith(true, ['condom']);
   });
 });

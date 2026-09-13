@@ -1,9 +1,17 @@
 from django.db import IntegrityError, transaction
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 from apps.core.exceptions import Conflict
 from apps.cycles.models import Cycle, DailyLog
-from apps.cycles.serializers import CycleSerializer, DailyLogSerializer
+from apps.cycles.serializers import (
+    CycleInitSerializer,
+    CycleSerializer,
+    DailyLogSerializer,
+)
+from apps.cycles.services import calculate_cycle_projections
 
 
 class OwnedModelViewSet(viewsets.ModelViewSet):
@@ -14,15 +22,11 @@ class OwnedModelViewSet(viewsets.ModelViewSet):
       get_object() 404s on another user's pk — existence is never leaked
       as a 403 (RULE 3).
     - perform_create stamps the owner server-side; the client cannot choose it.
-    - A unique-constraint violation the pre-checks missed (two concurrent
-      retries of the same POST) becomes a 409 Problem, never a 500. The
-      savepoint keeps the request's outer RLS transaction usable.
 
     Subclasses set `model` and `serializer_class` only.
     """
 
     model = None
-    conflict_detail = "A resource with these values already exists."
 
     def get_queryset(self):
         return self.model.objects.for_user(self.request.user)
@@ -52,6 +56,34 @@ class CycleViewSet(OwnedModelViewSet):
         if Cycle.objects.for_user(self.request.user).filter(start_date=start).exists():
             raise Conflict({"start_date": ["A cycle starting on this date already exists."]})
         super().perform_create(serializer)
+        # Compute and persist projections on the created cycle
+        cycle = Cycle.objects.for_user(self.request.user).filter(start_date=start).first()
+        if cycle:
+            calculate_cycle_projections(cycle, self.request.user)
+            cycle.save(update_fields=["estimated_ovulation_date", "next_period_date"])
+
+    @action(detail=False, methods=["post"], url_path="init")
+    def init_cycle(self, request):
+        serializer = CycleInitSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        start_date = serializer.validated_data["start_date"]
+
+        cycle = Cycle.objects.for_user(request.user).filter(start_date=start_date).first()
+        if not cycle:
+            cycle = Cycle(user=request.user, start_date=start_date)
+
+        calculate_cycle_projections(cycle, request.user)
+        cycle.save()
+
+        if not DailyLog.objects.for_user(request.user).filter(date=start_date).exists():
+            DailyLog.objects.create(
+                user=request.user,
+                date=start_date,
+                flow=DailyLog.Flow.MEDIUM,
+                notes="Cycle initialized",
+            )
+
+        return Response(CycleSerializer(cycle).data, status=status.HTTP_201_CREATED)
 
 
 class DailyLogViewSet(OwnedModelViewSet):

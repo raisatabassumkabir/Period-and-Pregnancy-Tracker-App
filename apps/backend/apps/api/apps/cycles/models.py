@@ -8,6 +8,8 @@ class Cycle(OwnedModel):
 
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
+    estimated_ovulation_date = models.DateField(null=True, blank=True)
+    next_period_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True, default="")
 
     class Meta:
@@ -51,6 +53,8 @@ class DailyLog(OwnedModel):
     flow = models.CharField(max_length=16, choices=Flow.choices, default=Flow.NONE)
     mood = models.CharField(max_length=16, choices=Mood.choices, default=Mood.UNSPECIFIED)
     symptoms = models.JSONField(default=list, blank=True)
+    intercourse_logged = models.BooleanField(default=False)
+    contraception_used = models.JSONField(default=list, blank=True)
     temperature_celsius = models.DecimalField(
         max_digits=4, decimal_places=2, null=True, blank=True
     )

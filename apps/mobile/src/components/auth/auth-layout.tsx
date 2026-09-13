@@ -86,10 +86,21 @@ export function AuthLayout({
               </Text>
             </View>
 
-            {/* Modern Card Container */}
+            {/* Modern Card Container with Soft Pastel Aesthetics */}
             <View
               testID="auth-form-card"
-              className="rounded-card border border-white/10 bg-surface/90 p-5 shadow-lg"
+              style={{
+                borderRadius: 24,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1,
+                borderColor: '#F0E5E1',
+                padding: 24,
+                shadowColor: '#F0E5E1',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.8,
+                shadowRadius: 15,
+                elevation: 4,
+              }}
             >
               {children}
             </View>

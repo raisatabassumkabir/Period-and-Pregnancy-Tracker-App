@@ -29,6 +29,10 @@ jest.mock('@/api/billing/use-subscription-status', () => ({
 
 jest.mock('@/api/cycles', () => ({
   useCycles: jest.fn(),
+  useInitCycle: () => ({
+    mutateAsync: jest.fn(),
+    isPending: false,
+  }),
 }));
 
 jest.mock('@/api/pregnancy', () => ({
@@ -205,5 +209,22 @@ describe('Home', () => {
     expect(screen.queryByTestId('cycle-demo-pill')).toBeNull();
     expect(screen.queryByTestId('pregnancy-demo-pill')).toBeNull();
     expect(screen.queryByTestId('pregnancy-ring')).toBeNull();
+  });
+
+  it('renders the prominent pastel Start my first log CTA on cycle empty state', () => {
+    mockUser();
+    mockHealthData();
+    setup(<Home />);
+    expect(screen.getByTestId('start-first-log-cta')).toBeOnTheScreen();
+    expect(screen.getByText('Start my first log')).toBeOnTheScreen();
+  });
+
+  it('opens InitializeCycleModal when Start my first log is pressed on empty dashboard', async () => {
+    mockUser();
+    mockHealthData();
+    const { user } = setup(<Home />);
+    await user.press(screen.getByTestId('start-first-log-cta'));
+    expect(screen.getByTestId('initialize-cycle-modal')).toBeOnTheScreen();
+    expect(screen.getByText('When did your last period start?')).toBeOnTheScreen();
   });
 });

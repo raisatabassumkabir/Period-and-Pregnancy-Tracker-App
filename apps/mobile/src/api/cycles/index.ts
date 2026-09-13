@@ -4,4 +4,5 @@
 export * from './use-create-cycle';
 export * from './use-cycles';
 export * from './use-daily-logs';
+export * from './use-init-cycle';
 export * from './use-save-daily-log';

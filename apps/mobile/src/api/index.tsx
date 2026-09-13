@@ -4,3 +4,4 @@ export * from './common';
 export * from './cycles';
 export * from './pregnancy';
 export * from './types';
+export * from './users';

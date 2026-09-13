@@ -91,8 +91,10 @@ export default function RootLayout() {
       const target = isFirstTime ? '/onboarding' : '/login';
       requestAnimationFrame(() => router.replace(target));
     } else if (status === 'signIn' && onAuthScreen) {
-      // Allow setup-profile to stay mounted if user just registered
-      requestAnimationFrame(() => router.replace('/(app)'));
+      // Allow onboarding to stay mounted until completed
+      if (root !== 'onboarding') {
+        requestAnimationFrame(() => router.replace('/(app)'));
+      }
     }
   }, [
     status,

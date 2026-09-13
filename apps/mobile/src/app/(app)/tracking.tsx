@@ -7,6 +7,7 @@ import {
   FlowSelector,
   KickCounter,
   MoodSelector,
+  SexualHealthSelector,
   SymptomPicker,
 } from '@/components/tracking';
 import {
@@ -78,6 +79,7 @@ export default function Tracking() {
     setFlow,
     setMood,
     setDischarge,
+    setSexualHealth,
     toggleSymptom,
     save,
     isSaving,
@@ -136,6 +138,14 @@ export default function Tracking() {
 
         <Section title="Vaginal discharge">
           <DischargeSelector value={draft.discharge} onChange={setDischarge} />
+        </Section>
+
+        <Section title="SEXUAL HEALTH">
+          <SexualHealthSelector
+            intercourseLogged={draft.intercourseLogged}
+            contraceptionUsed={draft.contraceptionUsed}
+            onChange={setSexualHealth}
+          />
         </Section>
 
         <Section title="Movements">

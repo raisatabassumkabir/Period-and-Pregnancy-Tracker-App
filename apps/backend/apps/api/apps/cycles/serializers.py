@@ -9,8 +9,23 @@ class CycleSerializer(serializers.ModelSerializer):
         model = Cycle
         # Explicit allowlist (RULE 4). `user` is intentionally absent: it is set
         # server-side from the authenticated request, never client-supplied.
-        fields = ["id", "start_date", "end_date", "notes", "created_at", "updated_at"]
-        read_only_fields = ["id", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "start_date",
+            "end_date",
+            "estimated_ovulation_date",
+            "next_period_date",
+            "notes",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "estimated_ovulation_date",
+            "next_period_date",
+            "created_at",
+            "updated_at",
+        ]
 
     def validate(self, attrs):
         start = attrs.get("start_date", getattr(self.instance, "start_date", None))
@@ -18,6 +33,10 @@ class CycleSerializer(serializers.ModelSerializer):
         if start and end and end < start:
             raise serializers.ValidationError("end_date cannot precede start_date.")
         return attrs
+
+
+class CycleInitSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
 
 
 class DailyLogSerializer(serializers.ModelSerializer):
@@ -29,6 +48,8 @@ class DailyLogSerializer(serializers.ModelSerializer):
             "flow",
             "mood",
             "symptoms",
+            "intercourse_logged",
+            "contraception_used",
             "temperature_celsius",
             "notes",
             "created_at",

@@ -18,6 +18,8 @@ export interface DailyLogDraft {
   notes: string;
   /** App-only; persisted in the encrypted store, not sent to the API. */
   discharge: Discharge;
+  intercourseLogged: boolean;
+  contraceptionUsed: string[];
 }
 
 const EMPTY_DRAFT: DailyLogDraft = {
@@ -26,6 +28,8 @@ const EMPTY_DRAFT: DailyLogDraft = {
   symptoms: [],
   notes: '',
   discharge: 'unspecified',
+  intercourseLogged: false,
+  contraceptionUsed: [],
 };
 
 /**
@@ -64,6 +68,8 @@ export function useTodayLog() {
       symptoms: existing.symptoms,
       notes: existing.notes,
       discharge: current.discharge,
+      intercourseLogged: existing.intercourse_logged ?? false,
+      contraceptionUsed: existing.contraception_used ?? [],
     }));
   }
 
@@ -101,9 +107,18 @@ export function useTodayLog() {
       setDraft((current) => ({ ...current, discharge })),
     []
   );
+  const setSexualHealth = React.useCallback(
+    (intercourseLogged: boolean, contraceptionUsed: string[]) =>
+      setDraft((current) => ({
+        ...current,
+        intercourseLogged,
+        contraceptionUsed,
+      })),
+    []
+  );
 
   const save = React.useCallback(async () => {
-    const { discharge, ...serverFields } = draft;
+    const { discharge, intercourseLogged, contraceptionUsed, ...serverFields } = draft;
 
     const newLog: DailyLog = {
       id: existing?.id ?? `local-${Date.now()}`,
@@ -112,6 +127,8 @@ export function useTodayLog() {
       mood: serverFields.mood,
       symptoms: serverFields.symptoms,
       notes: serverFields.notes,
+      intercourse_logged: intercourseLogged,
+      contraception_used: contraceptionUsed,
       temperature_celsius: existing?.temperature_celsius ?? null,
       created_at: existing?.created_at ?? new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -164,6 +181,8 @@ export function useTodayLog() {
         id: existing?.id && !existing.id.startsWith('local-') ? existing.id : undefined,
         date: today,
         ...serverFields,
+        intercourse_logged: intercourseLogged,
+        contraception_used: contraceptionUsed,
       });
       queryClient.invalidateQueries({ queryKey: ['daily-logs'] });
     } catch {
@@ -171,7 +190,7 @@ export function useTodayLog() {
     }
 
     return saved;
-  }, [draft, existing?.id, existing?.created_at, queryClient, saveMutation, today]);
+  }, [draft, existing?.id, existing?.created_at, existing?.temperature_celsius, queryClient, saveMutation, today]);
 
   const errorBody = saveMutation.error?.response?.data;
 
@@ -180,6 +199,7 @@ export function useTodayLog() {
     setFlow,
     setMood,
     setDischarge,
+    setSexualHealth,
     toggleSymptom,
     save,
     isSaving: saveMutation.isPending,

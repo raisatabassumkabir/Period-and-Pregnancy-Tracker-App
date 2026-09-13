@@ -3,7 +3,12 @@ import { useForm } from 'react-hook-form';
 
 import { useLogin } from '@/api/auth';
 import { useAuth } from '@/lib';
-import { findDemoAccount, seedDemoUserState } from '@/lib/auth/demo-users';
+import {
+  clearUserStateForCleanTest,
+  findDemoAccount,
+  isCleanTestAccount,
+  seedDemoUserState,
+} from '@/lib/auth/demo-users';
 
 import { applyProblemToForm } from './apply-problem-to-form';
 import type { LoginFormValues } from './auth-schemas';
@@ -22,7 +27,27 @@ export const useLoginLogic = () => {
   });
 
   const handleLogin = async (values: LoginFormValues) => {
-    const demo = findDemoAccount(values.email);
+    const trimmedEmail = values.email.trim();
+
+    if (isCleanTestAccount(trimmedEmail)) {
+      await clearUserStateForCleanTest();
+      try {
+        const tokens = await loginMutation.mutateAsync({
+          email: trimmedEmail,
+          password: values.password,
+        });
+        signIn({ access: tokens.access, refresh: tokens.refresh });
+      } catch {
+        // Allows testing clean-slate flow even when local Django backend is offline
+        signIn({
+          access: `clean-test-access-token`,
+          refresh: `clean-test-refresh-token`,
+        });
+      }
+      return;
+    }
+
+    const demo = findDemoAccount(trimmedEmail);
     if (demo) {
       await seedDemoUserState(demo);
       signIn({

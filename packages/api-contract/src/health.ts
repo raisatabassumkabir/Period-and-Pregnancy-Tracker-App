@@ -48,6 +48,8 @@ export interface Profile {
   budget_tier: BudgetTier;
   height: number | null;
   weight: number | null;
+  average_cycle_length?: number;
+  average_period_duration?: number;
   goals: string[];
   source: string;
   medical_conditions: MedicalCondition[];
@@ -67,6 +69,8 @@ export type ProfileWrite = Partial<
     | 'budget_tier'
     | 'height'
     | 'weight'
+    | 'average_cycle_length'
+    | 'average_period_duration'
     | 'goals'
     | 'source'
     | 'medical_conditions'
@@ -82,6 +86,8 @@ export interface Cycle {
   start_date: string;
   end_date: string | null;
   notes: string;
+  estimated_ovulation_date?: string | null;
+  next_period_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -91,6 +97,10 @@ export interface CycleWrite {
   start_date: string;
   end_date?: string | null;
   notes?: string;
+}
+
+export interface CycleInitWrite {
+  start_date: string;
 }
 
 // --------------------------------------------
@@ -130,6 +140,8 @@ export interface DailyLog {
   /** DRF decimal — serialized as a string, e.g. `"36.60"`. */
   temperature_celsius: string | null;
   notes: string;
+  intercourse_logged?: boolean;
+  contraception_used?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -142,6 +154,8 @@ export interface DailyLogWrite {
   symptoms?: Symptom[];
   temperature_celsius?: string | null;
   notes?: string;
+  intercourse_logged?: boolean;
+  contraception_used?: string[];
 }
 
 // --------------------------------------------

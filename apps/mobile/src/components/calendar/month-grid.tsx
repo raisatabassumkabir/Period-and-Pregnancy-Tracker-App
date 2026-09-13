@@ -60,13 +60,13 @@ const LEGEND: readonly { phase: Exclude<CyclePhase, 'none'>; label: string }[] =
     { phase: 'ovulation', label: 'Ovulation' },
   ];
 
-interface DayCellProps {
+export interface DayCellProps {
   date: string | null;
   classification: DayClassification | null;
 }
 
 /** The coloured face-circle inside a cell; a bare dot on an unmarked day. */
-function StateCircle({
+const StateCircle = React.memo(function StateCircle({
   classification,
 }: {
   classification: DayClassification;
@@ -85,8 +85,6 @@ function StateCircle({
         width: STATE_CIRCLE_SIZE,
         height: STATE_CIRCLE_SIZE,
         backgroundColor: color ?? colors.cycle.lavender,
-        // A predicted period/window is a forecast, so it reads lighter — but
-        // not so light that the face stops being legible.
         opacity: isProjected ? PROJECTED_OPACITY : 1,
       }}
       testID={`calendar-state-${phase}`}
@@ -98,13 +96,42 @@ function StateCircle({
       ) : null}
     </View>
   );
+});
+
+/**
+ * Custom comparison function ensuring DayCell only re-renders when its date
+ * or visual classification attributes actually mutate, preventing full 35-cell
+ * re-render sweeps on parent updates.
+ */
+export function areDayCellPropsEqual(
+  prevProps: DayCellProps,
+  nextProps: DayCellProps
+): boolean {
+  if (prevProps.date !== nextProps.date) return false;
+  if (!prevProps.date && !nextProps.date) return true;
+  if (prevProps.classification === nextProps.classification) return true;
+  if (!prevProps.classification || !nextProps.classification) return false;
+
+  const prev = prevProps.classification;
+  const next = nextProps.classification;
+
+  return (
+    prev.phase === next.phase &&
+    prev.mood === next.mood &&
+    prev.isToday === next.isToday &&
+    prev.isProjected === next.isProjected &&
+    prev.isPeriod === next.isPeriod &&
+    prev.isLogged === next.isLogged
+  );
 }
 
-function DayCell({ date, classification }: DayCellProps) {
+export const DayCell = React.memo(function DayCell({
+  date,
+  classification,
+}: DayCellProps) {
   if (!date || !classification) return <View className={CELL_CLASS} />;
 
   const dayNumber = String(Number(date.slice(-2)));
-  // Colour-only toggles; never a runtime-toggled shadow class.
   const containerClass = `${CELL_CLASS} items-center justify-between rounded-pill bg-surface py-2 ${
     classification.isToday
       ? 'border-2 border-accent'
@@ -119,7 +146,7 @@ function DayCell({ date, classification }: DayCellProps) {
       <StateCircle classification={classification} />
     </View>
   );
-}
+}, areDayCellPropsEqual);
 
 function Legend() {
   return (
@@ -171,9 +198,15 @@ export function MonthGrid({
   onSelectMonth,
 }: Props) {
   const palette = usePaletteColors();
-  const weeks = buildMonthMatrix(year, monthIndex);
-  const today = todayDateString();
-  const context = { cycles, logs, today, cycleLengthDays };
+  const weeks = React.useMemo(
+    () => buildMonthMatrix(year, monthIndex),
+    [year, monthIndex]
+  );
+  const today = React.useMemo(() => todayDateString(), []);
+  const context = React.useMemo(
+    () => ({ cycles, logs, today, cycleLengthDays }),
+    [cycles, logs, today, cycleLengthDays]
+  );
 
   return (
     <View testID="calendar-month-grid">

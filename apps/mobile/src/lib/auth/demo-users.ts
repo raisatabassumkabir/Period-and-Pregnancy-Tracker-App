@@ -31,11 +31,14 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
       age: 26,
       height: '165',
       weight: '58',
+      averageCycleLength: 28,
+      averagePeriodDuration: 5,
       mode: 'cycle_tracking',
       diet: 'unspecified',
       medicalConditions: [],
       goals: ['sync_sex_life', 'symptoms'],
       source: 'Friends or Family',
+      hasCompletedOnboarding: true,
     },
   },
   {
@@ -52,11 +55,14 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
       age: 30,
       height: '168',
       weight: '64',
+      averageCycleLength: 28,
+      averagePeriodDuration: 5,
       mode: 'pregnancy',
       diet: 'unspecified',
       medicalConditions: [],
       goals: ['symptoms'],
       source: 'Medical professional',
+      hasCompletedOnboarding: true,
     },
   },
   {
@@ -73,14 +79,56 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
       age: 28,
       height: '162',
       weight: '61',
+      averageCycleLength: 32,
+      averagePeriodDuration: 5,
       mode: 'cycle_tracking',
       diet: 'unspecified',
       medicalConditions: ['pcos'],
       goals: ['pcos_endo', 'discharge', 'symptoms'],
       source: 'Google Play or Google search',
+      hasCompletedOnboarding: true,
     },
   },
 ];
+
+export const CLEAN_TEST_PASSWORD = 'TestUser2026!';
+
+export interface CleanTestAccount {
+  email: string;
+  password: string;
+  name: string;
+  badge: string;
+  description: string;
+}
+
+export const CLEAN_TEST_ACCOUNTS: readonly CleanTestAccount[] = [
+  {
+    email: 'test1@happywomen.com',
+    password: CLEAN_TEST_PASSWORD,
+    name: 'Clean Test User 1',
+    badge: 'Fresh User 1',
+    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+  },
+  {
+    email: 'test2@happywomen.com',
+    password: CLEAN_TEST_PASSWORD,
+    name: 'Clean Test User 2',
+    badge: 'Fresh User 2',
+    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+  },
+  {
+    email: 'test3@happywomen.com',
+    password: CLEAN_TEST_PASSWORD,
+    name: 'Clean Test User 3',
+    badge: 'Fresh User 3',
+    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+  },
+];
+
+export function isCleanTestAccount(email: string): boolean {
+  const normalized = email.trim().toLowerCase();
+  return CLEAN_TEST_ACCOUNTS.some((acc) => acc.email.toLowerCase() === normalized);
+}
 
 export function findDemoAccount(email: string): DemoUserAccount | undefined {
   const normalized = email.trim().toLowerCase();
@@ -91,4 +139,11 @@ export async function seedDemoUserState(account: DemoUserAccount): Promise<void>
   await setItem(STORAGE_KEYS.PERSONALIZATION_PROFILE, account.profile);
   await setItem(STORAGE_KEYS.TRACKING_MODE, account.mode === 'pregnancy' ? 'pregnancy' : 'cycle');
   useHealthStore.getState().setMode(account.mode);
+}
+
+export async function clearUserStateForCleanTest(): Promise<void> {
+  // Clear any existing stored profile so the user is guaranteed to start on Screen 1
+  await setItem(STORAGE_KEYS.PERSONALIZATION_PROFILE, null);
+  await setItem(STORAGE_KEYS.TRACKING_MODE, 'cycle');
+  useHealthStore.getState().setMode('cycle');
 }

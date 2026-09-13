@@ -1,8 +1,15 @@
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 from apps.cycles.models import Cycle, DailyLog
-from apps.cycles.serializers import CycleSerializer, DailyLogSerializer
+from apps.cycles.serializers import (
+    CycleInitSerializer,
+    CycleSerializer,
+    DailyLogSerializer,
+)
+from apps.cycles.services import calculate_cycle_projections
 
 
 class OwnedModelViewSet(viewsets.ModelViewSet):
@@ -30,6 +37,35 @@ class CycleViewSet(OwnedModelViewSet):
     model = Cycle
     serializer_class = CycleSerializer
     queryset = Cycle.objects.none()  # schema generation only; see get_queryset
+
+    def perform_create(self, serializer):
+        cycle = serializer.save(user=self.request.user)
+        calculate_cycle_projections(cycle, self.request.user)
+        cycle.save(update_fields=["estimated_ovulation_date", "next_period_date"])
+
+    @action(detail=False, methods=["post"], url_path="init")
+    def init_cycle(self, request):
+        serializer = CycleInitSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        start_date = serializer.validated_data["start_date"]
+
+        cycle = Cycle.objects.for_user(request.user).filter(start_date=start_date).first()
+        if not cycle:
+            cycle = Cycle(user=request.user, start_date=start_date)
+
+        calculate_cycle_projections(cycle, request.user)
+        cycle.save()
+
+        # Anchor with initial DailyLog if not already logged
+        if not DailyLog.objects.for_user(request.user).filter(date=start_date).exists():
+            DailyLog.objects.create(
+                user=request.user,
+                date=start_date,
+                flow=DailyLog.Flow.MEDIUM,
+                notes="Cycle initialized",
+            )
+
+        return Response(CycleSerializer(cycle).data, status=status.HTTP_201_CREATED)
 
 
 class DailyLogViewSet(OwnedModelViewSet):

@@ -5,8 +5,8 @@ import { getItem, setItem } from '../storage';
 
 const SELECTED_THEME = 'SELECTED_THEME';
 export type ColorSchemeType = 'light' | 'dark' | 'system';
-/** Happy Women is designed dark-first; the OS setting only applies once opted into. */
-const DEFAULT_THEME: ColorSchemeType = 'dark';
+/** Happy Women defaults to the polished pastel light aesthetic. */
+const DEFAULT_THEME: ColorSchemeType = 'light';
 /**
  * this hooks should only be used while selecting the theme
  * This hooks will return the selected theme which is stored in AsyncStorage

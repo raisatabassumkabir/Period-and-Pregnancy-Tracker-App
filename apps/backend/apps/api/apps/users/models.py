@@ -87,6 +87,8 @@ class Profile(TimestampedModel):
 
     height = models.FloatField(null=True, blank=True)
     weight = models.FloatField(null=True, blank=True)
+    average_cycle_length = models.PositiveIntegerField(default=28, blank=True)
+    average_period_duration = models.PositiveIntegerField(default=5, blank=True)
     goals = models.JSONField(default=list, blank=True)
     source = models.CharField(max_length=64, blank=True, default="")
 

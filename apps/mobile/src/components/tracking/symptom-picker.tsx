@@ -20,7 +20,7 @@ import {
   Zap,
 } from 'lucide-react-native';
 import React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { InteractionManager, Pressable, ScrollView, View } from 'react-native';
 
 import type { Symptom } from '@/api/cycles/types';
 import { Text } from '@/components/ui';
@@ -59,6 +59,70 @@ const SYMPTOM_OPTIONS: readonly SymptomOption[] = [
   { code: 'low_mood', label: 'Low mood', icon: CloudRain },
 ];
 
+interface SymptomItemProps {
+  code: Symptom;
+  label: string;
+  icon: LucideIcon;
+  isSelected: boolean;
+  onToggle: (symptom: Symptom) => void;
+  accentColor: string;
+  toneColor: string;
+}
+
+/**
+ * Memoized individual symptom toggle button. Prevents re-rendering all 18 buttons
+ * when only a single button is pressed. Uses runAfterInteractions to prevent UI lag.
+ */
+const SymptomItem = React.memo(function SymptomItem({
+  code,
+  label,
+  icon: Icon,
+  isSelected,
+  onToggle,
+  accentColor,
+  toneColor,
+}: SymptomItemProps) {
+  const handlePress = React.useCallback(() => {
+    InteractionManager.runAfterInteractions(() => {
+      onToggle(code);
+    });
+  }, [code, onToggle]);
+
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: isSelected }}
+      accessibilityLabel={label}
+      testID={`symptom-${code}`}
+      onPress={handlePress}
+      className="w-16 items-center"
+    >
+      <View
+        className={`size-16 items-center justify-center rounded-full border-2 ${
+          isSelected
+            ? 'border-accent bg-accent-200'
+            : 'border-divider bg-surface'
+        }`}
+      >
+        <Icon
+          size={ICON_SIZE}
+          color={isSelected ? accentColor : toneColor}
+        />
+      </View>
+      <Text
+        numberOfLines={1}
+        className={`mt-1.5 text-[11px] ${
+          isSelected
+            ? 'font-body-bold text-accent-700'
+            : 'font-body-semibold text-tone-700'
+        }`}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+});
+
 interface Props {
   selected: readonly Symptom[];
   onToggle: (symptom: Symptom) => void;
@@ -67,6 +131,7 @@ interface Props {
 /** Horizontal row of circular icon buttons; the active ones turn coral. */
 export function SymptomPicker({ selected, onToggle }: Props) {
   const palette = usePaletteColors();
+  const selectedSet = React.useMemo(() => new Set(selected), [selected]);
 
   return (
     <ScrollView
@@ -75,44 +140,18 @@ export function SymptomPicker({ selected, onToggle }: Props) {
       testID="symptom-picker"
     >
       <View className="flex-row gap-3">
-        {SYMPTOM_OPTIONS.map(({ code, label, icon: Icon }) => {
-          const isSelected = selected.includes(code);
-          return (
-            <Pressable
-              key={code}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isSelected }}
-              accessibilityLabel={label}
-              testID={`symptom-${code}`}
-              onPress={() => onToggle(code)}
-              className="w-16 items-center"
-            >
-              <View
-                // Colour-only toggle; never a runtime-toggled shadow class.
-                className={`size-16 items-center justify-center rounded-full border-2 ${
-                  isSelected
-                    ? 'border-accent bg-accent-200'
-                    : 'border-divider bg-surface'
-                }`}
-              >
-                <Icon
-                  size={ICON_SIZE}
-                  color={isSelected ? palette.accent : palette.tone[600]}
-                />
-              </View>
-              <Text
-                numberOfLines={1}
-                className={`mt-1.5 text-[11px] ${
-                  isSelected
-                    ? 'font-body-bold text-accent-700'
-                    : 'font-body-semibold text-tone-700'
-                }`}
-              >
-                {label}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {SYMPTOM_OPTIONS.map(({ code, label, icon }) => (
+          <SymptomItem
+            key={code}
+            code={code}
+            label={label}
+            icon={icon}
+            isSelected={selectedSet.has(code)}
+            onToggle={onToggle}
+            accentColor={palette.accent}
+            toneColor={palette.tone[600]}
+          />
+        ))}
       </View>
     </ScrollView>
   );
