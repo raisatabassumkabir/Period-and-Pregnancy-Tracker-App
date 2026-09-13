@@ -7,6 +7,7 @@ import { showUpgrade } from '@/lib/upgrade';
 
 export const client = axios.create({
   baseURL: Env.API_URL,
+  timeout: 8000,
   headers: {
     'Content-Type': 'application/json',
   },

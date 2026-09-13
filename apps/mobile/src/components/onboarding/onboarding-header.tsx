@@ -53,7 +53,8 @@ export function OnboardingHeader({
           accessibilityLabel="Skip"
           testID="onboarding-skip"
           onPress={onSkip}
-          className="px-3 py-1.5 rounded-full bg-white/70 border border-[#F0E5E1] active:opacity-75"
+          hitSlop={{ top: 16, bottom: 16, left: 24, right: 24 }}
+          className="px-4 py-2 rounded-full bg-white/80 border border-[#F0E5E1] active:opacity-60"
         >
           <Text className="font-body-bold text-[13px] text-[#FF9FA8]">
             Skip

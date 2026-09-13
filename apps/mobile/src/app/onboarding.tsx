@@ -94,26 +94,34 @@ export default function Onboarding() {
     const parsedWeight = parseFloat(weightKg) || null;
 
     // 1. Persist to local storage
-    await updateProfile(
-      {
-        hasCompletedOnboarding: true,
-        appIntent: intent ?? 'myself',
-        partnerCode,
-        goals: selectedGoals,
-        medicalConditions: selectedConditions as any,
-        source: selectedSource,
-        averageCycleLength: cycleLength,
-        averagePeriodDuration: periodDuration,
-        height: heightCm,
-        weight: weightKg,
-        mode: assignedMode,
-      },
-      { silent: true }
-    );
-
-    // 2. Post to Django backend Profile model
     try {
-      await saveProfileMutation.mutateAsync({
+      await updateProfile(
+        {
+          hasCompletedOnboarding: true,
+          appIntent: intent ?? 'myself',
+          partnerCode,
+          goals: selectedGoals,
+          medicalConditions: selectedConditions as any,
+          source: selectedSource,
+          averageCycleLength: cycleLength,
+          averagePeriodDuration: periodDuration,
+          height: heightCm,
+          weight: weightKg,
+          mode: assignedMode,
+        },
+        { silent: true }
+      );
+    } catch (err) {
+      console.warn('Failed to update local profile:', err);
+    }
+
+    setHealthMode(isPregnancyGoal ? 'pregnancy' : 'cycle');
+    await setIsFirstTime(false);
+
+    // 2. Post to Django backend Profile model in background (fire-and-forget)
+    // Never block UI navigation or freeze the app when the backend is offline or slow
+    saveProfileMutation
+      .mutateAsync({
         mode: assignedMode,
         goals: selectedGoals,
         medical_conditions: selectedConditions.filter(
@@ -124,13 +132,10 @@ export default function Onboarding() {
         average_period_duration: periodDuration,
         height: parsedHeight,
         weight: parsedWeight,
+      })
+      .catch((err) => {
+        console.warn('Profile sync to Django backend was skipped or errored:', err);
       });
-    } catch (err) {
-      console.warn('Profile sync to Django backend was skipped or errored:', err);
-    }
-
-    setHealthMode(isPregnancyGoal ? 'pregnancy' : 'cycle');
-    await setIsFirstTime(false);
 
     if (status === 'signIn') {
       router.replace('/(app)');
