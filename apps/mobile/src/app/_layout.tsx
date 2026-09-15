@@ -19,6 +19,8 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { APIProvider } from '@/api';
 import { UpgradeSheet } from '@/components/billing';
+import { PrivacyShield } from '@/components/security';
+import { AppErrorBoundary } from '@/components/ui';
 import {
   hydrateAuth,
   loadSelectedPalette,
@@ -134,17 +136,21 @@ function Providers({ children }: { children: React.ReactNode }) {
         style={vars(paletteTokens)}
         className={theme.dark ? 'dark flex-1' : 'flex-1'}
       >
-        <KeyboardProvider>
-          <ThemeProvider value={theme}>
-            <APIProvider>
-              <BottomSheetModalProvider>
-                {children}
-                <UpgradeSheet />
-                <FlashMessage position="top" />
-              </BottomSheetModalProvider>
-            </APIProvider>
-          </ThemeProvider>
-        </KeyboardProvider>
+        <AppErrorBoundary name="RootLayout">
+          <PrivacyShield>
+            <KeyboardProvider>
+              <ThemeProvider value={theme}>
+                <APIProvider>
+                  <BottomSheetModalProvider>
+                    {children}
+                    <UpgradeSheet />
+                    <FlashMessage position="top" />
+                  </BottomSheetModalProvider>
+                </APIProvider>
+              </ThemeProvider>
+            </KeyboardProvider>
+          </PrivacyShield>
+        </AppErrorBoundary>
       </View>
     </GestureHandlerRootView>
   );

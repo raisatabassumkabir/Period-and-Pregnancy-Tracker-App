@@ -95,6 +95,16 @@ export async function getItem<T>(key: string): Promise<T | null> {
 }
 
 export async function setItem<T>(key: string, value: T): Promise<void> {
+  // Security compliance: auth tokens and cryptographic credentials must never enter MMKV
+  if (
+    key === 'token' ||
+    key === 'app.auth.token' ||
+    key.toLowerCase().includes('credential')
+  ) {
+    throw new Error(
+      `[Security Compliance Violation] Key "${key}" must be stored in expo-secure-store, not MMKV.`
+    );
+  }
   const store = await openStore();
   store.set(key, JSON.stringify(value));
 }

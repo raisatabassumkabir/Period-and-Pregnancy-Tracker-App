@@ -19,6 +19,24 @@ jest.mock('react-native-edge-to-edge', () => ({
   SystemBars: () => null,
 }));
 
+let mockProfileGoals: string[] = [];
+const mockUpdateProfile = jest.fn();
+
+jest.mock('@/lib/health/use-personalization-profile', () => ({
+  ...jest.requireActual('@/lib/health/use-personalization-profile'),
+  usePersonalizationProfile: () => ({
+    profile: {
+      fullName: 'Ada Lovelace',
+      goals: mockProfileGoals,
+      medicalConditions: [],
+      averageCycleLength: 28,
+      mode: 'cycle_tracking',
+    },
+    updateProfile: mockUpdateProfile,
+    isLoading: false,
+  }),
+}));
+
 jest.mock('@/api/auth', () => ({
   useMe: jest.fn(),
 }));
@@ -57,7 +75,9 @@ const mockUser = (
   fullName: string | null = 'Ada Lovelace',
   isPremium = false
 ) => {
-  mockedUseMe.mockReturnValue({ data: { full_name: fullName } } as never);
+  mockedUseMe.mockReturnValue({
+    data: { full_name: fullName, profile: { goals: mockProfileGoals } },
+  } as never);
   mockedUseSubscription.mockReturnValue({
     data: { is_premium: isPremium },
   } as never);
@@ -81,7 +101,9 @@ const startedDaysAgo = (days: number) => {
 
 afterEach(() => {
   cleanup();
+  mockProfileGoals = [];
   mockPush.mockReset();
+  mockUpdateProfile.mockReset();
   mockedUseMe.mockReset();
   mockedUseSubscription.mockReset();
   mockedUseCycles.mockReset();
@@ -142,11 +164,11 @@ describe('Home', () => {
     expect(screen.getByTestId('premium-badge')).toBeOnTheScreen();
   });
 
-  it('invites the user to log a first period when there is no history', () => {
+  it('invites the user to start a first cycle when there is no history', () => {
     mockUser();
     mockHealthData();
     setup(<Home />);
-    expect(screen.getByText(/Log your first period/)).toBeOnTheScreen();
+    expect(screen.getAllByText('Start your first cycle')[0]).toBeOnTheScreen();
     expect(screen.queryByTestId('cycle-status-cards')).toBeNull();
   });
 
@@ -158,13 +180,13 @@ describe('Home', () => {
     setup(<Home />);
     expect(screen.getByTestId('cycle-status-cards')).toBeOnTheScreen();
     expect(screen.getByTestId('cycle-ring-day')).toHaveTextContent('10');
-    // Day 10 of 28 sits inside the estimated fertile window (days 9–15).
     expect(screen.getByTestId('pregnancy-chance-card')).toHaveTextContent(
       /High/
     );
   });
 
-  it('shows the gestation ring for an active pregnancy', () => {
+  it('shows the gestation ring for an active pregnancy when tracking pregnancy', () => {
+    mockProfileGoals = ['track_pregnancy'];
     mockUser();
     mockHealthData({
       pregnancies: [
@@ -183,14 +205,77 @@ describe('Home', () => {
     expect(screen.getByText('Second')).toBeOnTheScreen();
   });
 
-  it('prompts to start a pregnancy when none is active', () => {
+  it('renders ONLY the Start your first cycle card when goals has Track my period and activeCycle == null', () => {
+    mockProfileGoals = ['Track my period'];
     mockUser();
-    mockHealthData({ pregnancies: [{ id: 'p1', status: 'completed' }] });
+    mockHealthData({ cycles: [], pregnancies: [] });
     setup(<Home />);
-    expect(screen.getByText(/No active pregnancy/)).toBeOnTheScreen();
+    expect(screen.getAllByText('Start your first cycle')[0]).toBeOnTheScreen();
+    expect(screen.getByTestId('start-first-log-cta')).toBeOnTheScreen();
+    expect(screen.queryByTestId('start-pregnancy-cta')).toBeNull();
+    expect(screen.queryByTestId('pregnancy-empty-state-card')).toBeNull();
+    expect(screen.getByTestId('pregnant-transition-banner')).toBeOnTheScreen();
+    expect(screen.queryByTestId('cycle-transition-banner')).toBeNull();
+  });
+
+  it('allows switching to pregnancy mode via transition banner', async () => {
+    mockProfileGoals = ['Track my period'];
+    mockUser();
+    mockHealthData({ cycles: [], pregnancies: [] });
+    const { user } = setup(<Home />);
+    expect(screen.getByTestId('pregnant-transition-banner')).toBeOnTheScreen();
+    await user.press(screen.getByTestId('switch-to-pregnancy-cta'));
+    expect(mockUpdateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'pregnancy',
+        goals: expect.arrayContaining(['track_pregnancy']),
+      })
+    );
+  });
+
+  it('renders ONLY the Start Pregnancy Tracking card when goals has Track my pregnancy and activePregnancy == null', () => {
+    mockProfileGoals = ['Track my pregnancy'];
+    mockUser();
+    mockHealthData({ cycles: [], pregnancies: [] });
+    setup(<Home />);
+    expect(screen.getAllByText('Start Pregnancy Tracking')[0]).toBeOnTheScreen();
+    expect(screen.getByTestId('start-pregnancy-cta')).toBeOnTheScreen();
+    expect(screen.queryByTestId('start-first-log-cta')).toBeNull();
+    expect(screen.queryByTestId('cycle-empty-state-card')).toBeNull();
+    expect(screen.getByTestId('cycle-transition-banner')).toBeOnTheScreen();
+    expect(screen.queryByTestId('pregnant-transition-banner')).toBeNull();
+  });
+
+  it('allows switching to cycle mode via transition banner', async () => {
+    mockProfileGoals = ['Track my pregnancy'];
+    mockUser();
+    mockHealthData({ cycles: [], pregnancies: [] });
+    const { user } = setup(<Home />);
+    expect(screen.getByTestId('cycle-transition-banner')).toBeOnTheScreen();
+    await user.press(screen.getByTestId('switch-to-cycle-cta'));
+    expect(mockUpdateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'cycle_tracking',
+        goals: expect.arrayContaining(['track_period']),
+      })
+    );
+  });
+
+  it('renders BOTH empty states when user explicitly selected BOTH goals and hides transition banners', () => {
+    mockProfileGoals = ['Track my period', 'Track my pregnancy'];
+    mockUser();
+    mockHealthData({ cycles: [], pregnancies: [] });
+    setup(<Home />);
+    expect(screen.getByTestId('cycle-empty-state-card')).toBeOnTheScreen();
+    expect(screen.getByTestId('pregnancy-empty-state-card')).toBeOnTheScreen();
+    expect(screen.getByTestId('start-first-log-cta')).toBeOnTheScreen();
+    expect(screen.getByTestId('start-pregnancy-cta')).toBeOnTheScreen();
+    expect(screen.queryByTestId('pregnant-transition-banner')).toBeNull();
+    expect(screen.queryByTestId('cycle-transition-banner')).toBeNull();
   });
 
   it('falls back to labelled demo data when the backend is unreachable', () => {
+    mockProfileGoals = ['track_period', 'track_pregnancy'];
     mockUser();
     const failed = { data: undefined, isError: true };
     mockedUseCycles.mockReturnValue(failed as never);
@@ -211,15 +296,8 @@ describe('Home', () => {
     expect(screen.queryByTestId('pregnancy-ring')).toBeNull();
   });
 
-  it('renders the prominent pastel Start my first log CTA on cycle empty state', () => {
-    mockUser();
-    mockHealthData();
-    setup(<Home />);
-    expect(screen.getByTestId('start-first-log-cta')).toBeOnTheScreen();
-    expect(screen.getByText('Start my first log')).toBeOnTheScreen();
-  });
-
-  it('opens InitializeCycleModal when Start my first log is pressed on empty dashboard', async () => {
+  it('opens InitializeCycleModal date picker when Start your first cycle is pressed', async () => {
+    mockProfileGoals = ['track_period'];
     mockUser();
     mockHealthData();
     const { user } = setup(<Home />);

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useCycles } from '@/api/cycles';
 import { useAuth } from '@/lib';
 import { cleanup, screen, setup, waitFor } from '@/lib/test-utils';
 
@@ -7,6 +8,7 @@ import Onboarding from './onboarding';
 
 const mockReplace = jest.fn();
 const mockMutateAsync = jest.fn().mockResolvedValue({});
+const mockInitMutateAsync = jest.fn().mockResolvedValue({ id: 'new-c1' });
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ replace: mockReplace }),
@@ -18,19 +20,35 @@ jest.mock('@/api/users', () => ({
   }),
 }));
 
+jest.mock('@/api/cycles', () => ({
+  useCycles: jest.fn(),
+  useInitCycle: () => ({
+    mutateAsync: mockInitMutateAsync,
+    isPending: false,
+  }),
+}));
+
 // SystemBars schedules native status-bar work that outlives the jest environment.
 jest.mock('react-native-edge-to-edge', () => ({
   SystemBars: () => null,
 }));
 
+const mockedUseCycles = useCycles as jest.MockedFunction<typeof useCycles>;
+
 beforeEach(() => {
   useAuth.setState({ status: 'signIn', token: { access: 'tok', refresh: 'ref' } });
+  mockedUseCycles.mockReturnValue({
+    data: { results: [{ id: 'c1', start_date: '2026-09-01' }], count: 1 },
+    isError: false,
+    isLoading: false,
+  } as never);
 });
 
 afterEach(() => {
   cleanup();
   mockReplace.mockReset();
   mockMutateAsync.mockClear();
+  mockInitMutateAsync.mockClear();
 });
 
 describe('Onboarding (6-Step Flow)', () => {
@@ -119,6 +137,55 @@ describe('Onboarding (6-Step Flow)', () => {
         weight: 60,
       })
     );
+  });
+
+  it('redirects to InitializeCycle modal when no cycle exists on step 6 completion, then routes to Home on confirmation', async () => {
+    mockedUseCycles.mockReturnValue({
+      data: { results: [], count: 0 },
+      isError: false,
+      isLoading: false,
+    } as never);
+
+    const { user } = setup(<Onboarding />);
+
+    // Step 1: App Intent
+    await user.press(screen.getByTestId('intent-myself'));
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Step 2: Goal
+    await waitFor(() => expect(screen.getByTestId('goal-track_period')).toBeOnTheScreen());
+    await user.press(screen.getByTestId('goal-track_period'));
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Step 3: Conditions
+    await waitFor(() => expect(screen.getByTestId('condition-none')).toBeOnTheScreen());
+    await user.press(screen.getByTestId('condition-none'));
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Step 4: Acquisition
+    await waitFor(() => expect(screen.getByTestId('acquisition-friends-or-family')).toBeOnTheScreen());
+    await user.press(screen.getByTestId('acquisition-friends-or-family'));
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Step 5: Cycle baseline
+    await waitFor(() => expect(screen.getByTestId('cycle-length-inc')).toBeOnTheScreen());
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Step 6: Body metrics
+    await waitFor(() => expect(screen.getByTestId('height-input-metric')).toBeOnTheScreen());
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    // Verify InitializeCycleModal is shown
+    await waitFor(() => {
+      expect(screen.getByTestId('initialize-cycle-modal')).toBeOnTheScreen();
+    });
+
+    // Confirm in modal
+    await user.press(screen.getByTestId('init-cycle-confirm-button'));
+
+    // Only after confirmation routes to Home
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(app)'));
+    expect(mockInitMutateAsync).toHaveBeenCalled();
   });
 
   it('allows skipping directly into the app shell at any step', async () => {

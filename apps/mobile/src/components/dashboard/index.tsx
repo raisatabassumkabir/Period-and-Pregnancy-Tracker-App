@@ -1,5 +1,6 @@
 export * from './cycle-ring';
 export * from './cycle-status-cards';
+export * from './dashboard-skeleton';
 export * from './initialize-cycle-modal';
 export * from './pregnancy-ring';
 export * from './pregnancy-status-cards';

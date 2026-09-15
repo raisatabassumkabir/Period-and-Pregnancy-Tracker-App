@@ -1,7 +1,9 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 
+import { useCycles } from '@/api/cycles';
 import { useSaveProfile } from '@/api/users';
+import { InitializeCycleModal } from '@/components/dashboard/initialize-cycle-modal';
 import {
   type AppIntent,
   OnboardingHeader,
@@ -28,9 +30,11 @@ export default function Onboarding() {
   const { updateProfile } = usePersonalizationProfile();
   const setHealthMode = useHealthStore((s) => s.setMode);
   const saveProfileMutation = useSaveProfile();
+  const cyclesQuery = useCycles();
 
   // Flow navigation state
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [showInitCycleModal, setShowInitCycleModal] = useState<boolean>(false);
 
   // Form selections
   const [intent, setIntent] = useState<AppIntent | null>(null);
@@ -87,7 +91,9 @@ export default function Onboarding() {
 
   // Persist all data and navigate to app
   const completeOnboarding = async () => {
-    const isPregnancyGoal = selectedGoals.includes('track_pregnancy');
+    const goalsToSave =
+      selectedGoals.length > 0 ? selectedGoals : ['track_period'];
+    const isPregnancyGoal = goalsToSave.includes('track_pregnancy');
     const assignedMode = isPregnancyGoal ? 'pregnancy' : 'cycle_tracking';
 
     const parsedHeight = parseFloat(heightCm) || null;
@@ -100,7 +106,7 @@ export default function Onboarding() {
           hasCompletedOnboarding: true,
           appIntent: intent ?? 'myself',
           partnerCode,
-          goals: selectedGoals,
+          goals: goalsToSave,
           medicalConditions: selectedConditions as any,
           source: selectedSource,
           averageCycleLength: cycleLength,
@@ -123,7 +129,7 @@ export default function Onboarding() {
     saveProfileMutation
       .mutateAsync({
         mode: assignedMode,
-        goals: selectedGoals,
+        goals: goalsToSave,
         medical_conditions: selectedConditions.filter(
           (c) => c !== 'none' && c !== 'not_sure'
         ) as any,
@@ -137,10 +143,22 @@ export default function Onboarding() {
         console.warn('Profile sync to Django backend was skipped or errored:', err);
       });
 
-    if (status === 'signIn') {
-      router.replace('/(app)');
+    const navigateToDestination = () => {
+      if (status === 'signIn') {
+        router.replace('/(app)');
+      } else {
+        router.replace('/login');
+      }
+    };
+
+    // 3. Flow Validation:
+    // If tracking cycle and no cycle exists yet, show InitializeCycle modal,
+    // and only route to Home once the anchor date is saved to the database.
+    const hasExistingCycles = (cyclesQuery.data?.results?.length ?? 0) > 0;
+    if (status === 'signIn' && !isPregnancyGoal && !hasExistingCycles) {
+      setShowInitCycleModal(true);
     } else {
-      router.replace('/login');
+      navigateToDestination();
     }
   };
 
@@ -236,6 +254,26 @@ export default function Onboarding() {
             testID="onboarding-next"
           />
         </View>
+
+        <InitializeCycleModal
+          visible={showInitCycleModal}
+          onClose={() => {
+            setShowInitCycleModal(false);
+            if (status === 'signIn') {
+              router.replace('/(app)');
+            } else {
+              router.replace('/login');
+            }
+          }}
+          onSuccess={() => {
+            setShowInitCycleModal(false);
+            if (status === 'signIn') {
+              router.replace('/(app)');
+            } else {
+              router.replace('/login');
+            }
+          }}
+        />
       </SafeAreaView>
     </View>
   );

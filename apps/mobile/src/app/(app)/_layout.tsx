@@ -11,6 +11,7 @@ import React from 'react';
 
 import { useAuth, usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { AppErrorBoundary } from '@/components/ui';
 
 const TAB_ICON_SIZE = 23;
 
@@ -28,17 +29,18 @@ export default function TabLayout() {
 
   if (!status) return null;
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: palette.accent,
-        tabBarInactiveTintColor: palette.tone[600],
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: palette.divider,
-          backgroundColor: palette.tone[100],
-        },
-      }}
-    >
+    <AppErrorBoundary name="TabLayout">
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: palette.accent,
+          tabBarInactiveTintColor: palette.tone[600],
+          tabBarStyle: {
+            borderTopWidth: 1,
+            borderTopColor: palette.divider,
+            backgroundColor: palette.tone[100],
+          },
+        }}
+      >
       <Tabs.Screen
         name="index"
         options={{
@@ -124,5 +126,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </AppErrorBoundary>
   );
 }

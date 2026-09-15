@@ -20,3 +20,4 @@ export type {
   AssistantContext,
   AssistantReply,
 } from './types';
+export * from './use-chat';

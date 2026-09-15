@@ -14,6 +14,9 @@ import { ScrollView } from 'react-native';
 
 import { Pressable, Text, View } from '@/components/ui';
 
+const ICON_SIZE = 28;
+const ICON_STROKE_WIDTH = 2;
+
 export interface GoalOption {
   id: string;
   label: string;
@@ -28,56 +31,56 @@ const GOAL_OPTIONS: readonly GoalOption[] = [
     label: 'Get pregnant',
     iconBg: '#FFD6DA',
     iconColor: '#FF7575',
-    icon: <Heart size={24} color="#FF7575" fill="#FFD6DA" />,
+    icon: <Heart size={ICON_SIZE} color="#FF7575" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'track_pregnancy',
     label: 'Track my pregnancy',
     iconBg: '#DCEBFC',
     iconColor: '#5B9BD5',
-    icon: <Baby size={24} color="#5B9BD5" />,
+    icon: <Baby size={ICON_SIZE} color="#5B9BD5" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'track_period',
     label: 'Track my period',
     iconBg: '#FFE3E6',
     iconColor: '#FF9FA8',
-    icon: <Calendar size={24} color="#FF9FA8" />,
+    icon: <Calendar size={ICON_SIZE} color="#FF9FA8" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'well_being',
     label: 'Take charge of my well-being',
     iconBg: '#E8FAF0',
     iconColor: '#48BB78',
-    icon: <Activity size={24} color="#48BB78" />,
+    icon: <Activity size={ICON_SIZE} color="#48BB78" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'manage_weight',
     label: 'Manage my weight',
     iconBg: '#FDF3D5',
     iconColor: '#D69E2E',
-    icon: <Scale size={24} color="#D69E2E" />,
+    icon: <Scale size={ICON_SIZE} color="#D69E2E" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'enhance_sex_life',
     label: 'Enhance my sex life',
     iconBg: '#F5ECFA',
-    iconColor: '#B7791F',
-    icon: <Sparkles size={24} color="#9F7AEA" />,
+    iconColor: '#9F7AEA',
+    icon: <Sparkles size={ICON_SIZE} color="#9F7AEA" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'decode_discharge',
     label: 'Decode my discharge',
     iconBg: '#DCEBFC',
     iconColor: '#3182CE',
-    icon: <Droplet size={24} color="#3182CE" />,
+    icon: <Droplet size={ICON_SIZE} color="#3182CE" strokeWidth={ICON_STROKE_WIDTH} />,
   },
   {
     id: 'explore_contraception',
     label: 'Explore contraception',
     iconBg: '#E8FAF0',
     iconColor: '#38A169',
-    icon: <ShieldCheck size={24} color="#38A169" />,
+    icon: <ShieldCheck size={ICON_SIZE} color="#38A169" strokeWidth={ICON_STROKE_WIDTH} />,
   },
 ];
 
@@ -110,7 +113,7 @@ export function StepGoals({ selectedGoals, onToggleGoal }: StepGoalsProps) {
               key={goal.id}
               testID={`goal-${goal.id}`}
               onPress={() => onToggleGoal(goal.id)}
-              className={`mb-4 w-[48%] min-h-[140px] p-4 rounded-[24px] border justify-between active:opacity-85 ${
+              className={`relative mb-4 w-[48%] min-h-[152px] p-4 rounded-[24px] border items-center justify-center active:opacity-85 ${
                 isSelected
                   ? 'border-[#FF9FA8] bg-white'
                   : 'border-[#F0E5E1] bg-white/95'
@@ -123,22 +126,21 @@ export function StepGoals({ selectedGoals, onToggleGoal }: StepGoalsProps) {
                 elevation: 3,
               }}
             >
-              <View className="flex-row items-center justify-between">
-                <View
-                  className="size-12 rounded-full items-center justify-center"
-                  style={{ backgroundColor: goal.iconBg }}
-                >
-                  {goal.icon}
+              {isSelected && (
+                <View className="absolute top-3 right-3 size-5 rounded-full bg-[#FF9FA8] items-center justify-center">
+                  <Check size={12} color="#FFFFFF" strokeWidth={3} />
                 </View>
-                {isSelected && (
-                  <View className="size-5 rounded-full bg-[#FF9FA8] items-center justify-center">
-                    <Check size={12} color="#FFFFFF" strokeWidth={3} />
-                  </View>
-                )}
+              )}
+
+              <View
+                className="size-14 rounded-full items-center justify-center mb-3"
+                style={{ backgroundColor: goal.iconBg }}
+              >
+                {goal.icon}
               </View>
 
               <Text
-                className={`mt-3 font-body-bold text-[14px] leading-5 ${
+                className={`font-body-bold text-[14px] leading-5 text-center ${
                   isSelected ? 'text-[#FF7575]' : 'text-[#4A4A4A]'
                 }`}
               >

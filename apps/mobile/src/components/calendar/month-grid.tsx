@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import React from 'react';
+import type { ViewStyle } from 'react-native';
 
 import type { Cycle, DailyLog, Mood } from '@/api/cycles/types';
 import { Pressable, Text, View } from '@/components/ui';
@@ -13,11 +14,11 @@ import { MonthPicker } from './month-picker';
 /** Monday-first, matching `buildMonthMatrix`'s week order. */
 const WEEKDAY_INITIALS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'] as const;
 const NAV_ICON_SIZE = 20;
-/** Vertical pill: number on top, state circle underneath. */
-const CELL_CLASS = 'h-16 w-10';
+
+/** Google Play strict touch target: minimum 48x48dp */
+const MIN_TOUCH_TARGET = 48;
 const STATE_CIRCLE_SIZE = 22;
 const LEGEND_DOT_SIZE = 10;
-/** Predicted days read lighter than logged ones, without hiding the face. */
 const PROJECTED_OPACITY = 0.72;
 
 /** Emoji-style faces for a logged mood. */
@@ -29,11 +30,6 @@ const MOOD_FACES: Record<Exclude<Mood, 'unspecified'>, string> = {
   bad: '😢',
 };
 
-/**
- * Face shown on a coloured day the user hasn't logged a mood for, so every
- * marked day reads as a face rather than a bare dot. A logged mood always wins
- * over these — see `faceFor`.
- */
 const PHASE_FACES: Record<Exclude<CyclePhase, 'none'>, string> = {
   period: '😣',
   fertile: '😊',
@@ -46,7 +42,6 @@ const PHASE_COLORS: Record<Exclude<CyclePhase, 'none'>, string> = {
   ovulation: colors.cycle.ovulation,
 };
 
-/** The user's own mood if they logged one, else the phase's stock face. */
 function faceFor(classification: DayClassification): string | null {
   if (classification.mood) return MOOD_FACES[classification.mood];
   if (classification.phase !== 'none') return PHASE_FACES[classification.phase];
@@ -63,19 +58,31 @@ const LEGEND: readonly { phase: Exclude<CyclePhase, 'none'>; label: string }[] =
 export interface DayCellProps {
   date: string | null;
   classification: DayClassification | null;
+  isSelected?: boolean;
+  onPress?: (date: string) => void;
 }
 
 /** The coloured face-circle inside a cell; a bare dot on an unmarked day. */
 const StateCircle = React.memo(function StateCircle({
   classification,
+  isSelected,
 }: {
   classification: DayClassification;
+  isSelected?: boolean;
 }) {
   const { phase, isProjected } = classification;
   const color = phase === 'none' ? undefined : PHASE_COLORS[phase];
   const face = faceFor(classification);
+
   if (!color && !face) {
-    return <View className="size-1.5 rounded-full bg-tone-300" />;
+    return (
+      <View
+        className="size-1.5 rounded-full"
+        style={{
+          backgroundColor: isSelected ? '#FFFFFF' : '#D1C8C5',
+        }}
+      />
+    );
   }
 
   return (
@@ -98,16 +105,12 @@ const StateCircle = React.memo(function StateCircle({
   );
 });
 
-/**
- * Custom comparison function ensuring DayCell only re-renders when its date
- * or visual classification attributes actually mutate, preventing full 35-cell
- * re-render sweeps on parent updates.
- */
 export function areDayCellPropsEqual(
   prevProps: DayCellProps,
   nextProps: DayCellProps
 ): boolean {
   if (prevProps.date !== nextProps.date) return false;
+  if (prevProps.isSelected !== nextProps.isSelected) return false;
   if (!prevProps.date && !nextProps.date) return true;
   if (prevProps.classification === nextProps.classification) return true;
   if (!prevProps.classification || !nextProps.classification) return false;
@@ -128,23 +131,86 @@ export function areDayCellPropsEqual(
 export const DayCell = React.memo(function DayCell({
   date,
   classification,
+  isSelected,
+  onPress,
 }: DayCellProps) {
-  if (!date || !classification) return <View className={CELL_CLASS} />;
+  if (!date || !classification) {
+    return (
+      <View
+        style={{
+          minWidth: MIN_TOUCH_TARGET,
+          minHeight: MIN_TOUCH_TARGET,
+          width: 48,
+          height: 60,
+        }}
+      />
+    );
+  }
 
   const dayNumber = String(Number(date.slice(-2)));
-  const containerClass = `${CELL_CLASS} items-center justify-between rounded-pill bg-surface py-2 ${
-    classification.isToday
-      ? 'border-2 border-accent'
-      : 'border-2 border-transparent'
-  }`;
+  const { phase } = classification;
+
+  // Determine soft pill styling per design specifications
+  let backgroundColor = '#FFFFFF';
+  let textColor = '#2A2321';
+  let shadowStyle: ViewStyle = {};
+
+  if (isSelected) {
+    // Selected: Coral background (#FF9FA8) with white text & subtle shadow
+    backgroundColor = '#FF9FA8';
+    textColor = '#FFFFFF';
+    shadowStyle = {
+      shadowColor: '#FF9FA8',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.35,
+      shadowRadius: 4,
+      elevation: 2,
+    };
+  } else if (phase === 'period') {
+    // Period Predicted: Soft pink background (#FFF0F2) with dark text
+    backgroundColor = '#FFF0F2';
+    textColor = '#2A2321';
+  } else if (phase === 'fertile' || phase === 'ovulation') {
+    // Fertile Window: Soft mint green background (#E6F9EC)
+    backgroundColor = '#E6F9EC';
+    textColor = '#1F402B';
+  }
 
   return (
-    <View className={containerClass} testID={`calendar-day-${date}`}>
-      <Text className="font-body-semibold text-[13px] text-ink">
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Day ${dayNumber}${classification.isToday ? ', today' : ''}`}
+      testID={`calendar-day-${date}`}
+      onPress={onPress ? () => onPress(date) : undefined}
+      style={[
+        {
+          minWidth: MIN_TOUCH_TARGET,
+          minHeight: MIN_TOUCH_TARGET,
+          width: 48,
+          height: 60,
+          borderRadius: 24,
+          backgroundColor,
+          paddingVertical: 6,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        },
+        shadowStyle,
+      ]}
+    >
+      <Text
+        style={{
+          fontSize: 13,
+          fontWeight: isSelected ? '700' : '600',
+          color: textColor,
+        }}
+      >
         {dayNumber}
       </Text>
-      <StateCircle classification={classification} />
-    </View>
+      <StateCircle
+        classification={classification}
+        isSelected={isSelected}
+      />
+    </Pressable>
   );
 }, areDayCellPropsEqual);
 
@@ -174,35 +240,56 @@ function Legend() {
   );
 }
 
-interface Props {
+export interface CalendarGridProps {
   year: number;
   monthIndex: number;
   cycles: readonly Cycle[];
   logs: readonly DailyLog[];
-  /** Personalised average when known. */
   cycleLengthDays?: number;
+  selectedDate?: string | null;
+  onSelectDate?: (date: string) => void;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onSelectMonth: (monthIndex: number) => void;
 }
 
-/** Month calendar: month dropdown, weekday initials, pill-shaped day cells, legend. */
-export function MonthGrid({
+/**
+ * CalendarGrid: High polish calendar grid adhering to Google Play touch targets (min 48x48dp),
+ * soft pill shapes, accessible contrast, and subtle elevation for active selection.
+ */
+export function CalendarGrid({
   year,
   monthIndex,
   cycles,
   logs,
   cycleLengthDays,
+  selectedDate,
+  onSelectDate,
   onPrevMonth,
   onNextMonth,
   onSelectMonth,
-}: Props) {
+}: CalendarGridProps) {
   const palette = usePaletteColors();
+  const today = React.useMemo(() => todayDateString(), []);
+  const [internalSelectedDate, setInternalSelectedDate] = React.useState<string>(
+    selectedDate ?? today
+  );
+
+  const activeSelectedDate = selectedDate ?? internalSelectedDate;
+
+  const handleDayPress = React.useCallback(
+    (date: string) => {
+      setInternalSelectedDate(date);
+      onSelectDate?.(date);
+    },
+    [onSelectDate]
+  );
+
   const weeks = React.useMemo(
     () => buildMonthMatrix(year, monthIndex),
     [year, monthIndex]
   );
-  const today = React.useMemo(() => todayDateString(), []);
+
   const context = React.useMemo(
     () => ({ cycles, logs, today, cycleLengthDays }),
     [cycles, logs, today, cycleLengthDays]
@@ -210,55 +297,93 @@ export function MonthGrid({
 
   return (
     <View testID="calendar-month-grid">
+      {/* Month Navigation with min 48x48 touch targets */}
       <View className="flex-row items-center justify-between">
         <Pressable
           accessibilityLabel="Previous month"
           accessibilityRole="button"
           testID="calendar-prev-month"
           onPress={onPrevMonth}
-          className="size-10 items-center justify-center rounded-full bg-surface"
+          style={{
+            minWidth: MIN_TOUCH_TARGET,
+            minHeight: MIN_TOUCH_TARGET,
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.08,
+            shadowRadius: 2,
+            elevation: 1,
+          }}
         >
           <ChevronLeft color={palette.ink} size={NAV_ICON_SIZE} />
         </Pressable>
+
         <MonthPicker
           year={year}
           monthIndex={monthIndex}
           onSelectMonth={onSelectMonth}
         />
+
         <Pressable
           accessibilityLabel="Next month"
           accessibilityRole="button"
           testID="calendar-next-month"
           onPress={onNextMonth}
-          className="size-10 items-center justify-center rounded-full bg-surface"
+          style={{
+            minWidth: MIN_TOUCH_TARGET,
+            minHeight: MIN_TOUCH_TARGET,
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.08,
+            shadowRadius: 2,
+            elevation: 1,
+          }}
         >
           <ChevronRight color={palette.ink} size={NAV_ICON_SIZE} />
         </Pressable>
       </View>
 
+      {/* Weekday Initials */}
       <View className="mt-5 flex-row justify-between">
         {WEEKDAY_INITIALS.map((initial, index) => (
           <Text
             key={`weekday-${index}`}
-            className="w-10 text-center font-body-semibold text-[12px] text-tone-600"
+            className="w-12 text-center font-body-semibold text-[12px] text-tone-600"
           >
             {initial}
           </Text>
         ))}
       </View>
 
+      {/* Day Cells Grid */}
       {weeks.map((week, weekIndex) => (
         <View
           key={`week-${weekIndex}`}
           className="mt-2 flex-row justify-between"
         >
-          {week.map((date, dayIndex) => (
-            <DayCell
-              key={date ?? `blank-${weekIndex}-${dayIndex}`}
-              date={date}
-              classification={date ? classifyDay(date, context) : null}
-            />
-          ))}
+          {week.map((date, dayIndex) => {
+            const isSelected = Boolean(date && date === activeSelectedDate);
+            return (
+              <DayCell
+                key={date ?? `blank-${weekIndex}-${dayIndex}`}
+                date={date}
+                classification={date ? classifyDay(date, context) : null}
+                isSelected={isSelected}
+                onPress={handleDayPress}
+              />
+            );
+          })}
         </View>
       ))}
 
@@ -266,3 +391,7 @@ export function MonthGrid({
     </View>
   );
 }
+
+/** Backward compatibility alias for MonthGrid */
+export const MonthGrid = CalendarGrid;
+export type MonthGridProps = CalendarGridProps;
