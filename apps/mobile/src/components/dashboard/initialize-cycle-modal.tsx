@@ -95,13 +95,21 @@ export function InitializeCycleModal({
     }
   };
 
+  const handleDismiss = React.useCallback(() => {
+    if (initCycle.isPending) return;
+    setErrorMessage(null);
+    onClose();
+  }, [initCycle.isPending, onClose]);
+
   const handleConfirm = async () => {
+    if (initCycle.isPending) return;
     setErrorMessage(null);
     try {
       await initCycle.mutateAsync({ start_date: selectedDate });
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['dashboard', 'current-cycle'] }),
         queryClient.invalidateQueries({ queryKey: ['cycles'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard', 'current-cycle'] }),
         queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
       ]);
       onSuccess?.();
@@ -119,16 +127,17 @@ export function InitializeCycleModal({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="slide"
+      onRequestClose={handleDismiss}
       testID="initialize-cycle-modal"
     >
-      <View className="flex-1 justify-center bg-black/50 p-5">
+      <View className="flex-1 justify-end bg-black/50">
+        <Pressable className="absolute inset-0" onPress={handleDismiss} />
         <View
-          className="max-h-[90%] rounded-[28px] bg-white p-6"
+          className="max-h-[90%] rounded-t-[28px] bg-white p-6"
           style={{
             shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: 10 },
+            shadowOffset: { width: 0, height: -6 },
             shadowOpacity: 0.9,
             shadowRadius: 20,
             elevation: 8,
@@ -145,10 +154,11 @@ export function InitializeCycleModal({
               </Text>
             </View>
             <Pressable
-              onPress={onClose}
+              onPress={handleDismiss}
+              disabled={initCycle.isPending}
               hitSlop={8}
               testID="init-cycle-cancel-button"
-              className="p-1"
+              className={`p-1 ${initCycle.isPending ? 'opacity-40' : 'active:opacity-60'}`}
             >
               <X size={20} color="#A0A0B0" />
             </Pressable>
