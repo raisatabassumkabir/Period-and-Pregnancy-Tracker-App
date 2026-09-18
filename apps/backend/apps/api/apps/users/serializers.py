@@ -69,3 +69,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         with rls_user(str(user.pk)):
             Profile.objects.create(user=user, **profile_data)
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "email", "profile"]
+

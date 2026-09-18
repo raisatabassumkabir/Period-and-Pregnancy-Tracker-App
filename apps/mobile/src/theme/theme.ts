@@ -22,7 +22,7 @@ export const palette = {
   coralMuted: '#FFF0F2',
   coralDark: '#E87D88',
 
-  // Secondary FemTech Pastel Accents
+  // Secondary Happy Women Pastel Accents
   pastelBlue: '#B5D3F8',
   pastelBlueLight: '#DCEBFC',
 

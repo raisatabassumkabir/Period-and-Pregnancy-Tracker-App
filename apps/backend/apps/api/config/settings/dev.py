@@ -1,7 +1,7 @@
 from .base import *  # noqa: F403
 
 DEBUG = True
-ALLOWED_HOSTS = ALLOWED_HOSTS or ["localhost", "127.0.0.1"]  # noqa: F405
+ALLOWED_HOSTS = ['10.0.2.2', 'localhost', '127.0.0.1', '*']
 
 # Browsable API + session login for humans poking at endpoints locally.
 REST_FRAMEWORK = {

@@ -80,7 +80,10 @@ ASGI_APPLICATION = "config.asgi.application"
 # never leak onto the next request that reuses this pooled connection.
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://femtech:femtech@localhost:5432/femtech",
+        default=os.environ.get(
+            "DATABASE_URL",
+            "postgresql://postgres.pplvougrclleokageuik:Happy%20Women%20Application@aws-0-ap-south-1.pooler.supabase.com:5432/postgres",
+        ),
         conn_max_age=60,
     )
 }
@@ -128,7 +131,7 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Femtech API",
+    "TITLE": "Happy Women API",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "POSTPROCESSING_HOOKS": [

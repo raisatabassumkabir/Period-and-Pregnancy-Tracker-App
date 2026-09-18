@@ -12,6 +12,7 @@ import {
 } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { DatePickerModal } from '@/components/settings/personalization-item';
 
 type Step = 'goals' | 'info' | 'medical_source';
 
@@ -56,6 +57,7 @@ export default function SetupProfile() {
   const [weight, setWeight] = React.useState('');
   const [conditions, setConditions] = React.useState<MedicalCondition[]>([]);
   const [source, setSource] = React.useState<string>('');
+  const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
 
   const toggleGoal = (id: string) => {
     setGoals((prev) =>
@@ -203,13 +205,18 @@ export default function SetupProfile() {
                 <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
                   DATE OF BIRTH
                 </Text>
-                <TextInput
-                  value={dateOfBirth}
-                  onChangeText={setDateOfBirth}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor={palette.tone[500]}
-                  className="h-14 rounded-xl border border-divider bg-surface px-4 font-body text-[16px] text-ink shadow-sm"
-                />
+                <Pressable
+                  onPress={() => setDatePickerVisible(true)}
+                  className="h-14 justify-center rounded-xl border border-divider bg-surface px-4 shadow-sm"
+                >
+                  <Text
+                    className={`font-body text-[16px] ${
+                      dateOfBirth ? 'text-ink' : 'text-tone-500'
+                    }`}
+                  >
+                    {dateOfBirth || 'YYYY-MM-DD'}
+                  </Text>
+                </Pressable>
               </View>
 
               <View className="mb-5 flex-row gap-4">
@@ -323,6 +330,17 @@ export default function SetupProfile() {
           )}
         </ScrollView>
       </SafeAreaView>
+
+      {isDatePickerVisible && (
+        <DatePickerModal
+          initialDate={dateOfBirth}
+          onClose={() => setDatePickerVisible(false)}
+          onSelect={(date) => {
+            setDateOfBirth(date);
+            setDatePickerVisible(false);
+          }}
+        />
+      )}
     </View>
   );
 }

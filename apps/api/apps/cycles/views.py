@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -38,34 +39,46 @@ class CycleViewSet(OwnedModelViewSet):
     serializer_class = CycleSerializer
     queryset = Cycle.objects.none()  # schema generation only; see get_queryset
 
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
-        cycle = serializer.save(user=self.request.user)
-        calculate_cycle_projections(cycle, self.request.user)
-        cycle.save(update_fields=["estimated_ovulation_date", "next_period_date"])
+        with transaction.atomic():
+            cycle = serializer.save(user=self.request.user)
+            calculate_cycle_projections(cycle, self.request.user)
+            cycle.save(update_fields=["estimated_ovulation_date", "next_period_date"])
 
     @action(detail=False, methods=["post"], url_path="init")
+    @transaction.atomic
     def init_cycle(self, request):
         serializer = CycleInitSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         start_date = serializer.validated_data["start_date"]
 
-        cycle = Cycle.objects.for_user(request.user).filter(start_date=start_date).first()
-        if not cycle:
-            cycle = Cycle(user=request.user, start_date=start_date)
+        with transaction.atomic():
+            cycle = Cycle.objects.for_user(request.user).filter(start_date=start_date).first()
+            if not cycle:
+                cycle = Cycle(user=request.user, start_date=start_date)
 
-        calculate_cycle_projections(cycle, request.user)
-        cycle.save()
+            calculate_cycle_projections(cycle, request.user)
+            cycle.save()
 
-        # Anchor with initial DailyLog if not already logged
-        if not DailyLog.objects.for_user(request.user).filter(date=start_date).exists():
-            DailyLog.objects.create(
-                user=request.user,
-                date=start_date,
-                flow=DailyLog.Flow.MEDIUM,
-                notes="Cycle initialized",
-            )
+            # Anchor with initial DailyLog if not already logged
+            if not DailyLog.objects.for_user(request.user).filter(date=start_date).exists():
+                DailyLog.objects.create(
+                    user=request.user,
+                    date=start_date,
+                    flow=DailyLog.Flow.MEDIUM,
+                    notes="Cycle initialized",
+                )
 
         return Response(CycleSerializer(cycle).data, status=status.HTTP_201_CREATED)
+
 
 
 class DailyLogViewSet(OwnedModelViewSet):

@@ -3,14 +3,12 @@ import { Plus } from 'lucide-react-native';
 import React from 'react';
 
 import { useCycles, useDailyLogs } from '@/api/cycles';
-import { MonthGrid } from '@/components/calendar';
+import { MonthGrid } from '@/components/calendar/month-grid';
 import { AppHeader } from '@/components/ui/app-header';
 import {
   FocusAwareStatusBar,
-  Pill,
   Pressable,
   SafeAreaView,
-  ScreenHeader,
   ScrollView,
   Text,
   View,
@@ -25,11 +23,9 @@ import {
   withDemoFallback,
 } from '@/lib/health';
 import { usePaletteColors } from '@/lib/theme';
-import type { DailyLog, Symptom, Flow, Mood } from '@/api/cycles/types';
 
 const TRACKING_ROUTE = '/(app)/tracking';
 const FAB_ICON_SIZE = 18;
-/** Room under the grid so the floating button never covers the last week. */
 const FAB_CLEARANCE_CLASS = 'pb-28';
 
 function shiftMonth(date: Date, deltaMonths: number): Date {
@@ -59,23 +55,26 @@ function AddSymptomButton({ date }: { date: string }) {
   );
 }
 
-/** Month view of logged periods and estimated phases, with an offline demo fallback. */
-export default function Calendar() {
+/**
+ * CalendarScreen: Master-Detail calendar displaying logged period cycles, estimated phases,
+ * and a Day Summary card populated when tapping a date.
+ */
+export function CalendarScreen() {
   const [visibleMonth, setVisibleMonth] = React.useState(() => new Date());
   const [activeDate, setActiveDate] = React.useState(() => todayDateString());
 
   const { data: cyclesPage, isError: cyclesFailed } = useCycles();
   const { data: dailyLogsPage, isError: dailyLogsFailed } = useDailyLogs();
 
-  const { rows: cycles, isDemo: cyclesAreDemo } = withDemoFallback(
+  const { rows: cycles } = withDemoFallback(
     { data: cyclesPage, isError: cyclesFailed },
     DEMO_CYCLES
   );
-  const { rows: logs, isDemo: logsAreDemo } = withDemoFallback(
+  const { rows: logs } = withDemoFallback(
     { data: dailyLogsPage, isError: dailyLogsFailed },
     DEMO_DAILY_LOGS
   );
-  const isDemo = cyclesAreDemo || logsAreDemo;
+
   const cycleLengthDays = deriveCycleInsights(cycles)?.cycleLengthDays;
 
   const goToPrevMonth = () => setVisibleMonth((month) => shiftMonth(month, -1));
@@ -105,6 +104,7 @@ export default function Calendar() {
         showsVerticalScrollIndicator={false}
         contentContainerClassName={`px-4 pt-4 ${FAB_CLEARANCE_CLASS}`}
       >
+        {/* Strict 7-Column Grid Calendar */}
         <MonthGrid
           year={visibleMonth.getFullYear()}
           monthIndex={visibleMonth.getMonth()}
@@ -118,6 +118,7 @@ export default function Calendar() {
           onSelectMonth={goToMonth}
         />
 
+        {/* Master-Detail: Day Summary Card */}
         <View className="mt-8">
           <Text className="mb-4 font-heading text-lg text-ink">
             {formatCalendarDate(activeDate)}
@@ -136,19 +137,25 @@ export default function Calendar() {
               <View className="gap-3">
                 <Text className="font-body-semibold text-[15px] text-ink">Logged Data</Text>
                 {activeLog.flow && activeLog.flow !== 'none' && (
-                  <Text className="font-body text-sm text-tone-600">Flow: <Text className="font-body-semibold text-ink capitalize">{activeLog.flow}</Text></Text>
+                  <Text className="font-body text-sm text-tone-600">
+                    Flow: <Text className="font-body-semibold text-ink capitalize">{activeLog.flow}</Text>
+                  </Text>
                 )}
                 {activeLog.mood && activeLog.mood !== 'unspecified' && (
-                  <Text className="font-body text-sm text-tone-600">Mood: <Text className="font-body-semibold text-ink capitalize">{activeLog.mood}</Text></Text>
+                  <Text className="font-body text-sm text-tone-600">
+                    Mood: <Text className="font-body-semibold text-ink capitalize">{activeLog.mood}</Text>
+                  </Text>
                 )}
                 {activeLog.symptoms.length > 0 && (
                   <Text className="font-body text-sm text-tone-600">
                     Symptoms: <Text className="font-body-semibold text-ink">{activeLog.symptoms.length} logged</Text>
                   </Text>
                 )}
-                {(!activeLog.flow || activeLog.flow === 'none') && (!activeLog.mood || activeLog.mood === 'unspecified') && activeLog.symptoms.length === 0 && (
-                  <Text className="font-body text-sm text-tone-500">Only basic info logged.</Text>
-                )}
+                {(!activeLog.flow || activeLog.flow === 'none') &&
+                  (!activeLog.mood || activeLog.mood === 'unspecified') &&
+                  activeLog.symptoms.length === 0 && (
+                    <Text className="font-body text-sm text-tone-500">Only basic info logged.</Text>
+                  )}
               </View>
             ) : classification.isProjected || activeDate > todayDateString() ? (
               <View className="gap-2">
@@ -176,7 +183,11 @@ export default function Calendar() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Floating Action Button passes activeDate */}
       <AddSymptomButton date={activeDate} />
     </View>
   );
 }
+
+export default CalendarScreen;

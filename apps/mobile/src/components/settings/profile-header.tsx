@@ -12,6 +12,7 @@ import type {
 import { Button, Pill, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { DatePickerModal } from './personalization-item';
 
 const LOGIN_ROUTE = '/login';
 
@@ -60,6 +61,7 @@ export const ProfileHeader = () => {
   const palette = usePaletteColors();
   const router = useRouter();
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [isDatePickerVisible, setDatePickerVisible] = React.useState(false);
 
   // Form State
   const [fullName, setFullName] = React.useState(profile.fullName);
@@ -199,13 +201,18 @@ export const ProfileHeader = () => {
                 <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
                   DATE OF BIRTH (YYYY-MM-DD)
                 </Text>
-                <TextInput
-                  value={dateOfBirth}
-                  onChangeText={setDateOfBirth}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor={palette.tone[500]}
-                  className="h-12 rounded-xl border border-divider bg-canvas px-4 font-body text-[15px] text-ink"
-                />
+                <Pressable
+                  onPress={() => setDatePickerVisible(true)}
+                  className="h-12 justify-center rounded-xl border border-divider bg-canvas px-4"
+                >
+                  <Text
+                    className={`font-body text-[15px] ${
+                      dateOfBirth ? 'text-ink' : 'text-tone-500'
+                    }`}
+                  >
+                    {dateOfBirth || 'YYYY-MM-DD'}
+                  </Text>
+                </Pressable>
               </View>
 
               {/* Tracking Mode */}
@@ -329,6 +336,17 @@ export const ProfileHeader = () => {
           </View>
         </View>
       </Modal>
+
+      {isDatePickerVisible && (
+        <DatePickerModal
+          initialDate={dateOfBirth}
+          onClose={() => setDatePickerVisible(false)}
+          onSelect={(date) => {
+            setDateOfBirth(date);
+            setDatePickerVisible(false);
+          }}
+        />
+      )}
     </>
   );
 };

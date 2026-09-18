@@ -5,7 +5,7 @@ import type { AppIconBadgeConfig } from 'app-icon-badge/types';
 import { ClientEnv, Env } from './env';
 
 /** Rewritten by `pnpm init-app`; must match the project slug on expo.dev. */
-const SLUG = 'app-template';
+const SLUG = 'happy-women';
 
 /**
  * Brand charcoal — the same value as `PALETTES.happy.dark['--color-bg']` in

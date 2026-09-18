@@ -18,7 +18,7 @@ interface DateOfBirthInputProps {
   onChange: (val: string) => void;
 }
 
-function DatePickerModal({
+export function DatePickerModal({
   initialDate,
   onClose,
   onSelect,

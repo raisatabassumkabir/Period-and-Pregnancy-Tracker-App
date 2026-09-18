@@ -145,6 +145,8 @@ describe('Calendar', () => {
 
     await user.press(screen.getByTestId('calendar-add-symptom'));
 
-    expect(mockPush).toHaveBeenCalledWith('/(app)/tracking');
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: '/(app)/tracking' })
+    );
   });
 });

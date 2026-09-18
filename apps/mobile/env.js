@@ -23,12 +23,12 @@ require('dotenv').config({
 /**
  * Static app identity. `pnpm init-app` rewrites this block; you can also edit it by hand.
  */
-const BUNDLE_ID = 'com.example.app'; // ios bundle id
-const PACKAGE = 'com.example.app'; // android package name
+const BUNDLE_ID = 'com.happywomen.app'; // ios bundle id
+const PACKAGE = 'com.happywomen.app'; // android package name
 const NAME = 'Happy Women'; // app name
-const EXPO_ACCOUNT_OWNER = 'your-expo-account'; // expo account owner
+const EXPO_ACCOUNT_OWNER = 'happywomen'; // expo account owner
 const EAS_PROJECT_ID = '00000000-0000-0000-0000-000000000000'; // eas project id
-const SCHEME = 'apptemplate'; // deep-link scheme
+const SCHEME = 'happywomen'; // deep-link scheme
 
 /**
  * Non-production builds get a suffixed identifier so they can be installed

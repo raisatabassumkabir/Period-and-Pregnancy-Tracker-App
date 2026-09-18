@@ -1,14 +1,33 @@
-from rest_framework import generics, mixins, permissions, status, viewsets
+from rest_framework import generics, mixins, permissions, status, views, viewsets
 from rest_framework.response import Response
 
-from apps.users.models import Profile
-from apps.users.serializers import ProfileSerializer, RegisterSerializer
+from apps.users.models import Profile, User
+from apps.users.serializers import ProfileSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+
+
+class MeView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class SubscriptionStatusView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            "is_premium": False,
+            "status": "active",
+            "tier": "free",
+        })
 
 
 class ProfileViewSet(
@@ -40,3 +59,4 @@ class ProfileViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+

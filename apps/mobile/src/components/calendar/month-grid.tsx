@@ -17,9 +17,13 @@ const NAV_ICON_SIZE = 20;
 
 /** Google Play strict touch target: minimum 48x48dp */
 const MIN_TOUCH_TARGET = 48;
+/** Fixed circle size for day cells — leaves natural gaps inside the 14.28% wrapper. */
+const DAY_CIRCLE_SIZE = 40;
 const STATE_CIRCLE_SIZE = 22;
 const LEGEND_DOT_SIZE = 10;
 const PROJECTED_OPACITY = 0.72;
+/** Vertical gap between week rows in the calendar grid. */
+const WEEK_ROW_GAP = 8;
 
 /** Emoji-style faces for a logged mood. */
 const MOOD_FACES: Record<Exclude<Mood, 'unspecified'>, string> = {
@@ -135,16 +139,7 @@ export const DayCell = React.memo(function DayCell({
   onPress,
 }: DayCellProps) {
   if (!date || !classification) {
-    return (
-      <View
-        style={{
-          minWidth: MIN_TOUCH_TARGET,
-          minHeight: MIN_TOUCH_TARGET,
-          width: 48,
-          height: 60,
-        }}
-      />
-    );
+    return null;
   }
 
   const dayNumber = String(Number(date.slice(-2)));
@@ -156,7 +151,6 @@ export const DayCell = React.memo(function DayCell({
   let shadowStyle: ViewStyle = {};
 
   if (isSelected) {
-    // Selected: Coral background (#FF9FA8) with white text & subtle shadow
     backgroundColor = '#FF9FA8';
     textColor = '#FFFFFF';
     shadowStyle = {
@@ -167,11 +161,9 @@ export const DayCell = React.memo(function DayCell({
       elevation: 2,
     };
   } else if (phase === 'period') {
-    // Period Predicted: Soft pink background (#FFF0F2) with dark text
     backgroundColor = '#FFF0F2';
     textColor = '#2A2321';
   } else if (phase === 'fertile' || phase === 'ovulation') {
-    // Fertile Window: Soft mint green background (#E6F9EC)
     backgroundColor = '#E6F9EC';
     textColor = '#1F402B';
   }
@@ -184,22 +176,19 @@ export const DayCell = React.memo(function DayCell({
       onPress={onPress ? () => onPress(date) : undefined}
       style={[
         {
-          minWidth: MIN_TOUCH_TARGET,
-          minHeight: MIN_TOUCH_TARGET,
-          width: 48,
-          height: 60,
-          borderRadius: 24,
+          width: DAY_CIRCLE_SIZE,
+          height: DAY_CIRCLE_SIZE,
+          borderRadius: DAY_CIRCLE_SIZE / 2,
           backgroundColor,
-          paddingVertical: 6,
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
         },
         shadowStyle,
       ]}
     >
       <Text
         style={{
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: isSelected ? '700' : '600',
           color: textColor,
         }}
@@ -355,14 +344,16 @@ export function CalendarGrid({
       </View>
 
       {/* Weekday Initials */}
-      <View className="mt-5 flex-row justify-between">
+      <View className="mt-5 flex-row">
         {WEEKDAY_INITIALS.map((initial, index) => (
-          <Text
+          <View
             key={`weekday-${index}`}
-            className="w-12 text-center font-body-semibold text-[12px] text-tone-600"
+            style={{ width: '14.28%', alignItems: 'center' }}
           >
-            {initial}
-          </Text>
+            <Text className="font-body-semibold text-[12px] text-tone-600">
+              {initial}
+            </Text>
+          </View>
         ))}
       </View>
 
@@ -370,18 +361,35 @@ export function CalendarGrid({
       {weeks.map((week, weekIndex) => (
         <View
           key={`week-${weekIndex}`}
-          className="mt-2 flex-row justify-between"
+          style={{ marginTop: WEEK_ROW_GAP, flexDirection: 'row' }}
         >
           {week.map((date, dayIndex) => {
-            const isSelected = Boolean(date && date === activeSelectedDate);
+            if (!date) {
+              return (
+                <View
+                  key={`blank-${weekIndex}-${dayIndex}`}
+                  style={{ width: '14.28%', aspectRatio: 1 }}
+                />
+              );
+            }
+            const isSelected = Boolean(date === activeSelectedDate);
             return (
-              <DayCell
-                key={date ?? `blank-${weekIndex}-${dayIndex}`}
-                date={date}
-                classification={date ? classifyDay(date, context) : null}
-                isSelected={isSelected}
-                onPress={handleDayPress}
-              />
+              <View
+                key={date}
+                style={{
+                  width: '14.28%',
+                  aspectRatio: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <DayCell
+                  date={date}
+                  classification={classifyDay(date, context)}
+                  isSelected={isSelected}
+                  onPress={handleDayPress}
+                />
+              </View>
             );
           })}
         </View>
@@ -395,3 +403,4 @@ export function CalendarGrid({
 /** Backward compatibility alias for MonthGrid */
 export const MonthGrid = CalendarGrid;
 export type MonthGridProps = CalendarGridProps;
+

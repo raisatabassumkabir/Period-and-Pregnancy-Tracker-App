@@ -15,7 +15,7 @@ import {
 } from '@/lib/health';
 import { useKickCounter } from '@/lib/tracking';
 
-import { getAssistantClient } from './index';
+import { getAssistantClient } from './client';
 import type { AssistantContext } from './types';
 
 const RECENT_LOG_COUNT = 3;

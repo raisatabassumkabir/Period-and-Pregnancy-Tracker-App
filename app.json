@@ -1,5 +1,14 @@
 {
-  "android": {
-    "package": "com.kabirraisatabassum.expomonorepotemplate"
+  "expo": {
+    "name": "Happy Women",
+    "slug": "happy-women",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.happywomen.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.happywomen.app"
+    }
   }
 }
+

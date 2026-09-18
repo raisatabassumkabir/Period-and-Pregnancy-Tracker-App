@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import React from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useInitCycle } from '@/api/cycles';
 import {
@@ -28,6 +29,7 @@ export function InitializeCycleModal({
 }: InitializeCycleModalProps) {
   const queryClient = useQueryClient();
   const initCycle = useInitCycle();
+  const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 };
 
   const today = React.useMemo(() => todayDateString(), []);
   const [selectedDate, setSelectedDate] = React.useState<string>(today);
@@ -104,8 +106,15 @@ export function InitializeCycleModal({
   const handleConfirm = async () => {
     if (initCycle.isPending) return;
     setErrorMessage(null);
+
+    // Strictly format selected date as YYYY-MM-DD
+    const formattedStartDate =
+      typeof selectedDate === 'string'
+        ? selectedDate.trim().split('T')[0]
+        : toDateString(selectedDate);
+
     try {
-      await initCycle.mutateAsync({ start_date: selectedDate });
+      await initCycle.mutateAsync({ start_date: formattedStartDate });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['cycles'] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
@@ -114,12 +123,21 @@ export function InitializeCycleModal({
       ]);
       onSuccess?.();
       onClose();
-    } catch (err: unknown) {
-      const errorBody = (err as { response?: { data?: { detail?: string } } })
-        ?.response?.data;
-      setErrorMessage(
-        errorBody?.detail || 'Failed to initialize cycle. Please try again.'
-      );
+    } catch (err: any) {
+      const responseData = err?.response?.data;
+      let msg = 'Failed to initialize cycle. Please try again.';
+      if (responseData) {
+        if (typeof responseData.message === 'string') {
+          msg = responseData.message;
+        } else if (typeof responseData.detail === 'string') {
+          msg = responseData.detail;
+        } else {
+          msg = typeof responseData === 'object' ? JSON.stringify(responseData) : String(responseData);
+        }
+      } else if (err?.message) {
+        msg = err.message;
+      }
+      setErrorMessage(msg);
     }
   };
 
@@ -136,6 +154,7 @@ export function InitializeCycleModal({
         <View
           className="max-h-[90%] rounded-t-[28px] bg-white p-6"
           style={{
+            paddingBottom: insets.bottom + 20,
             shadowColor: '#F0E5E1',
             shadowOffset: { width: 0, height: -6 },
             shadowOpacity: 0.9,
@@ -227,10 +246,10 @@ export function InitializeCycleModal({
                 </Pressable>
               </View>
 
-              {/* Weekday headers */}
-              <View className="flex-row justify-between border-b border-[#F0E5E1] pb-1">
+              {/* Weekday headers - Strict 7-column 14.28% grid */}
+              <View className="flex-row border-b border-[#F0E5E1] pb-2">
                 {WEEKDAYS.map((wd, i) => (
-                  <View key={i} className="w-8 items-center">
+                  <View key={i} style={{ width: '14.28%', alignItems: 'center' }}>
                     <Text className="font-body-bold text-[11px] text-[#A0A0B0]">
                       {wd}
                     </Text>
@@ -238,44 +257,67 @@ export function InitializeCycleModal({
                 ))}
               </View>
 
-              {/* Month day grid */}
-              <View className="mt-2 gap-y-1">
+              {/* Month day grid - Strict 7-column 14.28% grid with 48x48 min touch targets */}
+              <View className="mt-2">
                 {monthWeeks.map((week, wIdx) => (
-                  <View key={wIdx} className="flex-row justify-between">
+                  <View key={wIdx} className="flex-row">
                     {week.map((dateStr, dIdx) => {
                       if (!dateStr) {
-                        return <View key={dIdx} className="size-8" />;
+                        return (
+                          <View
+                            key={`empty-${wIdx}-${dIdx}`}
+                            style={{ width: '14.28%', aspectRatio: 1 }}
+                          />
+                        );
                       }
                       const isSelected = dateStr === selectedDate;
                       const isFuture = dateStr > today;
                       const dayNumber = String(Number(dateStr.slice(-2)));
 
                       return (
-                        <Pressable
-                          key={dIdx}
-                          disabled={isFuture}
-                          onPress={() => setSelectedDate(dateStr)}
-                          testID={`init-cycle-day-${dateStr}`}
-                          className={`size-8 items-center justify-center rounded-full ${
-                            isSelected
-                              ? 'bg-[#FF9FA8]'
-                              : isFuture
-                                ? 'opacity-25'
-                                : 'active:bg-[#FFE5E8]'
-                          }`}
+                        <View
+                          key={dateStr}
+                          style={{
+                            width: '14.28%',
+                            aspectRatio: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
                         >
-                          <Text
-                            className={`text-xs ${
+                          <Pressable
+                            disabled={isFuture}
+                            onPress={() => setSelectedDate(dateStr)}
+                            testID={`init-cycle-day-${dateStr}`}
+                            style={{
+                              width: 36,
+                              height: 36,
+                              minWidth: 48,
+                              minHeight: 48,
+                              borderRadius: 24,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            className={`${
                               isSelected
-                                ? 'font-body-bold text-white'
+                                ? 'bg-[#FF9FA8]'
                                 : isFuture
-                                  ? 'font-body text-[#A0A0B0]'
-                                  : 'font-body-medium text-[#2A2321]'
+                                  ? 'opacity-25'
+                                  : 'active:bg-[#FFE5E8]'
                             }`}
                           >
-                            {dayNumber}
-                          </Text>
-                        </Pressable>
+                            <Text
+                              className={`text-xs ${
+                                isSelected
+                                  ? 'font-body-bold text-white'
+                                  : isFuture
+                                    ? 'font-body text-[#A0A0B0]'
+                                    : 'font-body-medium text-[#2A2321]'
+                              }`}
+                            >
+                              {dayNumber}
+                            </Text>
+                          </Pressable>
+                        </View>
                       );
                     })}
                   </View>

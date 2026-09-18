@@ -16,9 +16,10 @@ def calculate_cycle_projections(cycle, user=None):
     owner = user or getattr(cycle, "user", None)
     profile = Profile.objects.filter(user=owner).first() if owner else None
 
+    raw_cycle_length = getattr(profile, "average_cycle_length", None) if profile else None
     cycle_length = (
-        profile.average_cycle_length
-        if profile and profile.average_cycle_length
+        raw_cycle_length
+        if isinstance(raw_cycle_length, int) and raw_cycle_length > 0
         else DEFAULT_CYCLE_LENGTH
     )
 
@@ -27,4 +28,5 @@ def calculate_cycle_projections(cycle, user=None):
     cycle.estimated_ovulation_date = cycle.start_date + timedelta(days=ovulation_offset)
     cycle.next_period_date = cycle.start_date + timedelta(days=cycle_length)
     return cycle
+
 
