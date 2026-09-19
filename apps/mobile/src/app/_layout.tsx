@@ -58,7 +58,7 @@ export default function RootLayout() {
   const router = useRouter();
   const navigationState = useRootNavigationState();
 
-  const { status } = useAuth();
+  const { status, token } = useAuth();
   const [isFirstTime, , isFirstTimeReady] = useIsFirstTime();
   const isAppReady = useAppReady();
   const { selectedTheme } = useSelectedTheme();
@@ -85,14 +85,18 @@ export default function RootLayout() {
     if (!navigationState?.key) return;
 
     const root = segments[0];
-    const inAppGroup = root === APP_GROUP;
     const onAuthScreen = AUTH_ROUTES.has(root);
 
-    if (status === 'signOut' && inAppGroup) {
+    if (!token && !onAuthScreen) {
       if (!isFirstTimeReady) return;
       const target = isFirstTime ? '/onboarding' : '/login';
+      
+      // Force dismiss any active modals so they don't block the redirect
+      if (router.canDismiss()) {
+        router.dismissAll();
+      }
       requestAnimationFrame(() => router.replace(target));
-    } else if (status === 'signIn' && onAuthScreen) {
+    } else if (token && onAuthScreen) {
       // Allow onboarding to stay mounted until completed
       if (root !== 'onboarding') {
         requestAnimationFrame(() => router.replace('/(app)'));
@@ -100,6 +104,7 @@ export default function RootLayout() {
     }
   }, [
     status,
+    token,
     segments,
     navigationState,
     router,

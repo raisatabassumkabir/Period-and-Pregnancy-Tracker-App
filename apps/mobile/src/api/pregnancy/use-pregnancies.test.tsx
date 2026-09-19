@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
+import { useAuth } from '@/lib/auth';
 import { client } from '../common';
 import type { PaginateQuery, Pregnancy } from '../types';
 import { activePregnancy, usePregnancies } from './use-pregnancies';
@@ -41,6 +42,13 @@ const page = (results: Pregnancy[]): PaginateQuery<Pregnancy> => ({
 });
 
 describe('usePregnancies', () => {
+  beforeEach(() => {
+    useAuth.setState({
+      status: 'signIn',
+      token: { access: 'test-access', refresh: 'test-refresh' },
+    });
+  });
+
   it('reads the paginated pregnancies collection', async () => {
     mockedClient.get.mockResolvedValue({ data: page([]) });
     const { result } = renderHook(() => usePregnancies(), { wrapper });

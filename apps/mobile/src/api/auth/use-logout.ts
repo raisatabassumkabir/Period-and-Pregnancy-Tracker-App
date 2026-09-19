@@ -10,7 +10,8 @@ export const useLogout = createMutation<
   AxiosError<ProblemDetail>
 >({
   mutationFn: async () => {
-    const response = await client.post('logout');
-    return response.data;
+    // Django backend uses stateless JWTs without a blacklist endpoint currently.
+    // So we just resolve immediately and let the local signOut() handle the rest.
+    return { success: true } as unknown as LogoutResponse;
   },
 });

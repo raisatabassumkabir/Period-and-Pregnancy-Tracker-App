@@ -35,6 +35,7 @@ export default function Onboarding() {
   // Flow navigation state
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [showInitCycleModal, setShowInitCycleModal] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form selections
   const [intent, setIntent] = useState<AppIntent | null>(null);
@@ -166,7 +167,12 @@ export default function Onboarding() {
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      await completeOnboarding();
+      setIsSubmitting(true);
+      try {
+        await completeOnboarding();
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -249,7 +255,8 @@ export default function Onboarding() {
             label={currentStep === TOTAL_STEPS ? 'Complete & Start' : 'Next'}
             size="lg"
             className="h-14 rounded-pill"
-            disabled={!isCurrentStepValid()}
+            disabled={!isCurrentStepValid() || isSubmitting}
+            loading={isSubmitting}
             onPress={handleNext}
             testID="onboarding-next"
           />

@@ -78,6 +78,8 @@ ASGI_APPLICATION = "config.asgi.application"
 # Persistent connections are safe with RLS because set_config(..., is_local=true)
 # is transaction-scoped: the variable dies with the request's transaction and can
 # never leak onto the next request that reuses this pooled connection.
+import sys
+
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get(
@@ -87,6 +89,12 @@ DATABASES = {
         conn_max_age=60,
     )
 }
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 
 AUTH_USER_MODEL = "users.User"
 

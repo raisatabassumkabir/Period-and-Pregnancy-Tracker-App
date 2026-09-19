@@ -91,7 +91,7 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
   },
 ];
 
-export const CLEAN_TEST_PASSWORD = 'TestUser2026!';
+export const CLEAN_TEST_PASSWORD = 'HappyWomen2026!';
 
 export interface CleanTestAccount {
   email: string;
@@ -147,3 +147,9 @@ export async function clearUserStateForCleanTest(): Promise<void> {
   await setItem(STORAGE_KEYS.TRACKING_MODE, 'cycle');
   useHealthStore.getState().setMode('cycle');
 }
+
+export function isDemoToken(token: string | undefined | null): boolean {
+  if (!token) return false;
+  return token.startsWith('demo-') || token.startsWith('clean-test-');
+}
+

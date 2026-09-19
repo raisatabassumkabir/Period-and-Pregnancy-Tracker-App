@@ -21,11 +21,7 @@ export default function TabLayout() {
   const { profile, isLoading } = usePersonalizationProfile();
   const router = useRouter();
 
-  React.useEffect(() => {
-    if (status === 'signIn' && !isLoading && !profile.hasCompletedOnboarding) {
-      requestAnimationFrame(() => router.replace('/onboarding'));
-    }
-  }, [status, isLoading, profile.hasCompletedOnboarding, router]);
+
 
   if (!status) return null;
   return (

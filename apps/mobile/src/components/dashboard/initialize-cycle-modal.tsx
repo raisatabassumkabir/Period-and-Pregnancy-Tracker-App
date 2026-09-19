@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
+import { useAuth } from '@/lib/auth';
 import { useInitCycle } from '@/api/cycles';
 import {
   addDays,
@@ -35,6 +36,7 @@ export function InitializeCycleModal({
   const [selectedDate, setSelectedDate] = React.useState<string>(today);
   const [currentMonth, setCurrentMonth] = React.useState<Date>(() => new Date());
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   // Sync state when modal is opened
   React.useEffect(() => {
@@ -42,6 +44,7 @@ export function InitializeCycleModal({
       setSelectedDate(todayDateString());
       setCurrentMonth(new Date());
       setErrorMessage(null);
+      setIsSubmitting(false);
     }
   }, [visible]);
 
@@ -98,13 +101,14 @@ export function InitializeCycleModal({
   };
 
   const handleDismiss = React.useCallback(() => {
-    if (initCycle.isPending) return;
+    if (isSubmitting) return;
     setErrorMessage(null);
     onClose();
-  }, [initCycle.isPending, onClose]);
+  }, [isSubmitting, onClose]);
 
   const handleConfirm = async () => {
-    if (initCycle.isPending) return;
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setErrorMessage(null);
 
     // Strictly format selected date as YYYY-MM-DD
@@ -124,9 +128,17 @@ export function InitializeCycleModal({
       onSuccess?.();
       onClose();
     } catch (err: any) {
+      // If the interceptor purged the token, we are logging out. Clear the banner.
+      if (err?.response?.status === 401 && !useAuth.getState().token) {
+        setErrorMessage(null);
+        return;
+      }
+
       const responseData = err?.response?.data;
       let msg = 'Failed to initialize cycle. Please try again.';
-      if (responseData) {
+      if (err?.response?.status === 401) {
+        msg = 'Demo tokens cannot initialize cycles without a mock backend.';
+      } else if (responseData) {
         if (typeof responseData.message === 'string') {
           msg = responseData.message;
         } else if (typeof responseData.detail === 'string') {
@@ -138,6 +150,8 @@ export function InitializeCycleModal({
         msg = err.message;
       }
       setErrorMessage(msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -174,10 +188,10 @@ export function InitializeCycleModal({
             </View>
             <Pressable
               onPress={handleDismiss}
-              disabled={initCycle.isPending}
+              disabled={isSubmitting}
               hitSlop={8}
               testID="init-cycle-cancel-button"
-              className={`p-1 ${initCycle.isPending ? 'opacity-40' : 'active:opacity-60'}`}
+              className={`p-1 ${isSubmitting ? 'opacity-40' : 'active:opacity-60'}`}
             >
               <X size={20} color="#A0A0B0" />
             </Pressable>
@@ -348,7 +362,7 @@ export function InitializeCycleModal({
 
             {/* Submit Button */}
             <Pressable
-              disabled={initCycle.isPending}
+              disabled={isSubmitting}
               onPress={handleConfirm}
               testID="init-cycle-confirm-button"
               className="mt-5 h-13 flex-row items-center justify-center rounded-pill bg-[#FF9FA8] active:scale-[0.98]"
@@ -360,7 +374,7 @@ export function InitializeCycleModal({
                 elevation: 3,
               }}
             >
-              {initCycle.isPending ? (
+              {isSubmitting ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
                 <Text className="font-body-bold text-base text-white">

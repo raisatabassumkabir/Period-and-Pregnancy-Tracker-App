@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 
 import { isPaymentRequiredProblem, toUpgradeDetail } from '@/api/billing/types';
 import { signIn, signOut, useAuth } from '@/lib/auth';
+import { isDemoToken } from '@/lib/auth/demo-users';
 import type { TokenType } from '@/lib/auth/utils';
 import { showUpgrade } from '@/lib/upgrade';
 
@@ -114,6 +115,14 @@ client.interceptors.response.use(
       originalRequest._retry = true;
 
       const currentToken = useAuth.getState().token;
+
+      if (isDemoToken(currentToken?.access)) {
+        // Offline demo user or mock token — backend will reject with 401,
+        // but we MUST NOT refresh or force sign-out. Allow queries/mutations to fail
+        // gracefully so components switch to local demo fallback state.
+        return Promise.reject(error);
+      }
+
       if (!currentToken?.refresh) {
         // No refresh token available — sign out cleanly.
         handleForceSignOut();
@@ -153,6 +162,14 @@ client.interceptors.response.use(
           message: 'Upgrade to Premium to unlock this feature.',
           feature: 'premium',
         });
+      }
+    }
+
+    // ── Catch-all 401: Unhandled or failed refresh ────────────────────
+    if (status === 401) {
+      // Don't force logout for auth-exempt endpoints (e.g. login with wrong password)
+      if (originalRequest && !isAuthExempt(originalRequest.url)) {
+        handleForceSignOut();
       }
     }
 
