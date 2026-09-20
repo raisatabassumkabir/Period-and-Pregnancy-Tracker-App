@@ -382,6 +382,36 @@ export function InitializeCycleModal({
                 </Text>
               )}
             </Pressable>
+
+            {/* Skip Button */}
+            <Pressable
+              disabled={isSubmitting}
+              onPress={async () => {
+                if (isSubmitting) return;
+                setIsSubmitting(true);
+                try {
+                  await initCycle.mutateAsync({ start_date: todayDateString() });
+                  await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: ['cycles'] }),
+                    queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+                    queryClient.invalidateQueries({ queryKey: ['dashboard', 'current-cycle'] }),
+                    queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
+                  ]);
+                  onSuccess?.();
+                  onClose();
+                } catch (err: any) {
+                  setErrorMessage('Failed to skip. Please try again.');
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              testID="init-cycle-skip-button"
+              className="mt-4 py-2 flex-row items-center justify-center"
+            >
+              <Text className="font-body-bold text-sm text-[#8C8C8C]">
+                Skip for now
+              </Text>
+            </Pressable>
           </ScrollView>
         </View>
       </View>

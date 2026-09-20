@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { activePregnancy, usePregnancies } from '@/api/pregnancy';
+import { useProfile } from '@/api/users';
 import { MealCard } from '@/components/diet';
+import { DietNudgeCard } from '@/components/diet/diet-nudge-card';
+import { PersonalizationOptionsModal } from '@/components/settings/personalization-modal';
 import type { SegmentOption } from '@/components/ui';
 import {
   FocusAwareStatusBar,
   SafeAreaView,
-  ScreenHeader,
   ScrollView,
   SegmentedControl,
   Text,
@@ -16,6 +18,7 @@ import { MEAL_PLANS, TRIMESTER_KEYS } from '@/lib/diet';
 import type { Trimester } from '@/lib/health';
 import { derivePregnancyProgress } from '@/lib/health';
 import { translate } from '@/lib/i18n';
+import { AppHeader } from '@/components/ui/app-header';
 
 const TRIMESTERS: readonly Trimester[] = [1, 2, 3];
 
@@ -26,15 +29,16 @@ function trimesterOptions(): readonly SegmentOption<Trimester>[] {
   }));
 }
 
-/** Localized meal plan, defaulting to the trimester of the active pregnancy. */
-import { AppHeader } from '@/components/ui/app-header';
-
 export default function Diet() {
   const { data } = usePregnancies();
   const progress = derivePregnancyProgress(activePregnancy(data));
+  const { data: profile } = useProfile();
 
   const [selected, setSelected] = React.useState<Trimester | null>(null);
+  const [modalVisible, setModalVisible] = React.useState(false);
   const trimester = selected ?? progress?.trimester ?? 1;
+
+  const showNudge = profile && (profile.height == null || profile.weight == null);
 
   return (
     <View className="flex-1 bg-canvas" testID="diet-screen">
@@ -50,6 +54,10 @@ export default function Diet() {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="px-4 pb-8 pt-4"
       >
+        {showNudge && (
+          <DietNudgeCard onPress={() => setModalVisible(true)} />
+        )}
+
         <SegmentedControl
           options={trimesterOptions()}
           value={trimester}
@@ -66,6 +74,11 @@ export default function Diet() {
           {translate('diet.disclaimer')}
         </Text>
       </ScrollView>
+
+      <PersonalizationOptionsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }

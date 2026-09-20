@@ -45,8 +45,8 @@ export default function Onboarding() {
   const [selectedSource, setSelectedSource] = useState<string>('');
   const [cycleLength, setCycleLength] = useState<number>(DEFAULT_CYCLE_LENGTH);
   const [periodDuration, setPeriodDuration] = useState<number>(DEFAULT_PERIOD_DURATION);
-  const [heightCm, setHeightCm] = useState<string>('165');
-  const [weightKg, setWeightKg] = useState<string>('60');
+  const [heightCm, setHeightCm] = useState<string>('');
+  const [weightKg, setWeightKg] = useState<string>('');
 
   // Step 2 goal toggle
   const handleToggleGoal = (id: string) => {
@@ -183,7 +183,13 @@ export default function Onboarding() {
   };
 
   const handleSkip = async () => {
-    await completeOnboarding();
+    if (currentStep === 1) {
+      setIntent('myself');
+    } else if (currentStep === 5) {
+      setCycleLength(28);
+      setPeriodDuration(5);
+    }
+    await handleNext();
   };
 
   return (
