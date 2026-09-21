@@ -36,25 +36,6 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    height: 56,
-    borderRadius: 999,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#F0E5E1',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    shadowColor: '#F0E5E1',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.8,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-});
-
 export function GoogleButton({
   onPress,
   loading = false,
@@ -69,15 +50,14 @@ export function GoogleButton({
       accessibilityLabel={label}
       onPress={onPress}
       disabled={disabled || loading}
-      style={styles.button}
-      className="active:opacity-85"
+      className="h-14 flex-row items-center justify-center rounded-[16px] bg-bg active:opacity-70"
     >
       {loading ? (
-        <ActivityIndicator size="small" color="#FF9FA8" />
+        <ActivityIndicator size="small" color="#FF7A8A" />
       ) : (
         <View className="flex-row items-center justify-center">
-          <GoogleIcon size={20} />
-          <Text className="ml-3 font-body-bold text-[15px] text-[#4A4A4A]">
+          <GoogleIcon size={18} />
+          <Text className="ml-3 font-body-semibold text-[14px] text-ink">
             {label}
           </Text>
         </View>

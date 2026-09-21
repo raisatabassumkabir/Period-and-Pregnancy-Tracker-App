@@ -3,7 +3,7 @@ import type { TextInput } from 'react-native';
 
 import { FormField } from '@/components/ui';
 
-interface Props<T extends FieldValues> {
+interface Props<T extends FieldValues> extends Omit<TextInputProps, 'onSubmitEditing'> {
   control: Control<T>;
   onSubmitEditing?: () => void;
   inputRef?: React.MutableRefObject<TextInput | null>;
@@ -15,7 +15,9 @@ export function EmailInput<T extends FieldValues>({
   control,
   onSubmitEditing,
   inputRef,
-  label = 'Email address',
+  label,
+  placeholder = 'you@email.com',
+  ...rest
 }: Props<T>) {
   return (
     <FormField
@@ -23,7 +25,7 @@ export function EmailInput<T extends FieldValues>({
       name={'email' as Path<T>}
       label={label}
       testID="email-input"
-      placeholder="you@email.com"
+      placeholder={placeholder}
       inputRef={inputRef}
       keyboardType="email-address"
       autoCapitalize="none"
@@ -33,6 +35,7 @@ export function EmailInput<T extends FieldValues>({
       returnKeyType="next"
       submitBehavior="submit"
       onSubmitEditing={onSubmitEditing}
+      {...rest}
     />
   );
 }

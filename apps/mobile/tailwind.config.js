@@ -75,6 +75,7 @@ module.exports = {
         body: ['Nunito-Regular'],
         'body-semibold': ['Nunito-SemiBold'],
         'body-bold': ['Nunito-Bold'],
+        script: ['AngelFace'],
       },
       colors: {
         ...colors,
@@ -88,6 +89,10 @@ module.exports = {
         card: '28px',
         /** Fully rounded regardless of box size — pill buttons and day cells. */
         pill: '999px',
+      },
+      boxShadow: {
+        'card-soft': '0px 10px 30px rgba(0, 0, 0, 0.05)',
+        'glow-accent': '0px 8px 20px rgba(255, 122, 138, 0.4)',
       },
     },
   },

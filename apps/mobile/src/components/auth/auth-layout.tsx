@@ -1,10 +1,12 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
+import { usePathname, useRouter } from 'expo-router';
 
 import {
   BrandLockup,
   FocusAwareStatusBar,
-  GradientBackdrop,
   Pressable,
   SafeAreaView,
   Text,
@@ -15,7 +17,7 @@ import { usePaletteColors } from '@/lib/theme';
 
 const SCROLL_CONTENT = {
   flexGrow: 1,
-  paddingHorizontal: 22,
+  paddingHorizontal: 24,
   paddingBottom: 36,
 } as const;
 
@@ -24,6 +26,7 @@ interface Props {
   title: string;
   subtitle: string;
   onGoBack?: () => void;
+  activeTab?: 'login' | 'register';
   children: React.ReactNode;
   footer?: React.ReactNode;
   testID?: string;
@@ -34,15 +37,16 @@ export function AuthLayout({
   title,
   subtitle,
   onGoBack,
+  activeTab,
   children,
   footer,
   testID,
 }: Props) {
   const palette = usePaletteColors();
+  const router = useRouter();
 
   return (
-    <View className="flex-1 bg-canvas" testID={testID}>
-      <GradientBackdrop />
+    <View className="flex-1 bg-surface" testID={testID}>
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']} className="flex-1">
         <View className="h-12 justify-center px-4">
@@ -69,43 +73,54 @@ export function AuthLayout({
             showsVerticalScrollIndicator={false}
           >
             {/* Header Lockup */}
-            <View className="items-center pb-6 pt-2">
+            <Animated.View entering={FadeInDown.duration(800).springify().damping(16)} className="items-center pb-6 pt-2">
               <BrandLockup testID="auth-brand" />
-            </View>
+            </Animated.View>
 
             {/* Title & Subtitle */}
-            <View className="mb-6 px-1">
-              <Text className="font-body-bold text-[12px] uppercase tracking-widest text-accent">
+            <Animated.View entering={FadeInDown.delay(100).duration(800).springify().damping(16)} className="mb-6 px-1">
+              <Text className="font-body-semibold text-[14px] text-accent text-left mb-1">
                 {kicker}
               </Text>
-              <Text className="mt-1 font-heading text-[32px] text-ink">
+              <Text className="font-heading text-[30px] text-ink text-left leading-[36px] tracking-tight">
                 {title}
               </Text>
-              <Text className="mt-1.5 font-body text-[15px] leading-6 text-tone-700">
+              <Text className="mt-2 font-body text-[15px] text-tone-500 text-left leading-6">
                 {subtitle}
               </Text>
-            </View>
+            </Animated.View>
 
-            {/* Modern Card Container with Soft Pastel Aesthetics */}
-            <View
-              testID="auth-form-card"
-              style={{
-                borderRadius: 24,
-                backgroundColor: '#FFFFFF',
-                borderWidth: 1,
-                borderColor: '#F0E5E1',
-                padding: 24,
-                shadowColor: '#F0E5E1',
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.8,
-                shadowRadius: 15,
-                elevation: 4,
-              }}
-            >
+            {/* Segmented Control */}
+            {activeTab && (
+              <Animated.View entering={FadeInDown.delay(150).duration(800).springify().damping(16)} className="mb-6 flex-row rounded-[16px] bg-bg p-1">
+                <Pressable
+                  onPress={() => router.replace('/login')}
+                  className={`flex-1 items-center justify-center rounded-[12px] py-3 ${
+                    activeTab === 'login' ? 'bg-surface shadow-sm' : ''
+                  }`}
+                >
+                  <Text className={`font-body-semibold text-[15px] ${activeTab === 'login' ? 'text-ink' : 'text-tone-600'}`}>Sign in</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => router.replace('/register')}
+                  className={`flex-1 items-center justify-center rounded-[12px] py-3 ${
+                    activeTab === 'register' ? 'bg-surface shadow-sm' : ''
+                  }`}
+                >
+                  <Text className={`font-body-semibold text-[15px] ${activeTab === 'register' ? 'text-ink' : 'text-tone-600'}`}>Register</Text>
+                </Pressable>
+              </Animated.View>
+            )}
+
+            <Animated.View entering={FadeInUp.delay(200).duration(800).springify().damping(16)} testID="auth-form-card">
               {children}
-            </View>
+            </Animated.View>
 
-            {footer ? <View className="mt-7">{footer}</View> : null}
+            {footer ? (
+              <Animated.View entering={FadeInUp.delay(300).duration(800).springify().damping(16)} className="mt-7">
+                {footer}
+              </Animated.View>
+            ) : null}
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>

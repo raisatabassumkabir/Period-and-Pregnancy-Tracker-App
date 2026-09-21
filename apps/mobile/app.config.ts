@@ -118,6 +118,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           './assets/fonts/Nunito-SemiBold.ttf',
           './assets/fonts/Nunito-Bold.ttf',
           './assets/fonts/Nunito-ExtraBold.ttf',
+          // Hand-written script font for the brand wordmark
+          './assets/fonts/AngelFace.otf',
         ],
       },
     ],

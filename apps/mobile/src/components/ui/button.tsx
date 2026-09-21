@@ -15,7 +15,7 @@ const button = tv({
   variants: {
     variant: {
       default: {
-        container: 'bg-accent active:opacity-90',
+        container: 'bg-accent shadow-glow-accent active:opacity-90',
         label: 'text-white',
         indicator: 'text-white',
       },

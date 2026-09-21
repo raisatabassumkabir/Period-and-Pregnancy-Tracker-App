@@ -31,9 +31,9 @@ const LABEL_LIFT_Y = -12;
 const LABEL_LIFT_SCALE = 0.78;
 const TRANSITION_MS = 160;
 /** Tall enough for a lifted label above a line of body text. */
-const FLOATING_FIELD_HEIGHT = 60;
-const FRAME_BORDER_WIDTH = 2;
-const FRAME_RADIUS = 18;
+const FLOATING_FIELD_HEIGHT = 56;
+const FRAME_BORDER_WIDTH = 1;
+const FRAME_RADIUS = 16;
 
 /**
  * The one input skin in the app. `FormField` composes this with
@@ -126,10 +126,10 @@ function useFrameStyle({ isFocused, hasError, isDisabled }: FieldFrameState) {
     focus.value = withTiming(isFocused ? 1 : 0, { duration: TRANSITION_MS });
   }, [focus, isFocused]);
 
-  const restBorder = hasError ? colors.danger[500] : palette.divider;
+  const restBorder = hasError ? colors.danger[500] : 'transparent';
   const focusBorder = hasError ? colors.danger[500] : palette.accent;
-  const restGround = isDisabled ? palette.tone[200] : palette.surface;
-  const focusGround = isDisabled ? palette.tone[200] : palette.accentScale[100];
+  const restGround = isDisabled ? palette.tone[200] : palette.canvas;
+  const focusGround = isDisabled ? palette.tone[200] : palette.canvas;
 
   return useAnimatedStyle(() => ({
     borderColor: interpolateColor(

@@ -6,10 +6,10 @@ import { FormField, Pressable } from '@/components/ui';
 import { Eye, EyeOff } from '@/components/ui/icons';
 import { usePaletteColors } from '@/lib/theme';
 
-interface Props<T extends FieldValues> {
+interface Props<T extends FieldValues> extends Omit<TextInputProps, 'onSubmitEditing'> {
   control: Control<T>;
   name: Path<T>;
-  label: string;
+  label?: string;
   /** `new-password` on register so password managers offer to generate one. */
   autoComplete?: 'current-password' | 'new-password';
   returnKeyType?: 'next' | 'done';
@@ -28,6 +28,8 @@ export function PasswordInput<T extends FieldValues>({
   onSubmitEditing,
   inputRef,
   testID = 'password-input',
+  placeholder = '••••••••',
+  ...rest
 }: Props<T>) {
   const [isRevealed, setIsRevealed] = React.useState(false);
   const palette = usePaletteColors();
@@ -40,7 +42,7 @@ export function PasswordInput<T extends FieldValues>({
       name={name}
       label={label}
       testID={testID}
-      placeholder="••••••••"
+      placeholder={placeholder}
       inputRef={inputRef}
       secureTextEntry={!isRevealed}
       autoCapitalize="none"
@@ -52,6 +54,7 @@ export function PasswordInput<T extends FieldValues>({
       returnKeyType={returnKeyType}
       submitBehavior={returnKeyType === 'next' ? 'submit' : 'blurAndSubmit'}
       onSubmitEditing={onSubmitEditing}
+      {...rest}
       rightSlot={
         <Pressable
           accessibilityRole="button"

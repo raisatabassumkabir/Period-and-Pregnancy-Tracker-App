@@ -3,6 +3,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 import { Image } from 'expo-image';
+import { useFonts } from 'expo-font';
 
 import { Text } from './text';
 
@@ -42,11 +43,22 @@ export function BrandLockup({
   showWordmark = true,
   testID,
 }: BrandLockupProps) {
+  const [fontsLoaded] = useFonts({
+    AngelFace: require('../../../assets/fonts/AngelFace.otf'),
+  });
+
   return (
     <View className="items-center" testID={testID}>
       <BrandMark size={markSize} />
-      {showWordmark && (
-        <Text className="mt-2 font-heading text-[26px] tracking-tight text-ink">
+      {showWordmark && fontsLoaded && (
+        <Text 
+          className="mt-2 font-script text-[42px] tracking-tight text-accent"
+          style={{
+            textShadowColor: '#FF9FA8', // Matches text-accent
+            textShadowOffset: { width: 0.5, height: 0.5 },
+            textShadowRadius: 1
+          }}
+        >
           {Env.NAME}
         </Text>
       )}
