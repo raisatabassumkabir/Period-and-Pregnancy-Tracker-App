@@ -43,12 +43,16 @@ export function useTodayLog() {
   const logsQuery = useDailyLogs();
   const saveMutation = useSaveDailyLog();
 
-  const [localLogs, setLocalLogs] = React.useState<Record<string, DailyLog>>({});
+  const [localLogs, setLocalLogs] = React.useState<Record<string, DailyLog>>(
+    {}
+  );
 
   React.useEffect(() => {
-    getItem<Record<string, DailyLog>>(STORAGE_KEYS.LOCAL_DAILY_LOGS).then((stored) => {
-      if (stored) setLocalLogs(stored);
-    });
+    getItem<Record<string, DailyLog>>(STORAGE_KEYS.LOCAL_DAILY_LOGS).then(
+      (stored) => {
+        if (stored) setLocalLogs(stored);
+      }
+    );
   }, []);
 
   const serverLogs = logsQuery.data?.results ?? [];
@@ -118,7 +122,8 @@ export function useTodayLog() {
   );
 
   const save = React.useCallback(async () => {
-    const { discharge, intercourseLogged, contraceptionUsed, ...serverFields } = draft;
+    const { discharge, intercourseLogged, contraceptionUsed, ...serverFields } =
+      draft;
 
     const newLog: DailyLog = {
       id: existing?.id ?? `local-${Date.now()}`,
@@ -136,7 +141,9 @@ export function useTodayLog() {
 
     // 1. Save locally to MMKV encrypted store
     const storedLocalLogs =
-      (await getItem<Record<string, DailyLog>>(STORAGE_KEYS.LOCAL_DAILY_LOGS)) ?? {};
+      (await getItem<Record<string, DailyLog>>(
+        STORAGE_KEYS.LOCAL_DAILY_LOGS
+      )) ?? {};
     const updatedLocalLogs = { ...storedLocalLogs, [today]: newLog };
     await setItem(STORAGE_KEYS.LOCAL_DAILY_LOGS, updatedLocalLogs);
     setLocalLogs(updatedLocalLogs);
@@ -154,7 +161,9 @@ export function useTodayLog() {
       const currentResults = old?.results ?? [];
       const filtered = currentResults.filter((l) => l.date !== today);
       return {
-        count: (old?.count ?? 0) + (currentResults.some((l) => l.date === today) ? 0 : 1),
+        count:
+          (old?.count ?? 0) +
+          (currentResults.some((l) => l.date === today) ? 0 : 1),
         next: old?.next ?? null,
         previous: old?.previous ?? null,
         results: [newLog, ...filtered],
@@ -178,7 +187,10 @@ export function useTodayLog() {
     let saved = newLog;
     try {
       saved = await saveMutation.mutateAsync({
-        id: existing?.id && !existing.id.startsWith('local-') ? existing.id : undefined,
+        id:
+          existing?.id && !existing.id.startsWith('local-')
+            ? existing.id
+            : undefined,
         date: today,
         ...serverFields,
         intercourse_logged: intercourseLogged,
@@ -190,7 +202,15 @@ export function useTodayLog() {
     }
 
     return saved;
-  }, [draft, existing?.id, existing?.created_at, existing?.temperature_celsius, queryClient, saveMutation, today]);
+  }, [
+    draft,
+    existing?.id,
+    existing?.created_at,
+    existing?.temperature_celsius,
+    queryClient,
+    saveMutation,
+    today,
+  ]);
 
   const errorBody = saveMutation.error?.response?.data;
 

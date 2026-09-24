@@ -1,6 +1,12 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, Modal, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 
 import { useMe } from '@/api/auth';
 import { usePaymentSubscriptionStatus } from '@/api/billing/use-subscription-status';
@@ -12,6 +18,7 @@ import type {
 import { Button, Pill, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+
 import { DatePickerModal } from './personalization-item';
 
 const LOGIN_ROUTE = '/login';
@@ -84,9 +91,7 @@ export const ProfileHeader = () => {
 
   const toggleCondition = (id: MedicalCondition) => {
     setSelectedConditions((current) =>
-      current.includes(id)
-        ? current.filter((c) => c !== id)
-        : [...current, id]
+      current.includes(id) ? current.filter((c) => c !== id) : [...current, id]
     );
   };
 

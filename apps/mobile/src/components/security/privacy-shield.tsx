@@ -38,10 +38,10 @@ export function PrivacyShield({ children }: { children: React.ReactNode }) {
             <View style={styles.iconCircle}>
               <Shield size={36} color="#B83253" strokeWidth={2.2} />
             </View>
-            <Text className="font-heading mt-4 text-xl text-[#2D2D2D]">
+            <Text className="mt-4 font-heading text-xl text-[#2D2D2D]">
               Happy Women
             </Text>
-            <Text className="font-body mt-1 text-sm text-[#7A7A7A]">
+            <Text className="mt-1 font-body text-sm text-[#7A7A7A]">
               Protected for your privacy
             </Text>
           </View>

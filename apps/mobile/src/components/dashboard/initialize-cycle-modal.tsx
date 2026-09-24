@@ -1,11 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import React from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
-import { useAuth } from '@/lib/auth';
 import { useInitCycle } from '@/api/cycles';
+import { useAuth } from '@/lib/auth';
 import {
   addDays,
   buildMonthMatrix,
@@ -30,11 +37,18 @@ export function InitializeCycleModal({
 }: InitializeCycleModalProps) {
   const queryClient = useQueryClient();
   const initCycle = useInitCycle();
-  const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 };
+  const insets = React.useContext(SafeAreaInsetsContext) ?? {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  };
 
   const today = React.useMemo(() => todayDateString(), []);
   const [selectedDate, setSelectedDate] = React.useState<string>(today);
-  const [currentMonth, setCurrentMonth] = React.useState<Date>(() => new Date());
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(
+    () => new Date()
+  );
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
@@ -122,7 +136,9 @@ export function InitializeCycleModal({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['cycles'] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({ queryKey: ['dashboard', 'current-cycle'] }),
+        queryClient.invalidateQueries({
+          queryKey: ['dashboard', 'current-cycle'],
+        }),
         queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
       ]);
       onSuccess?.();
@@ -144,7 +160,10 @@ export function InitializeCycleModal({
         } else if (typeof responseData.detail === 'string') {
           msg = responseData.detail;
         } else {
-          msg = typeof responseData === 'object' ? JSON.stringify(responseData) : String(responseData);
+          msg =
+            typeof responseData === 'object'
+              ? JSON.stringify(responseData)
+              : String(responseData);
         }
       } else if (err?.message) {
         msg = err.message;
@@ -201,8 +220,9 @@ export function InitializeCycleModal({
             <Text className="font-heading text-[17px] text-[#2A2321]">
               When did your last period start?
             </Text>
-            <Text className="font-body mt-1 text-xs text-[#8C8C8C]">
-              We need an anchor date to compute your cycle days, fertile window, and period predictions.
+            <Text className="mt-1 font-body text-xs text-[#8C8C8C]">
+              We need an anchor date to compute your cycle days, fertile window,
+              and period predictions.
             </Text>
 
             {/* Quick Pick Chips */}
@@ -213,7 +233,7 @@ export function InitializeCycleModal({
                   <Pressable
                     key={opt.label}
                     onPress={() => handleQuickSelect(opt.date)}
-                    className={`rounded-full px-3.5 py-1.5 border ${
+                    className={`rounded-full border px-3.5 py-1.5 ${
                       isSelected
                         ? 'border-[#FF9FA8] bg-[#FFE5E8]'
                         : 'border-[#F0E5E1] bg-white'
@@ -263,7 +283,10 @@ export function InitializeCycleModal({
               {/* Weekday headers - Strict 7-column 14.28% grid */}
               <View className="flex-row border-b border-[#F0E5E1] pb-2">
                 {WEEKDAYS.map((wd, i) => (
-                  <View key={i} style={{ width: '14.28%', alignItems: 'center' }}>
+                  <View
+                    key={i}
+                    style={{ width: '14.28%', alignItems: 'center' }}
+                  >
                     <Text className="font-body-bold text-[11px] text-[#A0A0B0]">
                       {wd}
                     </Text>
@@ -365,7 +388,7 @@ export function InitializeCycleModal({
               disabled={isSubmitting}
               onPress={handleConfirm}
               testID="init-cycle-confirm-button"
-              className="mt-5 h-13 flex-row items-center justify-center rounded-pill bg-[#FF9FA8] active:scale-[0.98]"
+              className="h-13 mt-5 flex-row items-center justify-center rounded-pill bg-[#FF9FA8] active:scale-[0.98]"
               style={{
                 shadowColor: '#FF9FA8',
                 shadowOffset: { width: 0, height: 4 },
@@ -390,11 +413,15 @@ export function InitializeCycleModal({
                 if (isSubmitting) return;
                 setIsSubmitting(true);
                 try {
-                  await initCycle.mutateAsync({ start_date: todayDateString() });
+                  await initCycle.mutateAsync({
+                    start_date: todayDateString(),
+                  });
                   await Promise.all([
                     queryClient.invalidateQueries({ queryKey: ['cycles'] }),
                     queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-                    queryClient.invalidateQueries({ queryKey: ['dashboard', 'current-cycle'] }),
+                    queryClient.invalidateQueries({
+                      queryKey: ['dashboard', 'current-cycle'],
+                    }),
                     queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
                   ]);
                   onSuccess?.();
@@ -406,7 +433,7 @@ export function InitializeCycleModal({
                 }
               }}
               testID="init-cycle-skip-button"
-              className="mt-4 py-2 flex-row items-center justify-center"
+              className="mt-4 flex-row items-center justify-center py-2"
             >
               <Text className="font-body-bold text-sm text-[#8C8C8C]">
                 Skip for now

@@ -40,7 +40,8 @@ export function StepMedical({
         Do you have any of these health conditions?
       </Text>
       <Text className="mt-2 font-body text-[15px] leading-6 text-[#8C8C8C]">
-        Choose all that apply. Your information remains completely private, secure, and encrypted.
+        Choose all that apply. Your information remains completely private,
+        secure, and encrypted.
       </Text>
 
       <View className="mt-6 gap-3">
@@ -52,7 +53,7 @@ export function StepMedical({
               key={item.id}
               testID={`condition-${item.id}`}
               onPress={() => onToggleCondition(item.id)}
-              className={`flex-row items-center justify-between p-4 rounded-[20px] border active:opacity-85 ${
+              className={`flex-row items-center justify-between rounded-[20px] border p-4 active:opacity-85 ${
                 isSelected
                   ? 'border-[#FF9FA8] bg-white'
                   : 'border-[#F0E5E1] bg-white/95'
@@ -74,13 +75,15 @@ export function StepMedical({
               </Text>
 
               <View
-                className={`size-6 rounded-full border-2 items-center justify-center ${
+                className={`size-6 items-center justify-center rounded-full border-2 ${
                   isSelected
                     ? 'border-[#FF9FA8] bg-[#FF9FA8]'
                     : 'border-[#F0E5E1] bg-[#FCF8F5]'
                 }`}
               >
-                {isSelected && <Check size={14} color="#FFFFFF" strokeWidth={3} />}
+                {isSelected && (
+                  <Check size={14} color="#FFFFFF" strokeWidth={3} />
+                )}
               </View>
             </Pressable>
           );

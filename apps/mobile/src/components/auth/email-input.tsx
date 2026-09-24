@@ -1,9 +1,12 @@
 import type { Control, FieldValues, Path } from 'react-hook-form';
-import type { TextInput } from 'react-native';
+import type { TextInput, TextInputProps } from 'react-native';
 
 import { FormField } from '@/components/ui';
 
-interface Props<T extends FieldValues> extends Omit<TextInputProps, 'onSubmitEditing'> {
+interface Props<T extends FieldValues> extends Omit<
+  TextInputProps,
+  'onSubmitEditing'
+> {
   control: Control<T>;
   onSubmitEditing?: () => void;
   inputRef?: React.MutableRefObject<TextInput | null>;

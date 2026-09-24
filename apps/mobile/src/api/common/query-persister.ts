@@ -22,7 +22,10 @@ export function createMMKVQueryPersister(
       try {
         storage.set(QUERY_CACHE_KEY, JSON.stringify(client));
       } catch (error) {
-        console.warn('[QueryPersister] Failed to persist client to MMKV:', error);
+        console.warn(
+          '[QueryPersister] Failed to persist client to MMKV:',
+          error
+        );
       }
     },
     restoreClient: (): PersistedClient | undefined => {

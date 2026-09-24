@@ -3,12 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.12.3",
+  "main": "expo-router/entry",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
     "init-app": "node scripts/init-app.js",
     "mobile": "pnpm --filter mobile",
     "contract": "pnpm --filter @repo/api-contract",
+    "start": "pnpm mobile start",
+    "android": "pnpm mobile android",
+    "ios": "pnpm mobile ios",
     "lint": "pnpm -r --if-present lint",
     "type-check": "pnpm -r --if-present type-check",
     "test": "pnpm -r --if-present test",
@@ -24,7 +28,13 @@
   },
   "pnpm": {
     "patchedDependencies": {
+      "expo-modules-core@3.0.30": "patches/expo-modules-core@3.0.30.patch",
       "react-native-css-interop@0.2.1": "patches/react-native-css-interop@0.2.1.patch"
     }
+  },
+  "dependencies": {
+    "expo": "~54.0.37",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

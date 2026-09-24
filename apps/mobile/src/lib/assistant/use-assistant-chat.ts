@@ -1,7 +1,7 @@
 export type { ChatMessage } from './use-chat';
 export {
+  useChat as useAssistantChat,
   useAssistantContext,
   useChat,
-  useChat as useAssistantChat,
   WELCOME_MESSAGE,
 } from './use-chat';

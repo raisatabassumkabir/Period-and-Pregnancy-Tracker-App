@@ -31,7 +31,8 @@ export function SexualHealthSelector({
   onChange,
   testID = 'sexual-health-selector',
 }: SexualHealthSelectorProps) {
-  const isNoneSelected = !intercourseLogged && contraceptionUsed.includes('none');
+  const isNoneSelected =
+    !intercourseLogged && contraceptionUsed.includes('none');
 
   const handleToggle = (id: string) => {
     if (id === 'none') {
@@ -97,9 +98,7 @@ export function SexualHealthSelector({
             testID={`sexual-health-${opt.id}`}
             onPress={() => handleToggle(opt.id)}
             className={`h-11 items-center justify-center rounded-pill border px-4 active:scale-[0.98] ${
-              selected
-                ? 'border-accent bg-accent'
-                : 'border-divider bg-surface'
+              selected ? 'border-accent bg-accent' : 'border-divider bg-surface'
             }`}
           >
             <Text

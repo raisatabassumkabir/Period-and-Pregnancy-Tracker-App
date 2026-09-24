@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
 import { ArrowRight, Sparkles } from 'lucide-react-native';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 interface DietNudgeCardProps {
   onPress: () => void;
@@ -16,7 +16,8 @@ export function DietNudgeCard({ onPress }: DietNudgeCardProps) {
         </Text>
       </View>
       <Text className="mb-4 font-body text-[14px] leading-5 text-[#3E7060]">
-        Add your body metrics to get calorie targets and cycle-synced meal plans.
+        Add your body metrics to get calorie targets and cycle-synced meal
+        plans.
       </Text>
       <TouchableOpacity
         onPress={onPress}

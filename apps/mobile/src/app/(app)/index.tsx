@@ -1,5 +1,12 @@
 import { useRouter } from 'expo-router';
-import { ArrowRight, Baby, Calendar, HeartPulse, Plus, Sparkles } from 'lucide-react-native';
+import {
+  ArrowRight,
+  Baby,
+  Calendar,
+  HeartPulse,
+  Plus,
+  Sparkles,
+} from 'lucide-react-native';
 import React from 'react';
 
 import { useCycles } from '@/api/cycles';
@@ -86,13 +93,7 @@ function LogActionButton({ label }: { label: string }) {
   );
 }
 
-function SectionHeading({
-  title,
-  isDemo,
-}: {
-  title: string;
-  isDemo: boolean;
-}) {
+function SectionHeading({ title, isDemo }: { title: string; isDemo: boolean }) {
   return (
     <View className="flex-row items-center justify-between">
       <Kicker>{title}</Kicker>
@@ -135,8 +136,9 @@ function CycleEmptyCard({ onStartCycle }: { onStartCycle: () => void }) {
         </View>
       </View>
 
-      <Text className="font-body mt-4 text-[14px] leading-5 text-[#8C8C8C]">
-        Log your first period to see your current cycle day, predicted ovulation, and next expected period date.
+      <Text className="mt-4 font-body text-[14px] leading-5 text-[#8C8C8C]">
+        Log your first period to see your current cycle day, predicted
+        ovulation, and next expected period date.
       </Text>
 
       <Pressable
@@ -192,8 +194,9 @@ function PregnancyEmptyCard({
         </View>
       </View>
 
-      <Text className="font-body mt-4 text-[14px] leading-5 text-[#8C8C8C]">
-        Follow your baby's development, track trimesters, and log important milestones week by week.
+      <Text className="mt-4 font-body text-[14px] leading-5 text-[#8C8C8C]">
+        Follow your baby's development, track trimesters, and log important
+        milestones week by week.
       </Text>
 
       <Pressable
@@ -351,7 +354,7 @@ function CycleSection({
               </Text>
             </View>
           </View>
-          <Text className="font-body mt-3 text-[13px] leading-5 text-[#4A4A4A]">
+          <Text className="mt-3 font-body text-[13px] leading-5 text-[#4A4A4A]">
             {medicalInsight.message}
           </Text>
         </View>
@@ -397,7 +400,7 @@ function PregnantTransitionBanner({
           <Text className="font-heading text-[16px] text-[#2A5C9A]">
             Pregnant? Switch to Pregnancy Mode
           </Text>
-          <Text className="font-body mt-0.5 text-xs text-[#6B8BAE]">
+          <Text className="mt-0.5 font-body text-xs text-[#6B8BAE]">
             Follow baby&apos;s growth week-by-week and count kicks
           </Text>
         </View>
@@ -453,7 +456,7 @@ function CycleTransitionBanner({
           <Text className="font-heading text-[16px] text-[#A63C4F]">
             Looking for Menstrual Tracking?
           </Text>
-          <Text className="font-body mt-0.5 text-xs text-[#A06E76]">
+          <Text className="mt-0.5 font-body text-xs text-[#A06E76]">
             Track period forecasts, ovulation, and fertile windows
           </Text>
         </View>
@@ -507,8 +510,7 @@ export default function Home() {
 
   const showCycleBlock =
     hasBothGoals || (tracksPeriod && !tracksPregnancy) || isDefaultCycle;
-  const showPregnancyBlock =
-    hasBothGoals || (tracksPregnancy && !tracksPeriod);
+  const showPregnancyBlock = hasBothGoals || (tracksPregnancy && !tracksPeriod);
 
   const pregnancyLeads = mode === 'pregnancy' && showPregnancyBlock;
 

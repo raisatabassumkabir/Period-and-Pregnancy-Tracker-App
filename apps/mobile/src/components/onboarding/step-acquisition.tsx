@@ -34,7 +34,8 @@ export function StepAcquisition({
         How did you find out about us?
       </Text>
       <Text className="mt-2 font-body text-[15px] leading-6 text-[#8C8C8C]">
-        This helps us understand how women discover Happy Women so we can reach more people.
+        This helps us understand how women discover Happy Women so we can reach
+        more people.
       </Text>
 
       <View className="mt-6 gap-3">
@@ -46,7 +47,7 @@ export function StepAcquisition({
               key={channel}
               testID={`acquisition-${channel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
               onPress={() => onSelectSource(channel)}
-              className={`flex-row items-center justify-between p-4 rounded-[20px] border active:opacity-85 ${
+              className={`flex-row items-center justify-between rounded-[20px] border p-4 active:opacity-85 ${
                 isSelected
                   ? 'border-[#FF9FA8] bg-white'
                   : 'border-[#F0E5E1] bg-white/95'
@@ -68,13 +69,15 @@ export function StepAcquisition({
               </Text>
 
               <View
-                className={`size-6 rounded-full border-2 items-center justify-center ${
+                className={`size-6 items-center justify-center rounded-full border-2 ${
                   isSelected
                     ? 'border-[#FF9FA8] bg-[#FF9FA8]'
                     : 'border-[#F0E5E1] bg-[#FCF8F5]'
                 }`}
               >
-                {isSelected && <Check size={14} color="#FFFFFF" strokeWidth={3} />}
+                {isSelected && (
+                  <Check size={14} color="#FFFFFF" strokeWidth={3} />
+                )}
               </View>
             </Pressable>
           );

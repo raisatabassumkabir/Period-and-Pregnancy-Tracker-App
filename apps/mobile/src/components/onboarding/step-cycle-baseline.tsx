@@ -51,8 +51,9 @@ export function StepCycleBaseline({
       <Text className="font-heading text-2xl leading-8 text-[#4A4A4A]">
         Tell us about your cycle
       </Text>
-      <Text className="font-body mt-2 text-sm leading-5 text-[#8C8C8C]">
-        This helps us predict your fertile window, ovulation days, and next period.
+      <Text className="mt-2 font-body text-sm leading-5 text-[#8C8C8C]">
+        This helps us predict your fertile window, ovulation days, and next
+        period.
       </Text>
 
       <View className="mt-8 gap-5">
@@ -99,7 +100,10 @@ export function StepCycleBaseline({
               <Minus size={20} color="#4A4A4A" strokeWidth={2.5} />
             </Pressable>
 
-            <View className="flex-row items-baseline gap-1" testID="cycle-length-value">
+            <View
+              className="flex-row items-baseline gap-1"
+              testID="cycle-length-value"
+            >
               <Text className="font-heading text-3xl text-[#4A4A4A]">
                 {cycleLength}
               </Text>
@@ -168,7 +172,10 @@ export function StepCycleBaseline({
               <Minus size={20} color="#4A4A4A" strokeWidth={2.5} />
             </Pressable>
 
-            <View className="flex-row items-baseline gap-1" testID="period-duration-value">
+            <View
+              className="flex-row items-baseline gap-1"
+              testID="period-duration-value"
+            >
               <Text className="font-heading text-3xl text-[#4A4A4A]">
                 {periodDuration}
               </Text>

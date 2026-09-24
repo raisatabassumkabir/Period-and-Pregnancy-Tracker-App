@@ -104,10 +104,7 @@ const SymptomItem = React.memo(function SymptomItem({
             : 'border-divider bg-surface'
         }`}
       >
-        <Icon
-          size={ICON_SIZE}
-          color={isSelected ? accentColor : toneColor}
-        />
+        <Icon size={ICON_SIZE} color={isSelected ? accentColor : toneColor} />
       </View>
       <Text
         numberOfLines={1}

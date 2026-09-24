@@ -1,6 +1,6 @@
+import { act } from '@testing-library/react-native';
 import React from 'react';
 import { AppState, Text, View } from 'react-native';
-import { act } from '@testing-library/react-native';
 
 import { cleanup, render, screen } from '@/lib/test-utils';
 
@@ -24,10 +24,12 @@ describe('PrivacyShield', () => {
 
   it('renders privacy overlay when AppState transitions to background or inactive', () => {
     let listener: (state: string) => void = () => {};
-    jest.spyOn(AppState, 'addEventListener').mockImplementation((_event, cb) => {
-      listener = cb as any;
-      return { remove: jest.fn() } as any;
-    });
+    jest
+      .spyOn(AppState, 'addEventListener')
+      .mockImplementation((_event, cb) => {
+        listener = cb as any;
+        return { remove: jest.fn() } as any;
+      });
 
     render(
       <PrivacyShield>

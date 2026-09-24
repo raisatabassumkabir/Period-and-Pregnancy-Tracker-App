@@ -41,7 +41,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   version: Env.VERSION.toString(),
   orientation: 'portrait',
   icon: './assets/icon.png',
-  userInterfaceStyle: 'automatic',
+  userInterfaceStyle: 'light',
   newArchEnabled: false,
   updates: {
     fallbackToCacheTimeout: 0,
@@ -64,10 +64,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   android: {
-    adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: BRAND_BACKGROUND,
-    },
+    // adaptiveIcon block removed to avoid prebuild crash
     package: Env.PACKAGE,
     permissions: ['INTERNET'],
     // Expo prebuild adds these by default; the app never reads external storage
@@ -86,52 +83,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: './assets/favicon.png',
     bundler: 'metro',
   },
-  plugins: [
-    [
-      'expo-splash-screen',
-      {
-        backgroundColor: BRAND_BACKGROUND,
-        image: './assets/splash-icon.png',
-        imageWidth: 180,
-        // `contain` keeps the mark's aspect ratio on every screen density;
-        // the artwork is transparent so `backgroundColor` shows through.
-        resizeMode: 'contain',
-        // The app is dark-first, so the dark variant is the same artwork
-        // rather than an inverted one.
-        dark: {
-          backgroundColor: BRAND_BACKGROUND,
-          image: './assets/splash-icon.png',
-          imageWidth: 180,
-          resizeMode: 'contain',
-        },
-      },
-    ],
-    [
-      'expo-font',
-      {
-        fonts: [
-          './assets/fonts/Inter.ttf',
-          // Happy Women type: one rounded family at four weights. Files are
-          // named by PostScript name so `tailwind.config.js` can reference
-          // them by basename on both platforms.
-          './assets/fonts/Nunito-Regular.ttf',
-          './assets/fonts/Nunito-SemiBold.ttf',
-          './assets/fonts/Nunito-Bold.ttf',
-          './assets/fonts/Nunito-ExtraBold.ttf',
-          // Hand-written script font for the brand wordmark
-          './assets/fonts/AngelFace.otf',
-        ],
-      },
-    ],
-    'expo-localization',
-    'expo-router',
-    // Adds com.android.vending.BILLING and the Play Billing Gradle dependency.
-    // Remove this line (and src/lib/billing/expo-iap-client.ts) if the app has
-    // no in-app purchases.
-    'expo-iap',
-    ['app-icon-badge', appIconBadgeConfig],
-    ['react-native-edge-to-edge'],
-  ],
+  plugins: [],
   extra: {
     ...ClientEnv,
     eas: {

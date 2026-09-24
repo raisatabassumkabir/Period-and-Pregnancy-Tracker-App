@@ -58,7 +58,9 @@ export default function Login() {
       </View>
 
       <View className="mb-4">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Email address</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Email address
+        </Text>
         <EmailInput
           control={form.control}
           label=""
@@ -68,7 +70,9 @@ export default function Login() {
       </View>
 
       <View className="mb-2">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Password</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Password
+        </Text>
         <PasswordInput
           control={form.control}
           name="password"
@@ -79,10 +83,12 @@ export default function Login() {
           onSubmitEditing={submit}
         />
       </View>
-      
+
       <View className="mb-6 items-end">
         <Pressable onPress={() => {}}>
-          <Text className="font-body-semibold text-[13px] text-ink">Forgot password?</Text>
+          <Text className="font-body-semibold text-[13px] text-ink">
+            Forgot password?
+          </Text>
         </Pressable>
       </View>
 
@@ -129,7 +135,7 @@ export default function Login() {
                     </Text>
                   </View>
                 </View>
-                <Text className="mt-0.5 text-[11px] font-mono text-tone-600">
+                <Text className="mt-0.5 font-mono text-[11px] text-tone-600">
                   {acc.email} • {acc.password}
                 </Text>
                 <Text className="mt-1 text-[11px] leading-4 text-tone-700">
@@ -172,4 +178,3 @@ export default function Login() {
     </AuthLayout>
   );
 }
-

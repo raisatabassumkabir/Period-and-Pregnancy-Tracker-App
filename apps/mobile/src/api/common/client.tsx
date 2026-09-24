@@ -85,21 +85,18 @@ client.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const status = error.response?.status;
-    
+
     // ── Structured logging ────────────────────────────────────────────
     if (error.response) {
       // 401/403 are expected during auth expiry/refresh; don't trigger Red Screen
-      const logFn = status === 401 || status === 403 ? console.info : console.error;
-      logFn(
-        `API Error [${status}]:`,
-        JSON.stringify(error.response.data)
-      );
+      const logFn =
+        status === 401 || status === 403 ? console.info : console.error;
+      logFn(`API Error [${status}]:`, JSON.stringify(error.response.data));
     } else if (error.request) {
       console.warn('API Network Error (No Response):', error.message);
     } else {
       console.error('API Request Setup Error:', error.message);
     }
-
 
     const originalRequest = error.config as
       | (InternalAxiosRequestConfig & { _retry?: boolean })

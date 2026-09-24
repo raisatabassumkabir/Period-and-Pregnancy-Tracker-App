@@ -44,4 +44,3 @@ export function APIProvider({ children }: { children: React.ReactNode }) {
     </PersistQueryClientProvider>
   );
 }
-

@@ -29,11 +29,12 @@ export function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
       <View style={styles.iconCircle}>
         <AlertTriangle size={32} color="#B83253" strokeWidth={2.2} />
       </View>
-      <Text className="font-heading mt-4 text-center text-2xl text-[#2D2D2D]">
+      <Text className="mt-4 text-center font-heading text-2xl text-[#2D2D2D]">
         Something went wrong
       </Text>
-      <Text className="font-body mt-2 max-w-[280px] text-center text-sm leading-5 text-[#7A7A7A]">
-        We encountered an unexpected issue. Your health data remains safely stored. Tap below to reload the app.
+      <Text className="mt-2 max-w-[280px] text-center font-body text-sm leading-5 text-[#7A7A7A]">
+        We encountered an unexpected issue. Your health data remains safely
+        stored. Tap below to reload the app.
       </Text>
       <Pressable
         accessibilityRole="button"

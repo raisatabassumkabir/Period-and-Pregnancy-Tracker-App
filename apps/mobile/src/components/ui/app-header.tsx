@@ -6,8 +6,8 @@ import { useMe } from '@/api/auth';
 import { usePaymentSubscriptionStatus } from '@/api/billing/use-subscription-status';
 import { PremiumBadge } from '@/components/billing';
 import { Pressable, Text, View } from '@/components/ui';
-import { usePaletteColors } from '@/lib/theme';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { usePaletteColors } from '@/lib/theme';
 
 const AVATAR_ICON_SIZE = 20;
 const BELL_ICON_SIZE = 22;
@@ -23,7 +23,7 @@ function AvatarButton({ fullName }: { fullName: string | null | undefined }) {
       accessibilityLabel="Open settings"
       testID="settings-avatar"
       onPress={() => router.push(SETTINGS_ROUTE)}
-      className="size-[42px] items-center justify-center rounded-full bg-accent-100 border border-accent/10 shadow-sm active:opacity-80"
+      className="size-[42px] items-center justify-center rounded-full border border-accent/10 bg-accent-100 shadow-sm active:opacity-80"
     >
       {fullName ? (
         <Text className="font-heading text-lg text-accent-700">
@@ -56,7 +56,7 @@ export function AppHeader({ title }: { title?: string }) {
           <Text className="font-body-bold text-[12px] uppercase tracking-widest text-accent">
             {title ? title.toUpperCase() : 'WELCOME BACK'}
           </Text>
-          <View className="flex-row items-center gap-2 mt-0.5">
+          <View className="mt-0.5 flex-row items-center gap-2">
             <Text className="font-heading text-[22px] tracking-wide text-ink">
               Hi, {firstName}
             </Text>

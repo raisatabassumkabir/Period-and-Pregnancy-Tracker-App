@@ -23,7 +23,8 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
     name: 'Claire Bennett',
     title: 'Regular Cycle Tracking POV',
     badge: 'Cycle Mode',
-    description: 'Day 10 in 28-day cycle, follicular phase, ovulation window prediction.',
+    description:
+      'Day 10 in 28-day cycle, follicular phase, ovulation window prediction.',
     mode: 'cycle',
     profile: {
       fullName: 'Claire Bennett',
@@ -47,7 +48,8 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
     name: 'Sarah Jenkins',
     title: 'Active Pregnancy Tracking POV',
     badge: 'Pregnancy Mode',
-    description: 'Week 18 (2nd Trimester), fetal kick counter, prenatal meal guidance.',
+    description:
+      'Week 18 (2nd Trimester), fetal kick counter, prenatal meal guidance.',
     mode: 'pregnancy',
     profile: {
       fullName: 'Sarah Jenkins',
@@ -71,7 +73,8 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
     name: 'Maya Chen',
     title: 'TTC & PCOS Management POV',
     badge: 'PCOS / Irregular',
-    description: 'PCOS condition, cervical discharge monitoring, hormonal symptom tracking.',
+    description:
+      'PCOS condition, cervical discharge monitoring, hormonal symptom tracking.',
     mode: 'cycle',
     profile: {
       fullName: 'Maya Chen',
@@ -107,27 +110,32 @@ export const CLEAN_TEST_ACCOUNTS: readonly CleanTestAccount[] = [
     password: CLEAN_TEST_PASSWORD,
     name: 'Clean Test User 1',
     badge: 'Fresh User 1',
-    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+    description:
+      'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
   },
   {
     email: 'test2@happywomen.com',
     password: CLEAN_TEST_PASSWORD,
     name: 'Clean Test User 2',
     badge: 'Fresh User 2',
-    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+    description:
+      'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
   },
   {
     email: 'test3@happywomen.com',
     password: CLEAN_TEST_PASSWORD,
     name: 'Clean Test User 3',
     badge: 'Fresh User 3',
-    description: 'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
+    description:
+      'Fresh slate auth account. Zero health profile. Forces Onboarding Step 1.',
   },
 ];
 
 export function isCleanTestAccount(email: string): boolean {
   const normalized = email.trim().toLowerCase();
-  return CLEAN_TEST_ACCOUNTS.some((acc) => acc.email.toLowerCase() === normalized);
+  return CLEAN_TEST_ACCOUNTS.some(
+    (acc) => acc.email.toLowerCase() === normalized
+  );
 }
 
 export function findDemoAccount(email: string): DemoUserAccount | undefined {
@@ -135,9 +143,14 @@ export function findDemoAccount(email: string): DemoUserAccount | undefined {
   return DEMO_ACCOUNTS.find((acc) => acc.email.toLowerCase() === normalized);
 }
 
-export async function seedDemoUserState(account: DemoUserAccount): Promise<void> {
+export async function seedDemoUserState(
+  account: DemoUserAccount
+): Promise<void> {
   await setItem(STORAGE_KEYS.PERSONALIZATION_PROFILE, account.profile);
-  await setItem(STORAGE_KEYS.TRACKING_MODE, account.mode === 'pregnancy' ? 'pregnancy' : 'cycle');
+  await setItem(
+    STORAGE_KEYS.TRACKING_MODE,
+    account.mode === 'pregnancy' ? 'pregnancy' : 'cycle'
+  );
   useHealthStore.getState().setMode(account.mode);
 }
 
@@ -152,4 +165,3 @@ export function isDemoToken(token: string | undefined | null): boolean {
   if (!token) return false;
   return token.startsWith('demo-') || token.startsWith('clean-test-');
 }
-

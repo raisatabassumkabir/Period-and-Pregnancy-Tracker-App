@@ -14,11 +14,11 @@ import {
   Text,
   View,
 } from '@/components/ui';
+import { AppHeader } from '@/components/ui/app-header';
 import { MEAL_PLANS, TRIMESTER_KEYS } from '@/lib/diet';
 import type { Trimester } from '@/lib/health';
 import { derivePregnancyProgress } from '@/lib/health';
 import { translate } from '@/lib/i18n';
-import { AppHeader } from '@/components/ui/app-header';
 
 const TRIMESTERS: readonly Trimester[] = [1, 2, 3];
 
@@ -38,7 +38,8 @@ export default function Diet() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const trimester = selected ?? progress?.trimester ?? 1;
 
-  const showNudge = profile && (profile.height == null || profile.weight == null);
+  const showNudge =
+    profile && (profile.height == null || profile.weight == null);
 
   return (
     <View className="flex-1 bg-canvas" testID="diet-screen">
@@ -54,9 +55,7 @@ export default function Diet() {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="px-4 pb-8 pt-4"
       >
-        {showNudge && (
-          <DietNudgeCard onPress={() => setModalVisible(true)} />
-        )}
+        {showNudge && <DietNudgeCard onPress={() => setModalVisible(true)} />}
 
         <SegmentedControl
           options={trimesterOptions()}

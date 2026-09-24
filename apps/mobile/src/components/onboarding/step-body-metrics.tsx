@@ -1,4 +1,4 @@
-import { Ruler, Scale, Sparkles } from 'lucide-react-native';
+import { Ruler, Scale } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
@@ -30,9 +30,15 @@ export function StepBodyMetrics({
   const kgVal = parseFloat(weightKg) || 0;
   const initialLbs = kgVal > 0 ? Math.round(kgVal * 2.20462) : 0;
 
-  const [feet, setFeet] = useState<string>(initialFeet > 0 ? String(initialFeet) : '');
-  const [inches, setInches] = useState<string>(initialInches > 0 ? String(initialInches) : '');
-  const [lbs, setLbs] = useState<string>(initialLbs > 0 ? String(initialLbs) : '');
+  const [feet, setFeet] = useState<string>(
+    initialFeet > 0 ? String(initialFeet) : ''
+  );
+  const [inches, setInches] = useState<string>(
+    initialInches > 0 ? String(initialInches) : ''
+  );
+  const [lbs, setLbs] = useState<string>(
+    initialLbs > 0 ? String(initialLbs) : ''
+  );
 
   const handleUnitToggle = (selected: UnitSystem) => {
     if (selected === unit) return;
@@ -90,18 +96,22 @@ export function StepBodyMetrics({
       <Text className="font-heading text-2xl leading-8 text-[#4A4A4A]">
         Help us personalize your nutrition
       </Text>
-      <Text className="font-body mt-2 text-sm leading-5 text-[#8C8C8C]">
-        Our diet engine tailors meal plans, calorie targets, and cycle nutrition based on your body metrics.
+      <Text className="mt-2 font-body text-sm leading-5 text-[#8C8C8C]">
+        Our diet engine tailors meal plans, calorie targets, and cycle nutrition
+        based on your body metrics.
       </Text>
 
       {/* Unit Selector Toggle */}
-      <View className="mt-6 flex-row self-center rounded-full bg-white p-1" style={{
-        shadowColor: '#F0E5E1',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.6,
-        shadowRadius: 10,
-        elevation: 2,
-      }}>
+      <View
+        className="mt-6 flex-row self-center rounded-full bg-white p-1"
+        style={{
+          shadowColor: '#F0E5E1',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.6,
+          shadowRadius: 10,
+          elevation: 2,
+        }}
+      >
         <Pressable
           accessibilityRole="button"
           testID="unit-metric"
@@ -154,9 +164,13 @@ export function StepBodyMetrics({
               <Ruler size={22} color="#6BA4E8" strokeWidth={2.2} />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">Height</Text>
+              <Text className="font-heading text-base text-[#4A4A4A]">
+                Height
+              </Text>
               <Text className="font-body text-xs text-[#8C8C8C]">
-                {unit === 'metric' ? 'Enter height in centimeters' : 'Enter feet and inches'}
+                {unit === 'metric'
+                  ? 'Enter height in centimeters'
+                  : 'Enter feet and inches'}
               </Text>
             </View>
           </View>
@@ -225,9 +239,13 @@ export function StepBodyMetrics({
               <Scale size={22} color="#D9A838" strokeWidth={2.2} />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">Weight</Text>
+              <Text className="font-heading text-base text-[#4A4A4A]">
+                Weight
+              </Text>
               <Text className="font-body text-xs text-[#8C8C8C]">
-                {unit === 'metric' ? 'Enter weight in kilograms' : 'Enter weight in pounds'}
+                {unit === 'metric'
+                  ? 'Enter weight in kilograms'
+                  : 'Enter weight in pounds'}
               </Text>
             </View>
           </View>

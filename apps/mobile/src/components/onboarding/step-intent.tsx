@@ -33,7 +33,7 @@ export function StepIntent({
         <Pressable
           testID="intent-myself"
           onPress={() => onSelectIntent('myself')}
-          className={`flex-row items-center p-5 rounded-[24px] border active:opacity-85 ${
+          className={`flex-row items-center rounded-[24px] border p-5 active:opacity-85 ${
             intent === 'myself'
               ? 'border-[#FF9FA8] bg-white'
               : 'border-[#F0E5E1] bg-white/90'
@@ -47,11 +47,14 @@ export function StepIntent({
           }}
         >
           <View
-            className={`size-14 rounded-full items-center justify-center ${
+            className={`size-14 items-center justify-center rounded-full ${
               intent === 'myself' ? 'bg-[#FFD6DA]' : 'bg-[#FCF8F5]'
             }`}
           >
-            <User size={26} color={intent === 'myself' ? '#FF9FA8' : '#8C8C8C'} />
+            <User
+              size={26}
+              color={intent === 'myself' ? '#FF9FA8' : '#8C8C8C'}
+            />
           </View>
           <View className="ml-4 flex-1">
             <Text className="font-body-bold text-[17px] text-[#4A4A4A]">
@@ -62,13 +65,15 @@ export function StepIntent({
             </Text>
           </View>
           <View
-            className={`size-6 rounded-full border-2 items-center justify-center ${
+            className={`size-6 items-center justify-center rounded-full border-2 ${
               intent === 'myself'
                 ? 'border-[#FF9FA8] bg-[#FF9FA8]'
                 : 'border-[#F0E5E1]'
             }`}
           >
-            {intent === 'myself' && <View className="size-2.5 rounded-full bg-white" />}
+            {intent === 'myself' && (
+              <View className="size-2.5 rounded-full bg-white" />
+            )}
           </View>
         </Pressable>
 
@@ -76,7 +81,7 @@ export function StepIntent({
         <Pressable
           testID="intent-partner"
           onPress={() => onSelectIntent('partner')}
-          className={`flex-row items-center p-5 rounded-[24px] border active:opacity-85 ${
+          className={`flex-row items-center rounded-[24px] border p-5 active:opacity-85 ${
             intent === 'partner'
               ? 'border-[#FF9FA8] bg-white'
               : 'border-[#F0E5E1] bg-white/90'
@@ -90,7 +95,7 @@ export function StepIntent({
           }}
         >
           <View
-            className={`size-14 rounded-full items-center justify-center ${
+            className={`size-14 items-center justify-center rounded-full ${
               intent === 'partner' ? 'bg-[#DCEBFC]' : 'bg-[#FCF8F5]'
             }`}
           >
@@ -108,20 +113,22 @@ export function StepIntent({
             </Text>
           </View>
           <View
-            className={`size-6 rounded-full border-2 items-center justify-center ${
+            className={`size-6 items-center justify-center rounded-full border-2 ${
               intent === 'partner'
                 ? 'border-[#FF9FA8] bg-[#FF9FA8]'
                 : 'border-[#F0E5E1]'
             }`}
           >
-            {intent === 'partner' && <View className="size-2.5 rounded-full bg-white" />}
+            {intent === 'partner' && (
+              <View className="size-2.5 rounded-full bg-white" />
+            )}
           </View>
         </Pressable>
 
         {/* Partner code input when selected */}
         {intent === 'partner' && (
           <View
-            className="p-5 rounded-[24px] bg-white border border-[#B5D3F8]"
+            className="rounded-[24px] border border-[#B5D3F8] bg-white p-5"
             style={{
               shadowColor: '#B5D3F8',
               shadowOffset: { width: 0, height: 4 },

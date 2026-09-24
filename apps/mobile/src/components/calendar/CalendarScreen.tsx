@@ -4,7 +4,6 @@ import React from 'react';
 
 import { useCycles, useDailyLogs } from '@/api/cycles';
 import { MonthGrid } from '@/components/calendar/month-grid';
-import { AppHeader } from '@/components/ui/app-header';
 import {
   FocusAwareStatusBar,
   Pressable,
@@ -13,10 +12,11 @@ import {
   Text,
   View,
 } from '@/components/ui';
+import { AppHeader } from '@/components/ui/app-header';
 import {
+  classifyDay,
   DEMO_CYCLES,
   DEMO_DAILY_LOGS,
-  classifyDay,
   deriveCycleInsights,
   formatCalendarDate,
   todayDateString,
@@ -40,7 +40,9 @@ function AddSymptomButton({ date }: { date: string }) {
     <Pressable
       accessibilityRole="button"
       testID="calendar-add-symptom"
-      onPress={() => router.push({ pathname: TRACKING_ROUTE, params: { date } })}
+      onPress={() =>
+        router.push({ pathname: TRACKING_ROUTE, params: { date } })
+      }
       className="absolute bottom-6 right-4 h-14 flex-row items-center gap-2 rounded-pill bg-accent px-6 active:opacity-90"
     >
       <Plus
@@ -135,26 +137,39 @@ export function CalendarScreen() {
           >
             {activeLog ? (
               <View className="gap-3">
-                <Text className="font-body-semibold text-[15px] text-ink">Logged Data</Text>
+                <Text className="font-body-semibold text-[15px] text-ink">
+                  Logged Data
+                </Text>
                 {activeLog.flow && activeLog.flow !== 'none' && (
                   <Text className="font-body text-sm text-tone-600">
-                    Flow: <Text className="font-body-semibold text-ink capitalize">{activeLog.flow}</Text>
+                    Flow:{' '}
+                    <Text className="font-body-semibold capitalize text-ink">
+                      {activeLog.flow}
+                    </Text>
                   </Text>
                 )}
                 {activeLog.mood && activeLog.mood !== 'unspecified' && (
                   <Text className="font-body text-sm text-tone-600">
-                    Mood: <Text className="font-body-semibold text-ink capitalize">{activeLog.mood}</Text>
+                    Mood:{' '}
+                    <Text className="font-body-semibold capitalize text-ink">
+                      {activeLog.mood}
+                    </Text>
                   </Text>
                 )}
                 {activeLog.symptoms.length > 0 && (
                   <Text className="font-body text-sm text-tone-600">
-                    Symptoms: <Text className="font-body-semibold text-ink">{activeLog.symptoms.length} logged</Text>
+                    Symptoms:{' '}
+                    <Text className="font-body-semibold text-ink">
+                      {activeLog.symptoms.length} logged
+                    </Text>
                   </Text>
                 )}
                 {(!activeLog.flow || activeLog.flow === 'none') &&
                   (!activeLog.mood || activeLog.mood === 'unspecified') &&
                   activeLog.symptoms.length === 0 && (
-                    <Text className="font-body text-sm text-tone-500">Only basic info logged.</Text>
+                    <Text className="font-body text-sm text-tone-500">
+                      Only basic info logged.
+                    </Text>
                   )}
               </View>
             ) : classification.isProjected || activeDate > todayDateString() ? (
@@ -169,12 +184,15 @@ export function CalendarScreen() {
                         : 'Future Date'}
                 </Text>
                 <Text className="font-body text-sm text-tone-500">
-                  Log your symptoms as the date approaches to improve predictions.
+                  Log your symptoms as the date approaches to improve
+                  predictions.
                 </Text>
               </View>
             ) : (
               <View className="gap-2">
-                <Text className="font-body-semibold text-[15px] text-ink">No data logged</Text>
+                <Text className="font-body-semibold text-[15px] text-ink">
+                  No data logged
+                </Text>
                 <Text className="font-body text-sm text-tone-500">
                   Tap the + button to log symptoms for this day.
                 </Text>

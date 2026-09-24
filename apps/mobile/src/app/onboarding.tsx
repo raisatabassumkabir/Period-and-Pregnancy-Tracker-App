@@ -14,7 +14,12 @@ import {
   StepIntent,
   StepMedical,
 } from '@/components/onboarding';
-import { Button, FocusAwareStatusBar, SafeAreaView, View } from '@/components/ui';
+import {
+  Button,
+  FocusAwareStatusBar,
+  SafeAreaView,
+  View,
+} from '@/components/ui';
 import { useAuth, useIsFirstTime } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 import { useHealthStore } from '@/store/useHealthStore';
@@ -44,7 +49,9 @@ export default function Onboarding() {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedSource, setSelectedSource] = useState<string>('');
   const [cycleLength, setCycleLength] = useState<number>(DEFAULT_CYCLE_LENGTH);
-  const [periodDuration, setPeriodDuration] = useState<number>(DEFAULT_PERIOD_DURATION);
+  const [periodDuration, setPeriodDuration] = useState<number>(
+    DEFAULT_PERIOD_DURATION
+  );
   const [heightCm, setHeightCm] = useState<string>('');
   const [weightKg, setWeightKg] = useState<string>('');
 
@@ -63,7 +70,9 @@ export default function Onboarding() {
     }
 
     setSelectedConditions((prev) => {
-      const withoutExclusive = prev.filter((c) => c !== 'none' && c !== 'not_sure');
+      const withoutExclusive = prev.filter(
+        (c) => c !== 'none' && c !== 'not_sure'
+      );
       return withoutExclusive.includes(id)
         ? withoutExclusive.filter((c) => c !== id)
         : [...withoutExclusive, id];
@@ -141,7 +150,10 @@ export default function Onboarding() {
         weight: parsedWeight,
       })
       .catch((err) => {
-        console.warn('Profile sync to Django backend was skipped or errored:', err);
+        console.warn(
+          'Profile sync to Django backend was skipped or errored:',
+          err
+        );
       });
 
     const navigateToDestination = () => {
@@ -256,7 +268,7 @@ export default function Onboarding() {
         </View>
 
         {/* Bottom Action Button */}
-        <View className="px-6 pb-6 pt-2 bg-[#FCF8F5]">
+        <View className="bg-[#FCF8F5] px-6 pb-6 pt-2">
           <Button
             label={currentStep === TOTAL_STEPS ? 'Complete & Start' : 'Next'}
             size="lg"

@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react';
 import { Modal, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
 
-import type { DietPreference, MedicalCondition, ProfileMode } from '@/api/types';
-import { useProfile, useSaveProfile } from '@/api/users';
+import type {
+  DietPreference,
+  MedicalCondition,
+  ProfileMode,
+} from '@/api/types';
 import { Button, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
+import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+
 import { DateOfBirthInput } from './personalization-item';
 
 const MODE_LABELS: Record<ProfileMode, string> = {
@@ -41,30 +45,40 @@ export interface PersonalizationOptionsModalProps {
   onClose: () => void;
 }
 
-export function PersonalizationOptionsModal({ visible, onClose }: PersonalizationOptionsModalProps) {
+export function PersonalizationOptionsModal({
+  visible,
+  onClose,
+}: PersonalizationOptionsModalProps) {
   const palette = usePaletteColors();
-  const queryClient = useQueryClient();
-  const { data: profile } = useProfile();
-  const saveProfileMutation = useSaveProfile();
+  const { profile, updateProfile } = usePersonalizationProfile();
+  const [isSaving, setIsSaving] = React.useState(false);
 
   // Form State
-  const [fullName, setFullName] = React.useState('');
-  const [dateOfBirth, setDateOfBirth] = React.useState('');
-  const [mode, setMode] = React.useState<ProfileMode>('cycle_tracking');
-  const [diet, setDiet] = React.useState<DietPreference>('unspecified');
-  const [selectedConditions, setSelectedConditions] = React.useState<MedicalCondition[]>([]);
-  const [height, setHeight] = React.useState('');
-  const [weight, setWeight] = React.useState('');
+  const [fullName, setFullName] = React.useState(profile.fullName || '');
+  const [dateOfBirth, setDateOfBirth] = React.useState(
+    profile.dateOfBirth || ''
+  );
+  const [mode, setMode] = React.useState<ProfileMode>(
+    profile.mode || 'cycle_tracking'
+  );
+  const [diet, setDiet] = React.useState<DietPreference>(
+    profile.diet || 'unspecified'
+  );
+  const [selectedConditions, setSelectedConditions] = React.useState<
+    MedicalCondition[]
+  >(profile.medicalConditions || []);
+  const [height, setHeight] = React.useState(profile.height || '');
+  const [weight, setWeight] = React.useState(profile.weight || '');
 
   useEffect(() => {
-    if (visible && profile) {
-      setFullName(profile.full_name || '');
-      setDateOfBirth(profile.date_of_birth || '');
+    if (visible) {
+      setFullName(profile.fullName || '');
+      setDateOfBirth(profile.dateOfBirth || '');
       setMode(profile.mode || 'cycle_tracking');
       setDiet(profile.diet || 'unspecified');
-      setSelectedConditions(profile.medical_conditions || []);
-      setHeight(profile.height ? String(profile.height) : '');
-      setWeight(profile.weight ? String(profile.weight) : '');
+      setSelectedConditions(profile.medicalConditions || []);
+      setHeight(profile.height || '');
+      setWeight(profile.weight || '');
     }
   }, [visible, profile]);
 
@@ -76,38 +90,50 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
 
   const handleSave = async () => {
     try {
-      await saveProfileMutation.mutateAsync({
-        id: profile?.id,
-        full_name: fullName || null,
-        date_of_birth: dateOfBirth || null,
+      setIsSaving(true);
+      await updateProfile({
+        fullName: fullName || '',
+        dateOfBirth: dateOfBirth || '',
         mode,
         diet,
-        medical_conditions: selectedConditions,
-        height: height ? parseFloat(height) : null,
-        weight: weight ? parseFloat(weight) : null,
+        medicalConditions: selectedConditions,
+        height: height || '',
+        weight: weight || '',
       });
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
       onClose();
     } catch (error) {
       console.warn('Failed to save profile', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
       <View className="flex-1 justify-end bg-black/60">
         <View className="max-h-[90%] rounded-t-3xl bg-surface px-5 pb-8 pt-6">
           <View className="mb-4 flex-row items-center justify-between border-b border-divider pb-3">
-            <Text className="font-heading text-[20px] text-ink">Personalization Options</Text>
+            <Text className="font-heading text-[20px] text-ink">
+              Personalization Options
+            </Text>
             <TouchableOpacity onPress={onClose} className="px-2 py-1">
-              <Text className="font-body-bold text-[16px] text-accent">Cancel</Text>
+              <Text className="font-body-bold text-[16px] text-accent">
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Full Name */}
             <View className="mb-5">
-              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">FULL NAME</Text>
+              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                FULL NAME
+              </Text>
               <TextInput
                 value={fullName}
                 onChangeText={setFullName}
@@ -119,14 +145,18 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
 
             {/* Date of Birth / Age */}
             <View className="mb-5">
-              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">DATE OF BIRTH (YYYY-MM-DD)</Text>
+              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                DATE OF BIRTH (YYYY-MM-DD)
+              </Text>
               <DateOfBirthInput value={dateOfBirth} onChange={setDateOfBirth} />
             </View>
 
             {/* Body Metrics */}
             <View className="mb-5 flex-row gap-4">
               <View className="flex-1">
-                <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">HEIGHT (cm)</Text>
+                <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                  HEIGHT (cm)
+                </Text>
                 <TextInput
                   value={height}
                   onChangeText={setHeight}
@@ -137,7 +167,9 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
                 />
               </View>
               <View className="flex-1">
-                <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">WEIGHT (kg)</Text>
+                <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                  WEIGHT (kg)
+                </Text>
                 <TextInput
                   value={weight}
                   onChangeText={setWeight}
@@ -151,19 +183,32 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
 
             {/* Tracking Mode */}
             <View className="mb-5">
-              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">TRACKING MODE</Text>
+              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                TRACKING MODE
+              </Text>
               <View className="flex-row flex-wrap gap-2">
-                {(['cycle_tracking', 'trying_to_conceive', 'pregnancy', 'postpartum'] as ProfileMode[]).map((m) => {
+                {(
+                  [
+                    'cycle_tracking',
+                    'trying_to_conceive',
+                    'pregnancy',
+                    'postpartum',
+                  ] as ProfileMode[]
+                ).map((m) => {
                   const active = mode === m;
                   return (
                     <Pressable
                       key={m}
                       onPress={() => setMode(m)}
                       className={`rounded-full border px-4 py-2.5 ${
-                        active ? 'border-accent bg-accent' : 'border-divider bg-canvas'
+                        active
+                          ? 'border-accent bg-accent'
+                          : 'border-divider bg-canvas'
                       }`}
                     >
-                      <Text className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}>
+                      <Text
+                        className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}
+                      >
                         {MODE_LABELS[m]}
                       </Text>
                     </Pressable>
@@ -174,19 +219,34 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
 
             {/* Dietary Preference */}
             <View className="mb-5">
-              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">DIETARY PREFERENCE</Text>
+              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                DIETARY PREFERENCE
+              </Text>
               <View className="flex-row flex-wrap gap-2">
-                {(['omnivore', 'vegetarian', 'vegan', 'pescatarian', 'halal', 'kosher'] as DietPreference[]).map((d) => {
+                {(
+                  [
+                    'omnivore',
+                    'vegetarian',
+                    'vegan',
+                    'pescatarian',
+                    'halal',
+                    'kosher',
+                  ] as DietPreference[]
+                ).map((d) => {
                   const active = diet === d;
                   return (
                     <Pressable
                       key={d}
                       onPress={() => setDiet(d)}
                       className={`rounded-full border px-3.5 py-2 ${
-                        active ? 'border-accent bg-accent' : 'border-divider bg-canvas'
+                        active
+                          ? 'border-accent bg-accent'
+                          : 'border-divider bg-canvas'
                       }`}
                     >
-                      <Text className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}>
+                      <Text
+                        className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}
+                      >
                         {DIET_LABELS[d]}
                       </Text>
                     </Pressable>
@@ -197,7 +257,9 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
 
             {/* Health Conditions */}
             <View className="mb-6">
-              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">MEDICAL / HEALTH CONDITIONS</Text>
+              <Text className="mb-2 font-body-semibold text-[13px] text-tone-700">
+                MEDICAL / HEALTH CONDITIONS
+              </Text>
               <View className="flex-row flex-wrap gap-2">
                 {MEDICAL_CONDITIONS_LIST.map((item) => {
                   const active = selectedConditions.includes(item.id);
@@ -206,10 +268,14 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
                       key={item.id}
                       onPress={() => toggleCondition(item.id)}
                       className={`rounded-full border px-3.5 py-2 ${
-                        active ? 'border-accent bg-accent/20' : 'border-divider bg-canvas'
+                        active
+                          ? 'border-accent bg-accent/20'
+                          : 'border-divider bg-canvas'
                       }`}
                     >
-                      <Text className={`font-body-semibold text-[13px] ${active ? 'text-accent' : 'text-ink'}`}>
+                      <Text
+                        className={`font-body-semibold text-[13px] ${active ? 'text-accent' : 'text-ink'}`}
+                      >
                         {active ? `✓ ${item.label}` : item.label}
                       </Text>
                     </Pressable>
@@ -225,8 +291,8 @@ export function PersonalizationOptionsModal({ visible, onClose }: Personalizatio
               size="lg"
               className="mt-2 rounded-pill"
               testID="save-personalization"
-              loading={saveProfileMutation.isPending}
-              disabled={saveProfileMutation.isPending}
+              loading={isSaving}
+              disabled={isSaving}
             />
           </ScrollView>
         </View>

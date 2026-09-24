@@ -1,7 +1,4 @@
-export {
-  getAssistantClient,
-  registerAssistantClient,
-} from './client';
+export { getAssistantClient, registerAssistantClient } from './client';
 export { localGuide } from './local-guide';
 export type {
   AssistantClient,
@@ -9,4 +6,3 @@ export type {
   AssistantReply,
 } from './types';
 export * from './use-chat';
-

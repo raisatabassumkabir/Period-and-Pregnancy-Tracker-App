@@ -1,0 +1,98 @@
+diff --git a/android/CMakeLists.txt b/android/CMakeLists.txt
+index d2db810..4731c36 100644
+--- a/android/CMakeLists.txt
++++ b/android/CMakeLists.txt
+@@ -1,5 +1,7 @@
+ cmake_minimum_required(VERSION 3.16)
+ 
++set(CMAKE_OBJECT_PATH_MAX 1024)
++
+ project(expo-modules-core)
+ 
+ set(CMAKE_VERBOSE_MAKEFILE ON)
+@@ -15,12 +17,12 @@ if (${NATIVE_DEBUG})
+ endif ()
+ 
+-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+-set(COMMON_DIR ${CMAKE_SOURCE_DIR}/../common/cpp)
++set(SRC_DIR src)
++set(COMMON_DIR src/main/cpp/common)
+ 
+-file(GLOB sources_android "${SRC_DIR}/main/cpp/*.cpp")
+-file(GLOB sources_android_types "${SRC_DIR}/main/cpp/types/*.cpp")
+-file(GLOB sources_android_javaclasses "${SRC_DIR}/main/cpp/javaclasses/*.cpp")
+-file(GLOB sources_android_javaclasses "${SRC_DIR}/main/cpp/decorators/*.cpp")
+-file(GLOB common_sources "${COMMON_DIR}/*.cpp")
++file(GLOB sources_android "src/main/cpp/*.cpp")
++file(GLOB sources_android_types "src/main/cpp/types/*.cpp")
++file(GLOB sources_android_javaclasses "src/main/cpp/javaclasses/*.cpp")
++file(GLOB sources_android_decorators "src/main/cpp/decorators/*.cpp")
++file(GLOB common_sources "src/main/cpp/common/*.cpp")
+ 
+ # shared
+@@ -42,9 +44,10 @@ add_library(
+         ${sources_android}
+         ${sources_android_types}
+         ${sources_android_javaclasses}
++        ${sources_android_decorators}
+ )
+ 
+-target_precompile_headers(${PACKAGE_NAME} PRIVATE ${SRC_DIR}/main/cpp/ExpoHeader.pch)
++# target_precompile_headers(${PACKAGE_NAME} PRIVATE src/main/cpp/ExpoHeader.pch)
+ 
+ if(IS_NEW_ARCHITECTURE_ENABLED)
+   add_subdirectory("${SRC_DIR}/fabric")
+@@ -106,5 +109,6 @@ target_include_directories(
+         # header only imports from turbomodule, e.g. CallInvokerHolder.h
+        "${REACT_NATIVE_DIR}/ReactAndroid/src/main/jni/react/turbomodule"
+        "${COMMON_DIR}"
++       "../common/cpp"
+        "${SRC_DIR}/fabric"
+ )
+diff --git a/android/build.gradle b/android/build.gradle
+index e161819..a46a6f1 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -287,3 +287,11 @@ tasks.register("generatePCH") {
+ tasks.register("prepareKotlinBuildScriptModel") {
+   dependsOn(generatePCHTask)
+ }
++
++tasks.register("copyCommonCpp", Copy) {
++  from file("../common/cpp")
++  into file("src/main/cpp/common")
++}
++tasks.named("preBuild").configure {
++  dependsOn("copyCommonCpp")
++}
+diff --git a/android/src/fabric/CMakeLists.txt b/android/src/fabric/CMakeLists.txt
+index b75653c..ae19198 100644
+--- a/android/src/fabric/CMakeLists.txt
++++ b/android/src/fabric/CMakeLists.txt
+@@ -1,14 +1,15 @@
+ # Copyright 2018-present 650 Industries. All rights reserved.
+ 
+-set(COMMON_FABRIC_DIR ${COMMON_DIR}/fabric)
++set(CMAKE_OBJECT_PATH_MAX 1024)
++
+ file(GLOB SOURCES "*.cpp")
+-file(GLOB COMMON_FABRIC_SOURCES "${COMMON_FABRIC_DIR}/*.cpp")
++file(GLOB COMMON_FABRIC_SOURCES "../main/cpp/common/fabric/*.cpp")
+ 
+ add_library(fabric STATIC
+   ${COMMON_FABRIC_SOURCES}
+   ${SOURCES}
+ )
+ 
+-target_precompile_headers(fabric PRIVATE ${SRC_DIR}/main/cpp/ExpoHeader.pch)
++# target_precompile_headers(fabric PRIVATE ../main/cpp/ExpoHeader.pch)
+ 
+ include("${REACT_NATIVE_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
+@@ -30,5 +31,6 @@ get_target_property(INCLUDE_fabricjni
+ target_include_directories(fabric PRIVATE
+   "${REACT_NATIVE_DIR}/ReactCommon"
+-  "${COMMON_FABRIC_DIR}"
++  "../main/cpp/common/fabric"
++  "../../common/cpp/fabric"
+   "${INCLUDE_fabricjni}/react/fabric"
+ )

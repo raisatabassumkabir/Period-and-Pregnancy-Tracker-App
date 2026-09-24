@@ -1,9 +1,9 @@
-import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 /**
  * Encrypted Health Data Storage Client (Zero-Knowledge Privacy Standard)
- * 
+ *
  * Sensitive local health data (conception dates, symptom logs, cycle markers, period dates)
  * is encrypted at rest before storing locally using hardware-backed SecureStore key storage.
  */
@@ -84,7 +84,9 @@ export const EncryptedHealthStorage = {
   async getHealthData<T>(key: string): Promise<T | null> {
     try {
       const encKey = await getOrCreateEncryptionKey();
-      const encryptedPayload = await AsyncStorage.getItem(`${HEALTH_DATA_PREFIX}${key}`);
+      const encryptedPayload = await AsyncStorage.getItem(
+        `${HEALTH_DATA_PREFIX}${key}`
+      );
       if (!encryptedPayload) return null;
 
       const jsonString = cipherDecrypt(encryptedPayload, encKey);

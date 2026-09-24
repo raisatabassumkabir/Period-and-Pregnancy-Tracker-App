@@ -2,6 +2,7 @@ import type { AxiosError } from 'axios';
 import { createQuery } from 'react-query-kit';
 
 import { useAuth } from '@/lib/auth';
+
 import { client } from '../common';
 import type { DailyLog, PaginateQuery, ProblemDetail } from '../types';
 
@@ -16,9 +17,7 @@ const _useDailyLogs = createQuery<
     (await client.get<PaginateQuery<DailyLog>>('daily-logs/')).data,
 });
 
-export const useDailyLogs = (
-  options?: Parameters<typeof _useDailyLogs>[0]
-) => {
+export const useDailyLogs = (options?: Parameters<typeof _useDailyLogs>[0]) => {
   const token = useAuth((state) => state.token);
   return _useDailyLogs({
     ...options,

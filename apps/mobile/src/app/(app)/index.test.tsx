@@ -238,7 +238,9 @@ describe('Home', () => {
     mockUser();
     mockHealthData({ cycles: [], pregnancies: [] });
     setup(<Home />);
-    expect(screen.getAllByText('Start Pregnancy Tracking')[0]).toBeOnTheScreen();
+    expect(
+      screen.getAllByText('Start Pregnancy Tracking')[0]
+    ).toBeOnTheScreen();
     expect(screen.getByTestId('start-pregnancy-cta')).toBeOnTheScreen();
     expect(screen.queryByTestId('start-first-log-cta')).toBeNull();
     expect(screen.queryByTestId('cycle-empty-state-card')).toBeNull();
@@ -303,6 +305,8 @@ describe('Home', () => {
     const { user } = setup(<Home />);
     await user.press(screen.getByTestId('start-first-log-cta'));
     expect(screen.getByTestId('initialize-cycle-modal')).toBeOnTheScreen();
-    expect(screen.getByText('When did your last period start?')).toBeOnTheScreen();
+    expect(
+      screen.getByText('When did your last period start?')
+    ).toBeOnTheScreen();
   });
 });

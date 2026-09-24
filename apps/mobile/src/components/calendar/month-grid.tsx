@@ -195,10 +195,7 @@ export const DayCell = React.memo(function DayCell({
       >
         {dayNumber}
       </Text>
-      <StateCircle
-        classification={classification}
-        isSelected={isSelected}
-      />
+      <StateCircle classification={classification} isSelected={isSelected} />
     </Pressable>
   );
 }, areDayCellPropsEqual);
@@ -260,9 +257,8 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   const palette = usePaletteColors();
   const today = React.useMemo(() => todayDateString(), []);
-  const [internalSelectedDate, setInternalSelectedDate] = React.useState<string>(
-    selectedDate ?? today
-  );
+  const [internalSelectedDate, setInternalSelectedDate] =
+    React.useState<string>(selectedDate ?? today);
 
   const activeSelectedDate = selectedDate ?? internalSelectedDate;
 
@@ -403,4 +399,3 @@ export function CalendarGrid({
 /** Backward compatibility alias for MonthGrid */
 export const MonthGrid = CalendarGrid;
 export type MonthGridProps = CalendarGridProps;
-

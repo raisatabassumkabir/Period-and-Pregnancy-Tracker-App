@@ -2,6 +2,7 @@ import type { AxiosError } from 'axios';
 import { createQuery } from 'react-query-kit';
 
 import { useAuth } from '@/lib/auth';
+
 import { client } from '../common';
 import type { ProblemDetail, SubscriptionStatusResponse } from '../types';
 
@@ -26,4 +27,3 @@ export const usePaymentSubscriptionStatus = (
     enabled: !!token && (options?.enabled ?? true),
   } as any);
 };
-

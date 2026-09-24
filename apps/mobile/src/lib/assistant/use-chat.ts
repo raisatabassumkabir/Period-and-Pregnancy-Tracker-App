@@ -107,10 +107,7 @@ export function useChat() {
         );
         const data = response.data;
         const answer =
-          data?.reply ||
-          data?.answer ||
-          data?.text ||
-          data?.message;
+          data?.reply || data?.answer || data?.text || data?.message;
 
         if (answer) {
           return answer;

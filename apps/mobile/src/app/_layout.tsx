@@ -90,7 +90,7 @@ export default function RootLayout() {
     if (!token && !onAuthScreen) {
       if (!isFirstTimeReady) return;
       const target = isFirstTime ? '/onboarding' : '/login';
-      
+
       // Force dismiss any active modals so they don't block the redirect
       if (router.canDismiss()) {
         router.dismissAll();

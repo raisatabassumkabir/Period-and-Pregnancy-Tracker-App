@@ -1,4 +1,4 @@
-import { Calendar, ChevronLeft, ChevronRight, User } from 'lucide-react-native';
+import { Calendar, User } from 'lucide-react-native';
 import React from 'react';
 import { Modal, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 
@@ -34,7 +34,11 @@ export function DatePickerModal({
     const y = parseInt(parts[0], 10) || 2000;
     const m = parseInt(parts[1], 10) || 1;
     const d = parseInt(parts[2], 10) || 15;
-    return { year: y, month: Math.max(1, Math.min(12, m)), day: Math.max(1, Math.min(31, d)) };
+    return {
+      year: y,
+      month: Math.max(1, Math.min(12, m)),
+      day: Math.max(1, Math.min(31, d)),
+    };
   }, [initialDate]);
 
   const [selectedYear, setSelectedYear] = React.useState(parsed.year);
@@ -51,8 +55,18 @@ export function DatePickerModal({
   }, [currentYear]);
 
   const monthNames = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   const daysInMonth = React.useMemo(() => {
@@ -71,26 +85,38 @@ export function DatePickerModal({
       <View className="flex-1 justify-center bg-black/60 p-5">
         <View className="rounded-3xl bg-surface p-6 shadow-xl">
           <View className="mb-4 flex-row items-center justify-between border-b border-divider pb-3">
-            <Text className="font-heading text-lg text-ink">Select Date of Birth</Text>
+            <Text className="font-heading text-lg text-ink">
+              Select Date of Birth
+            </Text>
             <TouchableOpacity onPress={onClose}>
               <Text className="font-body-bold text-sm text-accent">Cancel</Text>
             </TouchableOpacity>
           </View>
 
           {/* Year selector */}
-          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">YEAR</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4 flex-row gap-2">
+          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">
+            YEAR
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-4 flex-row gap-2"
+          >
             {years.map((y) => {
               const active = y === selectedYear;
               return (
                 <Pressable
                   key={y}
                   onPress={() => setSelectedYear(y)}
-                  className={`rounded-full px-3.5 py-1.5 border ${
-                    active ? 'border-accent bg-accent' : 'border-divider bg-canvas'
+                  className={`rounded-full border px-3.5 py-1.5 ${
+                    active
+                      ? 'border-accent bg-accent'
+                      : 'border-divider bg-canvas'
                   }`}
                 >
-                  <Text className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}>
+                  <Text
+                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                  >
                     {y}
                   </Text>
                 </Pressable>
@@ -99,7 +125,9 @@ export function DatePickerModal({
           </ScrollView>
 
           {/* Month selector */}
-          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">MONTH</Text>
+          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">
+            MONTH
+          </Text>
           <View className="mb-4 flex-row flex-wrap gap-2">
             {monthNames.map((name, idx) => {
               const mVal = idx + 1;
@@ -108,11 +136,15 @@ export function DatePickerModal({
                 <Pressable
                   key={name}
                   onPress={() => setSelectedMonth(mVal)}
-                  className={`rounded-full px-3 py-1.5 border ${
-                    active ? 'border-accent bg-accent' : 'border-divider bg-canvas'
+                  className={`rounded-full border px-3 py-1.5 ${
+                    active
+                      ? 'border-accent bg-accent'
+                      : 'border-divider bg-canvas'
                   }`}
                 >
-                  <Text className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}>
+                  <Text
+                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                  >
                     {name}
                   </Text>
                 </Pressable>
@@ -121,8 +153,14 @@ export function DatePickerModal({
           </View>
 
           {/* Day selector */}
-          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">DAY</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5 flex-row gap-1.5">
+          <Text className="mb-1.5 font-body-semibold text-xs text-tone-700">
+            DAY
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-5 flex-row gap-1.5"
+          >
             {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => {
               const active = d === selectedDay;
               return (
@@ -130,10 +168,14 @@ export function DatePickerModal({
                   key={d}
                   onPress={() => setSelectedDay(d)}
                   className={`size-9 items-center justify-center rounded-full border ${
-                    active ? 'border-accent bg-accent' : 'border-divider bg-canvas'
+                    active
+                      ? 'border-accent bg-accent'
+                      : 'border-divider bg-canvas'
                   }`}
                 >
-                  <Text className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}>
+                  <Text
+                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                  >
                     {d}
                   </Text>
                 </Pressable>
@@ -141,7 +183,12 @@ export function DatePickerModal({
             })}
           </ScrollView>
 
-          <Button label="Confirm Date" onPress={handleConfirm} size="default" className="rounded-pill" />
+          <Button
+            label="Confirm Date"
+            onPress={handleConfirm}
+            size="default"
+            className="rounded-pill"
+          />
         </View>
       </View>
     </Modal>
@@ -151,7 +198,9 @@ export function DatePickerModal({
 export function DateOfBirthInput({ value, onChange }: DateOfBirthInputProps) {
   const palette = usePaletteColors();
   const [pickerVisible, setPickerVisible] = React.useState(false);
-  const [validationError, setValidationError] = React.useState<string | null>(null);
+  const [validationError, setValidationError] = React.useState<string | null>(
+    null
+  );
 
   const handleTextChange = (text: string) => {
     // Only numeric digits allowed - prevents characters like 'T'

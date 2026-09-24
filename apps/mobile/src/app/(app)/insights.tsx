@@ -1,8 +1,16 @@
+import { ArrowRight, BookOpen, ShieldCheck, Trash2 } from 'lucide-react-native';
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, Pressable, Alert } from 'react-native';
-import { BookOpen, ShieldCheck, Heart, Trash2, ArrowRight } from 'lucide-react-native';
-import { useHealthStore } from '@/store/useHealthStore';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+
 import { EncryptedHealthStorage } from '@/lib/storage/encrypted-storage';
+import { useHealthStore } from '@/store/useHealthStore';
 
 export default function InsightsScreen() {
   const { currentWeek, babySizeLabel } = useHealthStore();
@@ -18,7 +26,10 @@ export default function InsightsScreen() {
           style: 'destructive',
           onPress: async () => {
             await EncryptedHealthStorage.purgeAllHealthData();
-            Alert.alert('Data Purged', 'Local encrypted health data has been completely erased.');
+            Alert.alert(
+              'Data Purged',
+              'Local encrypted health data has been completely erased.'
+            );
           },
         },
       ]
@@ -29,7 +40,9 @@ export default function InsightsScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Pregnancy Insights</Text>
-        <Text style={styles.headerSubtitle}>Week {currentWeek} Development & Guides</Text>
+        <Text style={styles.headerSubtitle}>
+          Week {currentWeek} Development & Guides
+        </Text>
       </View>
 
       {/* Main Feature Article Card */}
@@ -43,7 +56,9 @@ export default function InsightsScreen() {
           Your Baby's Hearing is Developing Rapidly in Week {currentWeek}
         </Text>
         <Text style={styles.articleSnippet}>
-          At week {currentWeek}, your baby is roughly the size of a {babySizeLabel}. Inner ear bones are fully formed, meaning your baby can now hear your heartbeat, voice, and surroundings!
+          At week {currentWeek}, your baby is roughly the size of a{' '}
+          {babySizeLabel}. Inner ear bones are fully formed, meaning your baby
+          can now hear your heartbeat, voice, and surroundings!
         </Text>
 
         <Pressable style={styles.readMoreButton}>
@@ -59,7 +74,8 @@ export default function InsightsScreen() {
           <Text style={styles.privacyTitle}>Zero-Knowledge Encrypted</Text>
         </View>
         <Text style={styles.privacyBody}>
-          Your sensitive reproductive health metrics are hardware-encrypted on disk with SecureStore keys. No third party can read your symptom logs.
+          Your sensitive reproductive health metrics are hardware-encrypted on
+          disk with SecureStore keys. No third party can read your symptom logs.
         </Text>
 
         <Pressable style={styles.purgeButton} onPress={handlePurgeData}>

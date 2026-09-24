@@ -47,7 +47,7 @@ export interface Palette {
   dark: PaletteTokens;
 }
 
-export const DEFAULT_PALETTE_ID: PaletteId = 'happy';
+export const DEFAULT_PALETTE_ID: PaletteId = 'rose';
 
 export const PALETTES: Record<PaletteId, Palette> = {
   /**

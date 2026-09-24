@@ -1,9 +1,9 @@
 import { Env } from '@env';
+import { useFonts } from 'expo-font';
+import { Image } from 'expo-image';
 import * as React from 'react';
 import { View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
-import { Image } from 'expo-image';
-import { useFonts } from 'expo-font';
 
 import { Text } from './text';
 
@@ -22,9 +22,13 @@ export function BrandMark({
   ...props
 }: BrandMarkProps) {
   return (
-    <Image 
-      source={require('../../../assets/icon.png')} 
-      style={{ width: size * 1.5, height: size * 1.5, borderRadius: (size * 1.5) / 2 }} 
+    <Image
+      source={require('../../../assets/icon.png')}
+      style={{
+        width: size * 1.5,
+        height: size * 1.5,
+        borderRadius: (size * 1.5) / 2,
+      }}
       contentFit="cover"
     />
   );
@@ -51,12 +55,12 @@ export function BrandLockup({
     <View className="items-center" testID={testID}>
       <BrandMark size={markSize} />
       {showWordmark && fontsLoaded && (
-        <Text 
+        <Text
           className="mt-2 font-script text-[42px] tracking-tight text-accent"
           style={{
             textShadowColor: '#FF9FA8', // Matches text-accent
             textShadowOffset: { width: 0.5, height: 0.5 },
-            textShadowRadius: 1
+            textShadowRadius: 1,
           }}
         >
           {Env.NAME}

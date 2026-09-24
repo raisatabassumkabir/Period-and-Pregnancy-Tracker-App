@@ -13,12 +13,7 @@ import {
   SuggestionChips,
   TypingIndicator,
 } from '@/components/assistant';
-import {
-  FocusAwareStatusBar,
-  Pill,
-  SafeAreaView,
-  View,
-} from '@/components/ui';
+import { FocusAwareStatusBar, Pill, SafeAreaView, View } from '@/components/ui';
 import { AppHeader } from '@/components/ui/app-header';
 import type { ChatMessage } from '@/lib/assistant/use-chat';
 import { useChat } from '@/lib/assistant/use-chat';
@@ -89,7 +84,7 @@ export default function Assistant() {
         </View>
 
         {/* Fixed Chat Input Bar */}
-        <View className="border-t border-divider px-4 py-3 bg-canvas">
+        <View className="border-t border-divider bg-canvas px-4 py-3">
           <View
             style={{
               backgroundColor: '#FCF8F5',

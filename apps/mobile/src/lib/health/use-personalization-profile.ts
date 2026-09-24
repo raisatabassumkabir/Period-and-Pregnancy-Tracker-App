@@ -103,9 +103,7 @@ export function usePersonalizationProfile() {
         setItem(STORAGE_KEYS.PERSONALIZATION_PROFILE, next);
 
         if (updates.mode) {
-          setHealthMode(
-            updates.mode === 'pregnancy' ? 'pregnancy' : 'cycle'
-          );
+          setHealthMode(updates.mode === 'pregnancy' ? 'pregnancy' : 'cycle');
         }
 
         return next;

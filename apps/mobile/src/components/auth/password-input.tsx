@@ -1,12 +1,15 @@
 import React from 'react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
-import type { TextInput } from 'react-native';
+import type { TextInput, TextInputProps } from 'react-native';
 
 import { FormField, Pressable } from '@/components/ui';
 import { Eye, EyeOff } from '@/components/ui/icons';
 import { usePaletteColors } from '@/lib/theme';
 
-interface Props<T extends FieldValues> extends Omit<TextInputProps, 'onSubmitEditing'> {
+interface Props<T extends FieldValues> extends Omit<
+  TextInputProps,
+  'onSubmitEditing'
+> {
   control: Control<T>;
   name: Path<T>;
   label?: string;

@@ -10,6 +10,8 @@ coverage/
 .turbo/
 
 # --- Expo / React Native (apps/mobile)
+android/
+ios/
 apps/mobile/.expo/
 apps/mobile/android/
 apps/mobile/ios/

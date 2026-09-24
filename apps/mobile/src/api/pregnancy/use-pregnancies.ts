@@ -2,6 +2,7 @@ import type { AxiosError } from 'axios';
 import { createQuery } from 'react-query-kit';
 
 import { useAuth } from '@/lib/auth';
+
 import { client } from '../common';
 import type { PaginateQuery, Pregnancy, ProblemDetail } from '../types';
 
@@ -24,7 +25,6 @@ export const usePregnancies = (
     enabled: !!token && (options?.enabled ?? true),
   } as any);
 };
-
 
 /** The server enforces at most one `active` pregnancy per user (409 on a second). */
 export const activePregnancy = (

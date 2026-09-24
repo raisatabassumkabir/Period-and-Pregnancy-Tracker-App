@@ -3,6 +3,7 @@ import React from 'react';
 import { ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 
 import type { MedicalCondition } from '@/api/types';
+import { DatePickerModal } from '@/components/settings/personalization-item';
 import {
   Button,
   FocusAwareStatusBar,
@@ -12,7 +13,6 @@ import {
 } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
-import { DatePickerModal } from '@/components/settings/personalization-item';
 
 type Step = 'goals' | 'info' | 'medical_source';
 
@@ -85,7 +85,7 @@ export default function SetupProfile() {
   };
 
   const renderProgressBar = (progress: number) => (
-    <View className="mb-6 h-1 w-full flex-row rounded-full bg-divider overflow-hidden">
+    <View className="mb-6 h-1 w-full flex-row overflow-hidden rounded-full bg-divider">
       <View
         className="h-full bg-accent"
         style={{ width: `${progress * 100}%` }}
@@ -97,7 +97,7 @@ export default function SetupProfile() {
     <View className="flex-1 bg-canvas">
       <FocusAwareStatusBar />
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-        <View className="flex-row items-center justify-between px-6 pt-4 pb-2">
+        <View className="flex-row items-center justify-between px-6 pb-2 pt-4">
           {step === 'goals' && (
             <TouchableOpacity onPress={() => router.replace('/(app)')}>
               <Text className="font-body-semibold text-[15px] text-tone-600">

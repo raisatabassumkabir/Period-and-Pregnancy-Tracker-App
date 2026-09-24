@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router';
-import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
 
@@ -11,7 +10,7 @@ import {
   PasswordHints,
   PasswordInput,
 } from '@/components/auth';
-import { Button, ErrorBanner, FormField, Pressable, Text, View } from '@/components/ui';
+import { Button, ErrorBanner, FormField, Text, View } from '@/components/ui';
 import { useRegisterLogic } from '@/hooks/use-register-logic';
 import { usePaletteColors } from '@/lib';
 
@@ -60,7 +59,9 @@ export default function Register() {
       </View>
 
       <View className="mb-4">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Your name</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Your name
+        </Text>
         <FormField
           control={form.control}
           name="fullName"
@@ -76,7 +77,9 @@ export default function Register() {
       </View>
 
       <View className="mb-4">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Email address</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Email address
+        </Text>
         <EmailInput
           control={form.control}
           label=""
@@ -87,7 +90,9 @@ export default function Register() {
       </View>
 
       <View className="mb-2">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Password</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Password
+        </Text>
         <PasswordInput
           control={form.control}
           name="password"
@@ -103,7 +108,9 @@ export default function Register() {
       <PasswordHints value={password ?? ''} />
 
       <View className="mb-6 mt-2">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">Confirm password</Text>
+        <Text className="mb-2 font-body-bold text-[13px] text-ink">
+          Confirm password
+        </Text>
         <PasswordInput
           control={form.control}
           name="confirmPassword"

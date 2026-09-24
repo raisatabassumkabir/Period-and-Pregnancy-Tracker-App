@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Pressable, Text, View } from '@/components/ui';
@@ -50,7 +50,7 @@ export function GoogleButton({
       accessibilityLabel={label}
       onPress={onPress}
       disabled={disabled || loading}
-      className="h-14 flex-row items-center justify-center rounded-[16px] bg-bg active:opacity-70"
+      className="bg-bg h-14 flex-row items-center justify-center rounded-[16px] active:opacity-70"
     >
       {loading ? (
         <ActivityIndicator size="small" color="#FF7A8A" />
