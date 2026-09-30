@@ -64,7 +64,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   android: {
-    // adaptiveIcon block removed to avoid prebuild crash
+    adaptiveIcon: {
+      foregroundImage: './assets/adaptive-icon.png',
+      backgroundColor: '#FCF8F5',
+    },
     package: Env.PACKAGE,
     permissions: ['INTERNET'],
     // Expo prebuild adds these by default; the app never reads external storage
