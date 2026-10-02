@@ -6,6 +6,7 @@ DATABASE_URL, REDIS_URL and plain env vars. No Heroku or Hetzner APIs in here.
 """
 
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -18,7 +19,7 @@ load_dotenv(BASE_DIR / ".env.local")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "insecure-dev-only-key")
 DEBUG = False
-ALLOWED_HOSTS = [h for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h]
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -78,8 +80,6 @@ ASGI_APPLICATION = "config.asgi.application"
 # Persistent connections are safe with RLS because set_config(..., is_local=true)
 # is transaction-scoped: the variable dies with the request's transaction and can
 # never leak onto the next request that reuses this pooled connection.
-import sys
-
 DATABASES = {
     "default": dj_database_url.config(
         default="postgres://femtech:femtech@localhost:5432/femtech",
@@ -109,6 +109,16 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -152,5 +162,8 @@ CACHES = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    o for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o
+    o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
+]
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
 ]

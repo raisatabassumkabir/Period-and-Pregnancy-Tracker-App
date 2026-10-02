@@ -69,6 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#FCF8F5',
     },
     package: Env.PACKAGE,
+    versionCode: 1,
     permissions: ['INTERNET'],
     // Expo prebuild adds these by default; the app never reads external storage
     // or draws overlays, and Play flags SYSTEM_ALERT_WINDOW as sensitive.

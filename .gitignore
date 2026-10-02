@@ -35,6 +35,10 @@ venv/
 db.sqlite3
 apps/backend/media/
 apps/backend/staticfiles/
+apps/api/media/
+apps/api/staticfiles/
+staticfiles/
+media/
 
 # --- Appwrite (apps/backend)
 apps/backend/.appwrite/
@@ -43,8 +47,10 @@ apps/backend/.appwrite/
 .env
 .env.*
 !.env.example
+!.env.*.example
 
 # --- Editors / OS
 .DS_Store
 .idea/
 *.swp
+scratch/
