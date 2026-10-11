@@ -168,3 +168,13 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     o.strip() for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
 ]
+
+# RevenueCat subscription management & webhook integration
+REVENUECAT_SECRET_API_KEY = os.environ.get("REVENUECAT_SECRET_API_KEY", "")
+REVENUECAT_WEBHOOK_AUTHORIZATION = os.environ.get("REVENUECAT_WEBHOOK_AUTHORIZATION", "")
+REVENUECAT_API_BASE_URL = os.environ.get(
+    "REVENUECAT_API_BASE_URL", "https://api.revenuecat.com/v1"
+)
+REVENUECAT_REQUEST_TIMEOUT_SECONDS = int(
+    os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "8")
+)

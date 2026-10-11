@@ -9,3 +9,6 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 CELERY_TASK_ALWAYS_EAGER = True
 
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+REVENUECAT_SECRET_API_KEY = "test_rc_secret_api_key_12345"
+REVENUECAT_WEBHOOK_AUTHORIZATION = "test_rc_webhook_auth_secret_67890"

@@ -29,6 +29,12 @@ from contextlib import contextmanager
 from django.db import connection, transaction
 
 
+def _get_config(cursor, key: str) -> str:
+    cursor.execute("SELECT current_setting(%s, true)", [key])
+    row = cursor.fetchone()
+    return row[0] if row and row[0] is not None else ""
+
+
 def _set_config(cursor, key: str, value: str) -> None:
     # set_config(name, value, is_local=true) -> transaction-local, dies on
     # COMMIT/ROLLBACK. Parametrised: the value is never interpolated into SQL.
@@ -40,14 +46,13 @@ def rls_user(user_id: str):
     """Scope all queries inside the block to one user, exactly like a request."""
     with transaction.atomic():
         with connection.cursor() as cursor:
+            prev = _get_config(cursor, "app.user_id")
             _set_config(cursor, "app.user_id", str(user_id))
         try:
             yield
         finally:
-            # Reset explicitly rather than relying on transaction end — in tests
-            # (and nested atomics) the enclosing transaction outlives this block.
             with connection.cursor() as cursor:
-                _set_config(cursor, "app.user_id", "")
+                _set_config(cursor, "app.user_id", prev)
 
 
 @contextmanager
@@ -60,9 +65,11 @@ def rls_bypass():
     """
     with transaction.atomic():
         with connection.cursor() as cursor:
+            prev = _get_config(cursor, "app.bypass")
             _set_config(cursor, "app.bypass", "on")
         try:
             yield
         finally:
             with connection.cursor() as cursor:
-                _set_config(cursor, "app.bypass", "")
+                _set_config(cursor, "app.bypass", prev)
+

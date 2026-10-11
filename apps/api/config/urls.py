@@ -4,12 +4,16 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.payments.views import SubscriptionStatusView
+from apps.payments.views import (
+    DeprecatedVerifyPurchaseView,
+    RevenueCatWebhookView,
+    SubscriptionStatusView,
+    SubscriptionSyncView,
+)
 from apps.users.views import (
     AssistantChatView,
     MeView,
     RegisterView,
-    VerifyPurchaseView,
 )
 from config.api_router import router
 
@@ -30,8 +34,18 @@ api_patterns = [
         name="subscription-status",
     ),
     path(
+        "payments/subscription-sync/",
+        SubscriptionSyncView.as_view(),
+        name="subscription-sync",
+    ),
+    path(
+        "payments/revenuecat/webhook/",
+        RevenueCatWebhookView.as_view(),
+        name="revenuecat-webhook",
+    ),
+    path(
         "payments/google-play/verify-purchase/",
-        VerifyPurchaseView.as_view(),
+        DeprecatedVerifyPurchaseView.as_view(),
         name="verify-purchase",
     ),
     path("assistant/chat/", AssistantChatView.as_view(), name="assistant-chat"),

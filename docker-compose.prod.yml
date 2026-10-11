@@ -11,8 +11,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       APP_DB_USER: ${APP_DB_USER:-femtech}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set}
-    ports:
-      - '127.0.0.1:5433:5432'
     volumes:
       - ./infra/initdb:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql/data

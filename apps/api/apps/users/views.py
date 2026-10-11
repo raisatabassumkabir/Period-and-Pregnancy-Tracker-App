@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -83,46 +82,6 @@ class MeView(APIView):
         user = request.user
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class SubscriptionStatusView(APIView):
-    """
-    Returns current subscription status according to CONTRACT.md.
-    """
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        return Response(
-            {
-                "is_premium": False,
-                "subscription_status": "free",
-                "subscription_ends_at": None,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-
-class VerifyPurchaseView(APIView):
-    """
-    Verifies Google Play purchase token and activates premium.
-    """
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        subscription_id = request.data.get("subscription_id", "premium_monthly")
-        return Response(
-            {
-                "is_premium": True,
-                "subscription_status": "active",
-                "subscription_ends_at": (
-                    timezone.now() + timezone.timedelta(days=30)
-                ).isoformat(),
-                "google_play_subscription_id": subscription_id,
-            },
-            status=status.HTTP_200_OK,
-        )
 
 
 class AssistantChatView(APIView):
