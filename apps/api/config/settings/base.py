@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.cycles",
     "apps.pregnancy",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [

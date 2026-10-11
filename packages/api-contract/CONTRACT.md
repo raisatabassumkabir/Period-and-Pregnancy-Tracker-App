@@ -12,24 +12,24 @@ in query params. Conventions follow https://apiguide.dev.
 
 ## Status codes
 
-| Verb | Success |
-| --- | --- |
-| GET | 200 |
-| POST | 201 (202 for async work) |
-| PUT / PATCH | 200 |
-| DELETE | 204 |
+| Verb        | Success                  |
+| ----------- | ------------------------ |
+| GET         | 200                      |
+| POST        | 201 (202 for async work) |
+| PUT / PATCH | 200                      |
+| DELETE      | 204                      |
 
-| Failure | Meaning | `type` (all `ProblemDetail`) |
-| --- | --- | --- |
-| 400 | body could not be parsed | `…/errors/malformed-request-body` |
-| 401 | missing / invalid / expired token | `…/errors/unauthorized`, `…/errors/expired-authentication-token` |
-| 402 | paywall | `…/status-codes/402/` — `PaymentRequiredProblem` (see below) |
-| 403 | authenticated but lacks role/scope | `…/errors/insufficient-scope` |
-| 404 | not found — **also another user's object** (never 403) | `…/errors/resource-not-found` |
-| 409 | conflict: duplicate, stale version, purchase token on another account | `…/errors/resource-conflict`, `…/errors/idempotency-key-conflict` |
-| 422 | parsed fine, failed validation | `…/errors/validation-failed` |
-| 429 | rate limited; honour `Retry-After` | `…/errors/rate-limit-exceeded` |
-| 5xx | server / upstream; generic body, retry with backoff | `…/errors/internal-server-error`, `service-unavailable`, `gateway-timeout` |
+| Failure | Meaning                                                               | `type` (all `ProblemDetail`)                                               |
+| ------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 400     | body could not be parsed                                              | `…/errors/malformed-request-body`                                          |
+| 401     | missing / invalid / expired token                                     | `…/errors/unauthorized`, `…/errors/expired-authentication-token`           |
+| 402     | paywall                                                               | `…/status-codes/402/` — `PaymentRequiredProblem` (see below)               |
+| 403     | authenticated but lacks role/scope                                    | `…/errors/insufficient-scope`                                              |
+| 404     | not found — **also another user's object** (never 403)                | `…/errors/resource-not-found`                                              |
+| 409     | conflict: duplicate, stale version, purchase token on another account | `…/errors/resource-conflict`, `…/errors/idempotency-key-conflict`          |
+| 422     | parsed fine, failed validation                                        | `…/errors/validation-failed`                                               |
+| 429     | rate limited; honour `Retry-After`                                    | `…/errors/rate-limit-exceeded`                                             |
+| 5xx     | server / upstream; generic body, retry with backoff                   | `…/errors/internal-server-error`, `service-unavailable`, `gateway-timeout` |
 
 `…` = `https://apiguide.dev`. Every `type` URL opens a human-readable definition.
 Never return an error with 200.
@@ -41,7 +41,10 @@ Never return an error with 200.
   "status": 422,
   "detail": "One or more fields failed validation.",
   "instance": "/api/auth/register/",
-  "errors": { "email": ["Enter a valid email address."], "profile": { "country": ["Use an ISO 3166-1 alpha-2 code, e.g. 'BD'."] } }
+  "errors": {
+    "email": ["Enter a valid email address."],
+    "profile": { "country": ["Use an ISO 3166-1 alpha-2 code, e.g. 'BD'."] }
+  }
 }
 ```
 
@@ -58,15 +61,15 @@ Never return an error with 200.
 this document is the target contract: the types exist and the client compiles
 against them, but calling those paths returns 404 until the backend catches up.
 
-| Live endpoint | Notes |
-| --- | --- |
-| `POST auth/register/` | 201 `RegisterResponse`; optional nested `profile` |
-| `POST auth/token/` | `LoginRequest` → `TokenPairResponse` |
-| `POST auth/token/refresh/` | `RefreshTokenRequest` → `TokenPairResponse` (rotating; the old refresh is blacklisted) |
-| `GET/PUT/PATCH profiles/`, `profiles/{id}/` | `Profile` — list holds only the caller's own row |
-| `cycles/`, `cycles/{id}/` | full CRUD, `Cycle`; 409 on a duplicate `start_date` |
-| `daily-logs/`, `daily-logs/{id}/` | full CRUD, `DailyLog`; one per calendar day, 409 on a duplicate `date` |
-| `pregnancies/`, `pregnancies/{id}/` | full CRUD, `Pregnancy`; 409 on a second `active` row |
+| Live endpoint                               | Notes                                                                                  |
+| ------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `POST auth/register/`                       | 201 `RegisterResponse`; optional nested `profile`                                      |
+| `POST auth/token/`                          | `LoginRequest` → `TokenPairResponse`                                                   |
+| `POST auth/token/refresh/`                  | `RefreshTokenRequest` → `TokenPairResponse` (rotating; the old refresh is blacklisted) |
+| `GET/PUT/PATCH profiles/`, `profiles/{id}/` | `Profile` — list holds only the caller's own row                                       |
+| `cycles/`, `cycles/{id}/`                   | full CRUD, `Cycle`; 409 on a duplicate `start_date`                                    |
+| `daily-logs/`, `daily-logs/{id}/`           | full CRUD, `DailyLog`; one per calendar day, 409 on a duplicate `date`                 |
+| `pregnancies/`, `pregnancies/{id}/`         | full CRUD, `Pregnancy`; 409 on a second `active` row                                   |
 
 Trailing slashes are required. Every list endpoint returns `PaginateQuery<T>`
 (`{ count, next, previous, results }`, page size 50, `?page=<n>`); there is no
@@ -83,17 +86,17 @@ Bearer JWT in `Authorization: Bearer <access_token>` on every request after
 login. The client stores the token in the device secure store. Access tokens
 last 15 minutes; refresh tokens 30 days.
 
-| Endpoint | Request | Response |
-| --- | --- | --- |
-| `POST auth/token/` **live** | `LoginRequest` | `TokenPairResponse` |
-| `POST auth/token/refresh/` **live** | `RefreshTokenRequest` | `TokenPairResponse` |
-| `POST auth/register/` **live** | `RegisterRequest` | `RegisterResponse` (201) |
-| `POST google` | `GoogleAuthRequest` | `GoogleAuthResponse` |
-| `POST forgot-password` | `ForgotPasswordRequest` | `ForgotPasswordResponse` |
-| `POST reset-password` | `ResetPasswordRequest` | `{ message }` |
-| `POST logout` | — | `LogoutResponse` |
-| `GET me` | — | `UserResponse` |
-| `DELETE me` | — | 204 (Google Play account-deletion policy) |
+| Endpoint                            | Request                 | Response                                  |
+| ----------------------------------- | ----------------------- | ----------------------------------------- |
+| `POST auth/token/` **live**         | `LoginRequest`          | `TokenPairResponse`                       |
+| `POST auth/token/refresh/` **live** | `RefreshTokenRequest`   | `TokenPairResponse`                       |
+| `POST auth/register/` **live**      | `RegisterRequest`       | `RegisterResponse` (201)                  |
+| `POST google`                       | `GoogleAuthRequest`     | `GoogleAuthResponse`                      |
+| `POST forgot-password`              | `ForgotPasswordRequest` | `ForgotPasswordResponse`                  |
+| `POST reset-password`               | `ResetPasswordRequest`  | `{ message }`                             |
+| `POST logout`                       | —                       | `LogoutResponse`                          |
+| `GET me`                            | —                       | `UserResponse`                            |
+| `DELETE me`                         | —                       | 204 (Google Play account-deletion policy) |
 
 ## Health data
 
@@ -105,13 +108,32 @@ submitted value.
 
 ## Billing
 
-| Endpoint | Request | Response |
-| --- | --- | --- |
-| `GET payments/subscription-status/` | — | `SubscriptionStatusResponse` |
-| `POST payments/google-play/verify-purchase/` | `VerifyPurchaseRequest` | `VerifyPurchaseResponse`; 404 unknown token; 409 token linked to another account |
+### Canonical Identifiers & Target Pricing Hypotheses
 
-`subscription-status` is the source of truth for premium. The client refetches
-it on foreground and after a verified purchase.
+| Identifier      | Type        | Target Planning USD | Notes                                       |
+| :-------------- | :---------- | :-----------------: | :------------------------------------------ |
+| premium_monthly | Product     |      .99 / mo       | Canonical Google Play subscription product  |
+| premium_annual  | Product     |      .99 / yr       | Canonical Google Play subscription product  |
+| premium         | Entitlement |          —          | Canonical RevenueCat entitlement identifier |
+
+Legacy compatibility: premium_yearly resolves to premium_annual. Note that store-configured prices in Google Play Console remain authoritative and localized.
+
+### Endpoints
+
+| Endpoint                                   | Request               | Response                                                                       |
+| :----------------------------------------- | :-------------------- | :----------------------------------------------------------------------------- |
+| GET payments/subscription-status/          | —                     | SubscriptionStatusResponse                                                     |
+| POST payments/google-play/verify-purchase/ | VerifyPurchaseRequest | VerifyPurchaseResponse; 404 unknown token; 409 token linked to another account |
+
+subscription-status is the source of truth for premium access decisions. The client refetches
+it on foreground and after purchase/restore operations.
+
+Status semantics:
+
+- is_premium: Authoritative flag for client access decisions.
+- subscription_status: Granular lifecycle state (ree, ctive, rialing, cancelled, past_due, xpired, illing_issue).
+- A cancelled subscription retains is_premium: true until subscription_ends_at. Once subscription_ends_at has elapsed, status transitions to xpired and is_premium: false.
+- Never exposes internal webhook secrets, raw receipt tokens, or database internals.
 
 ## 402 — the paywall
 

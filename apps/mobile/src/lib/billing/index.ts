@@ -1,4 +1,10 @@
 import {
+  CANONICAL_ENTITLEMENT_ID,
+  CANONICAL_PRODUCT_IDS,
+  TARGET_PRICING_USD,
+} from '@repo/api-contract';
+
+import {
   type BillingClient,
   BillingError,
   BillingNotConfiguredError,
@@ -9,9 +15,14 @@ import {
 } from './types';
 
 /** Play Console subscription product ids. Must match the backend's allowed list. */
-export const PREMIUM_PRODUCT_IDS = ['premium_monthly', 'premium_yearly'];
+export const PREMIUM_PRODUCT_IDS = [
+  CANONICAL_PRODUCT_IDS.MONTHLY,
+  CANONICAL_PRODUCT_IDS.ANNUAL,
+];
 
-export const DEFAULT_PRODUCT_ID = 'premium_monthly';
+export const DEFAULT_PRODUCT_ID = CANONICAL_PRODUCT_IDS.MONTHLY;
+
+export { CANONICAL_ENTITLEMENT_ID, CANONICAL_PRODUCT_IDS, TARGET_PRICING_USD };
 
 const stubClient: BillingClient = {
   isAvailable: () => false,

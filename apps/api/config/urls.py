@@ -4,11 +4,11 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from apps.payments.views import SubscriptionStatusView
 from apps.users.views import (
     AssistantChatView,
     MeView,
     RegisterView,
-    SubscriptionStatusView,
     VerifyPurchaseView,
 )
 from config.api_router import router

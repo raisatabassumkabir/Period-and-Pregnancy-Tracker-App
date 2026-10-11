@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.rls import rls_user
-from apps.users.models import Profile, User
+from apps.users.models import Profile
 from apps.users.serializers import ProfileSerializer, RegisterSerializer
 
 
@@ -56,11 +56,15 @@ class MeView(APIView):
     def get(self, request):
         user = request.user
         full_name = None
+        is_premium = False
         try:
             with rls_user(str(user.pk)):
                 profile = getattr(user, "profile", None)
                 if profile:
                     full_name = getattr(profile, "full_name", None)
+                subscription = getattr(user, "subscription", None)
+                if subscription:
+                    is_premium = subscription.has_active_access()
         except Exception:
             pass
 
@@ -69,7 +73,7 @@ class MeView(APIView):
                 "id": str(user.id),
                 "email": user.email,
                 "full_name": full_name or user.email.split("@")[0].replace(".", " ").title(),
-                "is_premium": False,
+                "is_premium": is_premium,
                 "created_at": user.date_joined.isoformat(),
             },
             status=status.HTTP_200_OK,
@@ -129,7 +133,7 @@ class AssistantChatView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        query = request.data.get("query", "")
+        _query = request.data.get("query", "")
         reply = (
             "Thank you for sharing your symptoms and questions. "
             "Based on your profile, tracking daily symptoms helps identify patterns over time. "
