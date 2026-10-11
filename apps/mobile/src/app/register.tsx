@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
 import type { TextInput } from 'react-native';
 
@@ -12,11 +11,8 @@ import {
 } from '@/components/auth';
 import { Button, ErrorBanner, FormField, Text, View } from '@/components/ui';
 import { useRegisterLogic } from '@/hooks/use-register-logic';
-import { usePaletteColors } from '@/lib';
 
 export default function Register() {
-  const router = useRouter();
-  const palette = usePaletteColors();
   const { form, handleRegister, isSubmitting, errors } = useRegisterLogic();
   const emailRef = React.useRef<TextInput | null>(null);
   const passwordRef = React.useRef<TextInput | null>(null);

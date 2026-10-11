@@ -195,7 +195,7 @@ function PregnancyEmptyCard({
       </View>
 
       <Text className="mt-4 font-body text-[14px] leading-5 text-[#8C8C8C]">
-        Follow your baby's development, track trimesters, and log important
+        Follow your baby&apos;s development, track trimesters, and log important
         milestones week by week.
       </Text>
 

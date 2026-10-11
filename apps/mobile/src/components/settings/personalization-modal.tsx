@@ -10,7 +10,7 @@ import { Button, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
-import { DateOfBirthInput } from './personalization-item';
+import { DateOfBirthInput } from './date-of-birth-input';
 
 const MODE_LABELS: Record<ProfileMode, string> = {
   cycle_tracking: 'Cycle Tracking',

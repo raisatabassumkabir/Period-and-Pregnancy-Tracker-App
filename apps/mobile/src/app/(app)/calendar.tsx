@@ -66,15 +66,14 @@ export default function Calendar() {
   const { data: cyclesPage, isError: cyclesFailed } = useCycles();
   const { data: dailyLogsPage, isError: dailyLogsFailed } = useDailyLogs();
 
-  const { rows: cycles, isDemo: cyclesAreDemo } = withDemoFallback(
+  const { rows: cycles } = withDemoFallback(
     { data: cyclesPage, isError: cyclesFailed },
     DEMO_CYCLES
   );
-  const { rows: logs, isDemo: logsAreDemo } = withDemoFallback(
+  const { rows: logs } = withDemoFallback(
     { data: dailyLogsPage, isError: dailyLogsFailed },
     DEMO_DAILY_LOGS
   );
-  const isDemo = cyclesAreDemo || logsAreDemo;
   const cycleLengthDays = deriveCycleInsights(cycles)?.cycleLengthDays;
 
   const goToPrevMonth = () => setVisibleMonth((month) => shiftMonth(month, -1));

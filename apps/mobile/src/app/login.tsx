@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
@@ -16,7 +15,6 @@ import { usePaletteColors } from '@/lib';
 import { CLEAN_TEST_ACCOUNTS, DEMO_ACCOUNTS } from '@/lib/auth/demo-users';
 
 export default function Login() {
-  const router = useRouter();
   const palette = usePaletteColors();
   const { form, handleLogin, selectDemoAccount, isSubmitting, errors } =
     useLoginLogic();

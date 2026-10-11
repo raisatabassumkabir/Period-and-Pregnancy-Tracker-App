@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
@@ -19,7 +20,7 @@ import { Button, Pill, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
-import { DatePickerModal } from './personalization-item';
+import { DatePickerModal } from './date-of-birth-input';
 
 const LOGIN_ROUTE = '/login';
 

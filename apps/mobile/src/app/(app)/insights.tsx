@@ -53,7 +53,7 @@ export default function InsightsScreen() {
         </View>
 
         <Text style={styles.articleTitle}>
-          Your Baby's Hearing is Developing Rapidly in Week {currentWeek}
+          Your Baby&apos;s Hearing is Developing Rapidly in Week {currentWeek}
         </Text>
         <Text style={styles.articleSnippet}>
           At week {currentWeek}, your baby is roughly the size of a{' '}

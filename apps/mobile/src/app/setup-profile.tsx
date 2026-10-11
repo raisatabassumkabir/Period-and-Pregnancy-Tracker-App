@@ -1,9 +1,10 @@
+/* eslint-disable max-lines-per-function */
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 
 import type { MedicalCondition } from '@/api/types';
-import { DatePickerModal } from '@/components/settings/personalization-item';
+import { DatePickerModal } from '@/components/settings/date-of-birth-input';
 import {
   Button,
   FocusAwareStatusBar,
@@ -182,7 +183,7 @@ export default function SetupProfile() {
             <View className="flex-1">
               {renderProgressBar(0.66)}
               <Text className="mb-2 text-center font-heading text-[28px] text-ink">
-                Let's get to know you
+                Let&apos;s get to know you
               </Text>
               <Text className="mb-8 text-center text-[15px] text-tone-600">
                 This helps us personalize your insights.

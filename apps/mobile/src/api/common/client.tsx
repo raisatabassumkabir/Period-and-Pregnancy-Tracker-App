@@ -91,7 +91,10 @@ client.interceptors.response.use(
       // 401/403 are expected during auth expiry/refresh; don't trigger Red Screen
       const logFn =
         status === 401 || status === 403 ? console.info : console.error;
-      logFn(`API Error [${status}]:`, JSON.stringify(error.response.data));
+      logFn(
+        `API Error [${status}] on ${error.config?.method?.toUpperCase()} ${error.config?.url}:`,
+        JSON.stringify(error.response.data)
+      );
     } else if (error.request) {
       console.warn('API Network Error (No Response):', error.message);
     } else {

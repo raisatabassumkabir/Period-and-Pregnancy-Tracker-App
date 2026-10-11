@@ -4,7 +4,13 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.users.views import RegisterView
+from apps.users.views import (
+    AssistantChatView,
+    MeView,
+    RegisterView,
+    SubscriptionStatusView,
+    VerifyPurchaseView,
+)
 from config.api_router import router
 
 
@@ -12,13 +18,32 @@ def health(_request):
     return JsonResponse({"status": "ok"})
 
 
+api_patterns = [
+    path("auth/register/", RegisterView.as_view(), name="auth-register"),
+    path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("me", MeView.as_view(), name="user-me"),
+    path("me/", MeView.as_view(), name="user-me-slash"),
+    path(
+        "payments/subscription-status/",
+        SubscriptionStatusView.as_view(),
+        name="subscription-status",
+    ),
+    path(
+        "payments/google-play/verify-purchase/",
+        VerifyPurchaseView.as_view(),
+        name="verify-purchase",
+    ),
+    path("assistant/chat/", AssistantChatView.as_view(), name="assistant-chat"),
+    path("", include(router.urls)),
+]
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health),
-    path("api/auth/register/", RegisterView.as_view(), name="auth-register"),
-    path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
-    path("api/", include(router.urls)),
+    path("api/", include(api_patterns)),
+    path("api/v1/", include(api_patterns)),
 ]
+

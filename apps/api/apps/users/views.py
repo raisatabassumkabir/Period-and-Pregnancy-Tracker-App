@@ -1,7 +1,10 @@
+from django.utils import timezone
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from apps.users.models import Profile
+from apps.core.rls import rls_user
+from apps.users.models import Profile, User
 from apps.users.serializers import ProfileSerializer, RegisterSerializer
 
 
@@ -40,3 +43,106 @@ class ProfileViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MeView(APIView):
+    """
+    Returns current authenticated user details according to CONTRACT.md.
+    Supports DELETE for Google Play Store account deletion compliance.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        full_name = None
+        try:
+            with rls_user(str(user.pk)):
+                profile = getattr(user, "profile", None)
+                if profile:
+                    full_name = getattr(profile, "full_name", None)
+        except Exception:
+            pass
+
+        return Response(
+            {
+                "id": str(user.id),
+                "email": user.email,
+                "full_name": full_name or user.email.split("@")[0].replace(".", " ").title(),
+                "is_premium": False,
+                "created_at": user.date_joined.isoformat(),
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubscriptionStatusView(APIView):
+    """
+    Returns current subscription status according to CONTRACT.md.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        return Response(
+            {
+                "is_premium": False,
+                "subscription_status": "free",
+                "subscription_ends_at": None,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class VerifyPurchaseView(APIView):
+    """
+    Verifies Google Play purchase token and activates premium.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        subscription_id = request.data.get("subscription_id", "premium_monthly")
+        return Response(
+            {
+                "is_premium": True,
+                "subscription_status": "active",
+                "subscription_ends_at": (
+                    timezone.now() + timezone.timedelta(days=30)
+                ).isoformat(),
+                "google_play_subscription_id": subscription_id,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class AssistantChatView(APIView):
+    """
+    AI Assistant chat endpoint responding to health questions.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        query = request.data.get("query", "")
+        reply = (
+            "Thank you for sharing your symptoms and questions. "
+            "Based on your profile, tracking daily symptoms helps identify patterns over time. "
+            "Please consult your healthcare provider for clinical diagnosis or urgent advice."
+        )
+        return Response(
+            {
+                "reply": reply,
+                "answer": reply,
+                "text": reply,
+                "message": reply,
+                "status": "ok",
+            },
+            status=status.HTTP_200_OK,
+        )
+

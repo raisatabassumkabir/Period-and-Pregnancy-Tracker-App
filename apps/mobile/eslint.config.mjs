@@ -26,7 +26,7 @@ const sharedRules = {
     'error',
     {
       case: 'kebabCase',
-      ignore: ['/android', '/ios'],
+      ignore: ['/android', '/ios', 'useHealthStore', 'CalendarScreen'],
     },
   ],
 

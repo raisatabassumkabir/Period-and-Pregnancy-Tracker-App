@@ -1,4 +1,4 @@
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs } from 'expo-router';
 import {
   Apple,
   CalendarDays,
@@ -10,15 +10,12 @@ import React from 'react';
 
 import { AppErrorBoundary } from '@/components/ui';
 import { useAuth, usePaletteColors } from '@/lib';
-import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
 const TAB_ICON_SIZE = 23;
 
 export default function TabLayout() {
   const status = useAuth.use.status();
   const palette = usePaletteColors();
-  const { profile, isLoading } = usePersonalizationProfile();
-  const router = useRouter();
 
   if (!status) return null;
   return (

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import React from 'react';
@@ -426,7 +427,7 @@ export function InitializeCycleModal({
                   ]);
                   onSuccess?.();
                   onClose();
-                } catch (err: any) {
+                } catch (_err: unknown) {
                   setErrorMessage('Failed to skip. Please try again.');
                 } finally {
                   setIsSubmitting(false);

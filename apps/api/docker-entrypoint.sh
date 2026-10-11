@@ -66,7 +66,7 @@ elif [ "$1" = "worker" ]; then
 elif [ "$1" = "beat" ]; then
   wait_for_db
   echo "Starting Celery beat..."
-  exec uv run celery -A config beat -l "${CELERY_LOG_LEVEL:-info}"
+  exec uv run celery -A config beat -l "${CELERY_LOG_LEVEL:-info}" -s /tmp/celerybeat-schedule
 
 else
   exec "$@"

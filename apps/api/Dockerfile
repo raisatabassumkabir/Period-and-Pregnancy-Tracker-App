@@ -36,8 +36,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy uv binaries
 COPY --from=ghcr.io/astral-sh/uv:0.6.5 /uv /uvx /bin/
 
-# Security: create non-root application user
-RUN groupadd -r -g 1001 appuser && useradd -r -u 1001 -g appuser appuser
+# Security: create non-root application user with home directory
+RUN groupadd -r -g 1001 appuser && useradd -m -u 1001 -g appuser -s /bin/bash appuser
 
 WORKDIR /app
 
@@ -45,11 +45,13 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:$PATH" \
+    UV_CACHE_DIR=/tmp/.uv-cache \
+    UV_NO_SYNC=1 \
     DJANGO_SETTINGS_MODULE=config.settings.prod \
     PORT=8000
 
 # Copy installed venv from builder
-COPY --from=builder /app/.venv /app/.venv
+COPY --chown=appuser:appuser --from=builder /app/.venv /app/.venv
 
 # Copy application source code
 COPY --chown=appuser:appuser . /app/

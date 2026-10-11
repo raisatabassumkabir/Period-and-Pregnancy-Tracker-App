@@ -51,7 +51,6 @@ SplashScreen.preventAutoHideAsync();
 
 /** Top-level routes that are valid for both signed-in and signed-out users. */
 const AUTH_ROUTES = new Set(['login', 'register', 'onboarding']);
-const APP_GROUP = '(app)';
 
 export default function RootLayout() {
   const segments = useSegments();

@@ -17,9 +17,9 @@ interface BrandMarkProps extends SvgProps {
 
 export function BrandMark({
   size = DEFAULT_MARK_SIZE,
-  color,
-  secondaryColor,
-  ...props
+  color: _color,
+  secondaryColor: _secondaryColor,
+  ..._props
 }: BrandMarkProps) {
   return (
     <Image
