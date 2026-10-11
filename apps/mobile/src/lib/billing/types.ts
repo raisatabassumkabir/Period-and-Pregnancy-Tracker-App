@@ -1,3 +1,9 @@
+import type {
+  CustomerInfo,
+  PurchasesOfferings,
+  PurchasesPackage,
+} from 'react-native-purchases';
+
 export interface BillingProduct {
   productId: string;
   title: string;
@@ -9,27 +15,38 @@ export interface BillingProduct {
 
 export interface BillingPurchase {
   productId: string;
-  purchaseToken: string;
+  purchaseToken?: string;
   transactionDate?: number;
   isAcknowledged?: boolean;
+  customerInfo?: CustomerInfo;
 }
 
 export interface BillingClient {
   isAvailable(): boolean;
-  initialize(): Promise<void>;
-  getProducts(productIds: string[]): Promise<BillingProduct[]>;
-  requestSubscription(productId: string): Promise<BillingPurchase>;
-  acknowledgePurchase(purchaseToken: string): Promise<void>;
+  initialize(appUserId?: string): Promise<void>;
+  identifyUser(appUserId: string): Promise<void>;
+  resetUser(): Promise<void>;
+  getProducts(productIds?: string[]): Promise<BillingProduct[]>;
+  getOfferings(): Promise<PurchasesOfferings | null>;
+  requestSubscription(
+    productIdOrPackage: string | PurchasesPackage
+  ): Promise<BillingPurchase>;
+  purchasePackage(pkg: PurchasesPackage): Promise<BillingPurchase>;
+  restorePurchases(): Promise<BillingPurchase[]>;
+  getCustomerInfo(): Promise<CustomerInfo | null>;
+  addCustomerInfoUpdateListener(
+    listener: (info: CustomerInfo) => void
+  ): () => void;
+  acknowledgePurchase(purchaseToken?: string): Promise<void>;
   getAvailablePurchases(): Promise<BillingPurchase[]>;
   endConnection(): Promise<void>;
 }
 
 export class BillingNotConfiguredError extends Error {
-  constructor() {
-    super(
-      'Google Play Billing is not configured. Register a BillingClient via ' +
-        'setBillingClient() before launching the purchase flow.'
-    );
+  constructor(
+    message = 'In-app purchases are not configured. Please check your configuration.'
+  ) {
+    super(message);
     this.name = 'BillingNotConfiguredError';
   }
 }
@@ -43,19 +60,18 @@ export class PurchaseCancelledError extends Error {
 }
 
 /**
- * Google accepted the order but payment is still settling (e.g. cash or bank
- * transfer). Premium is granted once the backend receives the RTDN for it.
+ * Payment is pending settlement (e.g. slow payment method / cash).
  */
 export class PurchasePendingError extends Error {
   constructor() {
     super(
-      'Your purchase is pending. Premium unlocks automatically once Google confirms the payment.'
+      'Your purchase is pending. Premium unlocks automatically once payment settles.'
     );
     this.name = 'PurchasePendingError';
   }
 }
 
-/** Any other Play Billing failure, carrying the store's error code for diagnostics. */
+/** Store / RevenueCat error carrying error code. */
 export class BillingError extends Error {
   readonly code: string;
 
@@ -63,5 +79,23 @@ export class BillingError extends Error {
     super(message);
     this.name = 'BillingError';
     this.code = code;
+  }
+}
+
+/** Purchase completed in store, but backend synchronization could not complete yet. */
+export class BackendSyncPendingError extends Error {
+  constructor(
+    message = 'Purchase succeeded in store, but verification is still completing. Please tap Restore or Retry.'
+  ) {
+    super(message);
+    this.name = 'BackendSyncPendingError';
+  }
+}
+
+/** Restoring purchases returned no active entitlement for this user. */
+export class NoActiveSubscriptionError extends Error {
+  constructor() {
+    super('No active premium subscription found for your account.');
+    this.name = 'NoActiveSubscriptionError';
   }
 }

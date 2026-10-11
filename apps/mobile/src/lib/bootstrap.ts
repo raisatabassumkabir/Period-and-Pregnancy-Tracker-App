@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 import { setBillingClient } from '@/lib/billing';
-import { createExpoIapBillingClient } from '@/lib/billing/expo-iap-client';
+import { createRevenueCatBillingClient } from '@/lib/billing/revenuecat-client';
 import { setFileSharer } from '@/lib/sharing';
 import { createExpoFileSharer } from '@/lib/sharing/expo-file-sharer';
 import { initTelemetry } from '@/lib/telemetry';
@@ -12,9 +12,9 @@ import { initTelemetry } from '@/lib/telemetry';
  */
 export function registerNativeIntegrations(): void {
   setFileSharer(createExpoFileSharer());
-  // Google Play Billing is the only purchase channel; iOS billing is not shipped.
+  // RevenueCat Google Play Billing on Android
   if (Platform.OS === 'android') {
-    setBillingClient(createExpoIapBillingClient());
+    setBillingClient(createRevenueCatBillingClient());
   }
   // Initialize Amplitude telemetry & session replay
   initTelemetry().catch(() => {

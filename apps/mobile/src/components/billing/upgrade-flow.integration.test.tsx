@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import * as verifyHook from '@/api/billing/use-verify-purchase';
+import * as syncHook from '@/api/billing/use-subscription-sync';
 import { client } from '@/api/common';
 import { setBillingClient } from '@/lib/billing';
 import { cleanup, fireEvent, render, screen, waitFor } from '@/lib/test-utils';
@@ -34,10 +34,19 @@ afterEach(() => {
   setBillingClient({
     isAvailable: () => false,
     initialize: async () => {},
+    identifyUser: async () => {},
+    resetUser: async () => {},
     getProducts: async () => [],
+    getOfferings: async () => null,
     requestSubscription: async () => {
       throw new Error('not configured');
     },
+    purchasePackage: async () => {
+      throw new Error('not configured');
+    },
+    restorePurchases: async () => [],
+    getCustomerInfo: async () => null,
+    addCustomerInfoUpdateListener: () => () => {},
     acknowledgePurchase: async () => {},
     getAvailablePurchases: async () => [],
     endConnection: async () => {},
@@ -101,28 +110,42 @@ describe('Upgrade flow (integration)', () => {
     );
   });
 
-  it('completes the full Play Billing happy path: 402 → buy → verify → success', async () => {
+  it('completes the full RevenueCat + Django sync happy path: 402 → buy → sync → success', async () => {
+    const requestSubscription = jest.fn().mockResolvedValue({
+      productId: PRODUCT_ID,
+      transactionDate: Date.now(),
+      isAcknowledged: true,
+    });
+
     setBillingClient({
       isAvailable: () => true,
       initialize: async () => {},
+      identifyUser: async () => {},
+      resetUser: async () => {},
       getProducts: async () => [],
-      requestSubscription: async () => ({
+      getOfferings: async () => null,
+      requestSubscription,
+      purchasePackage: async () => ({
         productId: PRODUCT_ID,
-        purchaseToken: 'play-token-xyz',
+        isAcknowledged: true,
       }),
+      restorePurchases: async () => [],
+      getCustomerInfo: async () => null,
+      addCustomerInfoUpdateListener: () => () => {},
       acknowledgePurchase: async () => {},
       getAvailablePurchases: async () => [],
       endConnection: async () => {},
     });
 
-    const verifyMutate = jest.fn().mockResolvedValue({
+    const syncMutate = jest.fn().mockResolvedValue({
       is_premium: true,
       subscription_status: 'active',
       subscription_ends_at: '2027-04-29T12:00:00Z',
-      google_play_subscription_id: PRODUCT_ID,
+      entitlement_id: 'premium',
+      product_id: PRODUCT_ID,
     });
-    jest.spyOn(verifyHook, 'useVerifyPurchase').mockReturnValue({
-      mutateAsync: verifyMutate,
+    jest.spyOn(syncHook, 'useSubscriptionSync').mockReturnValue({
+      mutateAsync: syncMutate,
       isPending: false,
       reset: jest.fn(),
     } as never);
@@ -139,12 +162,7 @@ describe('Upgrade flow (integration)', () => {
     expect(await screen.findByTestId('upgrade-sheet-cta')).toBeOnTheScreen();
     fireEvent.press(screen.getByTestId('upgrade-sheet-cta'));
 
-    await waitFor(() =>
-      expect(verifyMutate).toHaveBeenCalledWith({
-        subscription_id: PRODUCT_ID,
-        purchase_token: 'play-token-xyz',
-      })
-    );
+    await waitFor(() => expect(syncMutate).toHaveBeenCalled());
 
     expect(
       await screen.findByTestId('upgrade-sheet-success')

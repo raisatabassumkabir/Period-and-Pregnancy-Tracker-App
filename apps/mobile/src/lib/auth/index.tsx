@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { getBillingClient } from '../billing';
 import { resetTelemetryUser } from '../telemetry';
 import { createSelectors } from '../utils';
 import type { TokenType } from './utils';
@@ -27,6 +28,9 @@ const _useAuth = create<AuthState>((set, get) => ({
       // Ignore storage errors, still set the state
     });
     resetTelemetryUser();
+    getBillingClient()
+      .resetUser()
+      .catch(() => {});
     set({ status: 'signOut', token: null });
   },
   hydrate: () => {

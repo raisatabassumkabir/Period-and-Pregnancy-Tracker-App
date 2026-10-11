@@ -52,6 +52,7 @@ jest.mock('expo-constants', () => {
           PRIVACY_POLICY_URL: 'https://example.com/privacy',
           TERMS_URL: 'https://example.com/terms',
           SUPPORT_EMAIL: 'support@example.com',
+          REVENUECAT_ANDROID_API_KEY: 'goog_test_key_123',
         },
       },
     },
@@ -112,3 +113,90 @@ jest.mock('@amplitude/plugin-session-replay-react-native', () => ({
 global.window = {};
 // @ts-ignore
 global.window = global;
+
+// RevenueCat purchases mock
+jest.mock('react-native-purchases', () => {
+  const mockPkg = {
+    identifier: '$rc_monthly',
+    packageType: 'MONTHLY',
+    product: {
+      identifier: 'premium_monthly',
+      description: 'Full monthly access',
+      title: 'Premium Monthly',
+      price: 4.99,
+      priceString: '$4.99',
+      currencyCode: 'USD',
+      subscriptionPeriod: 'P1M',
+    },
+    offeringIdentifier: 'default',
+  };
+
+  return {
+    __esModule: true,
+    default: {
+      isConfigured: jest.fn(async () => true),
+      configure: jest.fn(),
+      logIn: jest.fn(async () => ({ customerInfo: {}, created: false })),
+      logOut: jest.fn(async () => ({})),
+      isAnonymous: jest.fn(async () => false),
+      getOfferings: jest.fn(async () => ({
+        all: {
+          default: {
+            identifier: 'default',
+            serverDescription: 'Default offering',
+            availablePackages: [mockPkg],
+            monthly: mockPkg,
+            annual: null,
+          },
+        },
+        current: {
+          identifier: 'default',
+          serverDescription: 'Default offering',
+          availablePackages: [mockPkg],
+          monthly: mockPkg,
+          annual: null,
+        },
+      })),
+      getCustomerInfo: jest.fn(async () => ({
+        entitlements: { active: {} },
+      })),
+      purchasePackage: jest.fn(async (pkg: any) => ({
+        productIdentifier: pkg?.product?.identifier ?? 'premium_monthly',
+        customerInfo: {
+          entitlements: {
+            active: {
+              premium: {
+                identifier: 'premium',
+                productIdentifier:
+                  pkg?.product?.identifier ?? 'premium_monthly',
+                isActive: true,
+              },
+            },
+          },
+        },
+      })),
+      restorePurchases: jest.fn(async () => ({
+        entitlements: { active: {} },
+      })),
+      addCustomerInfoUpdateListener: jest.fn(() => () => {}),
+      removeCustomerInfoUpdateListener: jest.fn(),
+    },
+    PURCHASES_ERROR_CODE: {
+      PURCHASE_CANCELLED_ERROR: 1,
+      STORE_PROBLEM_ERROR: 2,
+      PURCHASE_NOT_ALLOWED_ERROR: 3,
+      PAYMENT_PENDING_ERROR: 24,
+    },
+    PACKAGE_TYPE: {
+      UNKNOWN: 'UNKNOWN',
+      CUSTOM: 'CUSTOM',
+      LIFETIME: 'LIFETIME',
+      ANNUAL: 'ANNUAL',
+      SIX_MONTH: 'SIX_MONTH',
+      THREE_MONTH: 'THREE_MONTH',
+      TWO_MONTH: 'TWO_MONTH',
+      MONTHLY: 'MONTHLY',
+      WEEKLY: 'WEEKLY',
+    },
+  };
+});

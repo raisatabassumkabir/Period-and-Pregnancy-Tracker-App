@@ -1,34 +1,50 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
+import type { PurchasesPackage } from 'react-native-purchases';
 
-import type { VerifyPurchaseResponse } from '@/api/billing/types';
-import { useVerifyPurchase } from '@/api/billing/use-verify-purchase';
+import type { SubscriptionStatusResponse } from '@/api/billing/types';
+import { useSubscriptionSync } from '@/api/billing/use-subscription-sync';
 
 import { DEFAULT_PRODUCT_ID, getBillingClient } from './index';
-import { BillingNotConfiguredError, PurchaseCancelledError } from './types';
+import {
+  BackendSyncPendingError,
+  BillingNotConfiguredError,
+  NoActiveSubscriptionError,
+  PurchaseCancelledError,
+} from './types';
 
 export type PurchaseStatus =
   | 'idle'
   | 'opening'
   | 'verifying'
   | 'acknowledging'
+  | 'pending_sync'
   | 'success'
   | 'error';
 
 export interface UsePurchasePremiumResult {
   status: PurchaseStatus;
   error: Error | null;
-  result: VerifyPurchaseResponse | null;
-  buy: (productId?: string) => Promise<VerifyPurchaseResponse | null>;
+  result: SubscriptionStatusResponse | null;
+  buy: (
+    packageOrProductId?: PurchasesPackage | string
+  ) => Promise<SubscriptionStatusResponse | null>;
+  restore: () => Promise<SubscriptionStatusResponse | null>;
+  retrySync: () => Promise<SubscriptionStatusResponse | null>;
   reset: () => void;
 }
 
+const toPurchaseExecutionError = (e: unknown): Error | null => {
+  if (e instanceof PurchaseCancelledError) return null;
+  return e instanceof Error ? e : new Error(String(e));
+};
+
 export function usePurchasePremium(): UsePurchasePremiumResult {
-  const verify = useVerifyPurchase();
+  const sync = useSubscriptionSync();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<PurchaseStatus>('idle');
   const [error, setError] = useState<Error | null>(null);
-  const [result, setResult] = useState<VerifyPurchaseResponse | null>(null);
+  const [result, setResult] = useState<SubscriptionStatusResponse | null>(null);
 
   const reset = useCallback(() => {
     setStatus('idle');
@@ -36,50 +52,78 @@ export function usePurchasePremium(): UsePurchasePremiumResult {
     setResult(null);
   }, []);
 
+  const syncBackend = useCallback(async () => {
+    setStatus('verifying');
+    try {
+      const verified = await sync.mutateAsync();
+      await queryClient.invalidateQueries({
+        queryKey: ['payments', 'subscription-status'],
+      });
+      await queryClient.invalidateQueries({ queryKey: ['me'] });
+      setStatus('success');
+      setResult(verified);
+      return verified;
+    } catch {
+      const pendingError = new BackendSyncPendingError();
+      setError(pendingError);
+      setStatus('pending_sync');
+      return null;
+    }
+  }, [queryClient, sync]);
+
   const buy = useCallback(
-    async (productId: string = DEFAULT_PRODUCT_ID) => {
+    async (
+      packageOrProductId: PurchasesPackage | string = DEFAULT_PRODUCT_ID
+    ) => {
       const billing = getBillingClient();
       setError(null);
       setResult(null);
       try {
-        if (!billing.isAvailable()) {
-          throw new BillingNotConfiguredError();
-        }
+        if (!billing.isAvailable()) throw new BillingNotConfiguredError();
         setStatus('opening');
         await billing.initialize();
-        const purchase = await billing.requestSubscription(productId);
-
-        setStatus('verifying');
-        const verified = await verify.mutateAsync({
-          subscription_id: purchase.productId,
-          purchase_token: purchase.purchaseToken,
-        });
-
-        setStatus('acknowledging');
-        await billing.acknowledgePurchase(purchase.purchaseToken);
-
-        await queryClient.invalidateQueries({
-          queryKey: ['payments', 'subscription-status'],
-        });
-        await queryClient.invalidateQueries({ queryKey: ['me'] });
-
-        setStatus('success');
-        setResult(verified);
-        return verified;
+        if (typeof packageOrProductId === 'string') {
+          await billing.requestSubscription(packageOrProductId);
+        } else {
+          await billing.purchasePackage(packageOrProductId);
+        }
+        return await syncBackend();
       } catch (e) {
-        // Dismissing the Play dialog is a user choice, not a failure to surface.
-        if (e instanceof PurchaseCancelledError) {
+        const err = toPurchaseExecutionError(e);
+        if (!err) {
           setStatus('idle');
           return null;
         }
-        const err = e instanceof Error ? e : new Error(String(e));
         setError(err);
         setStatus('error');
         return null;
       }
     },
-    [queryClient, verify]
+    [syncBackend]
   );
 
-  return { status, error, result, buy, reset };
+  const restore = useCallback(async () => {
+    const billing = getBillingClient();
+    setError(null);
+    setResult(null);
+    try {
+      if (!billing.isAvailable()) throw new BillingNotConfiguredError();
+      setStatus('opening');
+      await billing.initialize();
+      const purchases = await billing.restorePurchases();
+      if (purchases.length === 0) throw new NoActiveSubscriptionError();
+      return await syncBackend();
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+      return null;
+    }
+  }, [syncBackend]);
+
+  const retrySync = useCallback(async () => {
+    setError(null);
+    return syncBackend();
+  }, [syncBackend]);
+
+  return { status, error, result, buy, restore, retrySync, reset };
 }

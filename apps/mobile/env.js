@@ -56,6 +56,8 @@ const client = z.object({
   PRIVACY_POLICY_URL: z.string().url(),
   TERMS_URL: z.string().url(),
   SUPPORT_EMAIL: z.string().email(),
+  // Public RevenueCat Android SDK key (e.g. goog_...). Empty disables purchases gracefully.
+  REVENUECAT_ANDROID_API_KEY: z.string().default(''),
 });
 
 const buildTime = z.object({
@@ -81,6 +83,10 @@ const _clientEnv = {
   PRIVACY_POLICY_URL: process.env.PRIVACY_POLICY_URL,
   TERMS_URL: process.env.TERMS_URL,
   SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
+  REVENUECAT_ANDROID_API_KEY:
+    process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY ??
+    process.env.REVENUECAT_ANDROID_API_KEY ??
+    '',
 };
 
 /**
@@ -97,14 +103,16 @@ const _env = {
   ..._buildTimeEnv,
 };
 
-const merged = buildTime.merge(client).refine(
-  (env) => env.APP_ENV !== 'production' || env.API_URL.startsWith('https://'),
-  {
-    path: ['API_URL'],
-    message:
-      'Production builds block cleartext traffic; API_URL must use https://',
-  }
-);
+const merged = buildTime
+  .merge(client)
+  .refine(
+    (env) => env.APP_ENV !== 'production' || env.API_URL.startsWith('https://'),
+    {
+      path: ['API_URL'],
+      message:
+        'Production builds block cleartext traffic; API_URL must use https://',
+    }
+  );
 const parsed = merged.safeParse(_env);
 
 if (parsed.success === false) {

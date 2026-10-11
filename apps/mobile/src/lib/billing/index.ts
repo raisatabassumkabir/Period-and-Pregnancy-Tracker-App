@@ -4,12 +4,15 @@ import {
   TARGET_PRICING_USD,
 } from '@repo/api-contract';
 
+import { createRevenueCatBillingClient } from './revenuecat-client';
 import {
+  BackendSyncPendingError,
   type BillingClient,
   BillingError,
   BillingNotConfiguredError,
   type BillingProduct,
   type BillingPurchase,
+  NoActiveSubscriptionError,
   PurchaseCancelledError,
   PurchasePendingError,
 } from './types';
@@ -27,10 +30,19 @@ export { CANONICAL_ENTITLEMENT_ID, CANONICAL_PRODUCT_IDS, TARGET_PRICING_USD };
 const stubClient: BillingClient = {
   isAvailable: () => false,
   initialize: async () => {},
+  identifyUser: async () => {},
+  resetUser: async () => {},
   getProducts: async () => [],
+  getOfferings: async () => null,
   requestSubscription: async () => {
     throw new BillingNotConfiguredError();
   },
+  purchasePackage: async () => {
+    throw new BillingNotConfiguredError();
+  },
+  restorePurchases: async () => [],
+  getCustomerInfo: async () => null,
+  addCustomerInfoUpdateListener: () => () => {},
   acknowledgePurchase: async () => {},
   getAvailablePurchases: async () => [],
   endConnection: async () => {},
@@ -46,10 +58,13 @@ export const getBillingClient = (): BillingClient => active;
 
 export const isBillingAvailable = () => active.isAvailable();
 
+export { createRevenueCatBillingClient };
 export type { BillingClient, BillingProduct, BillingPurchase };
 export {
+  BackendSyncPendingError,
   BillingError,
   BillingNotConfiguredError,
+  NoActiveSubscriptionError,
   PurchaseCancelledError,
   PurchasePendingError,
 };

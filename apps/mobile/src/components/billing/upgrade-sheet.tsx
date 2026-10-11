@@ -19,6 +19,7 @@ import Animated, {
 
 import type { UpgradeRequiredDetail } from '@/api/billing/types';
 import { colors as legacyColors, Modal, Text } from '@/components/ui';
+import { useOfferings } from '@/lib/billing/use-offerings';
 import { usePurchasePremium } from '@/lib/billing/use-purchase-premium';
 import { usePaletteColors } from '@/lib/theme';
 import { useUpgrade } from '@/lib/upgrade';
@@ -250,6 +251,100 @@ const ErrorBanner = ({ message }: ErrorBannerProps) => {
  * Mounted once in the root layout. Observes the upgrade store, which the axios
  * 402 interceptor and explicit "Go premium" buttons feed.
  */
+interface UpgradeSheetBodyProps {
+  purchase: ReturnType<typeof usePurchasePremium>;
+  monthlyPackage: ReturnType<typeof useOfferings>['monthlyPackage'];
+  detail: ReturnType<typeof useUpgrade.use.detail>;
+  title: string;
+  isLoading: boolean;
+  onClose: () => void;
+  onBuy: () => void;
+  onRestore: () => void;
+}
+
+const UpgradeSheetBody = ({
+  purchase,
+  monthlyPackage,
+  detail,
+  title,
+  isLoading,
+  onClose,
+  onBuy,
+  onRestore,
+}: UpgradeSheetBodyProps) => {
+  if (purchase.status === 'success' && purchase.result?.is_premium) {
+    return <SuccessState onClose={onClose} />;
+  }
+
+  const ctaLabel = monthlyPackage?.product.priceString
+    ? `Upgrade to Premium (${monthlyPackage.product.priceString}/month)`
+    : 'Upgrade to Premium';
+
+  return (
+    <>
+      <SparkleIcon />
+      <Text
+        testID="upgrade-sheet-title"
+        className="text-center font-heading text-[26px] text-ink"
+      >
+        {title}
+      </Text>
+      {!!detail?.message && (
+        <Text
+          testID="upgrade-sheet-message"
+          className="mt-2 text-center text-[15px] text-tone-700"
+        >
+          {detail.message}
+        </Text>
+      )}
+
+      <View className="mt-5">
+        {FEATURE_HIGHLIGHTS.map((f, idx) => (
+          <FeatureRow key={f.label} label={f.label} delay={120 + idx * 80} />
+        ))}
+      </View>
+
+      {purchase.status === 'pending_sync' ? (
+        <CtaButton
+          testID="upgrade-sheet-retry-cta"
+          loading={isLoading}
+          disabled={isLoading}
+          onPress={() => purchase.retrySync()}
+          label="Retry Verification"
+        />
+      ) : (
+        <CtaButton
+          testID="upgrade-sheet-cta"
+          loading={isLoading}
+          disabled={isLoading}
+          onPress={onBuy}
+          label={ctaLabel}
+        />
+      )}
+
+      <Pressable
+        testID="upgrade-sheet-restore"
+        accessibilityRole="button"
+        accessibilityLabel="Restore purchases"
+        disabled={isLoading}
+        onPress={onRestore}
+        className="mt-3 items-center self-center py-1"
+      >
+        <Text className="font-body-bold text-xs text-tone-700 underline">
+          Restore purchases
+        </Text>
+      </Pressable>
+
+      {(purchase.status === 'error' || purchase.status === 'pending_sync') &&
+        purchase.error && <ErrorBanner message={purchase.error.message} />}
+
+      <Text className="mt-3 text-center text-xs text-tone-600">
+        Billed via Google Play. Cancel anytime in Play settings.
+      </Text>
+    </>
+  );
+};
+
 export const UpgradeSheet = () => {
   const ref = useRef<BottomSheetModal>(null);
   const visible = useUpgrade.use.visible();
@@ -257,6 +352,7 @@ export const UpgradeSheet = () => {
   const hide = useUpgrade.use.hide();
   const colors = usePaletteColors();
   const purchase = usePurchasePremium();
+  const { monthlyPackage } = useOfferings();
 
   const snapPoints = useMemo(() => ['72%'], []);
   const title = getTitle(detail);
@@ -269,7 +365,6 @@ export const UpgradeSheet = () => {
     }
   }, [visible]);
 
-  // When the sheet is dismissed by the user (drag/backdrop), sync store
   const handleDismiss = () => {
     if (visible) hide();
     if (purchase.status === 'success') {
@@ -283,8 +378,11 @@ export const UpgradeSheet = () => {
   };
 
   const handleBuy = async () => {
-    // Success leaves the success state visible; the user taps "Done" to close.
-    await purchase.buy();
+    await purchase.buy(monthlyPackage ?? undefined);
+  };
+
+  const handleRestore = async () => {
+    await purchase.restore();
   };
 
   const isLoading =
@@ -300,53 +398,16 @@ export const UpgradeSheet = () => {
       backgroundStyle={{ backgroundColor: colors.canvas }}
     >
       <View className="px-6 pb-6" testID="upgrade-sheet">
-        {purchase.status === 'success' && purchase.result?.is_premium ? (
-          <SuccessState onClose={handleClose} />
-        ) : (
-          <>
-            <SparkleIcon />
-            <Text
-              testID="upgrade-sheet-title"
-              className="text-center font-heading text-[26px] text-ink"
-            >
-              {title}
-            </Text>
-            {!!detail?.message && (
-              <Text
-                testID="upgrade-sheet-message"
-                className="mt-2 text-center text-[15px] text-tone-700"
-              >
-                {detail.message}
-              </Text>
-            )}
-
-            <View className="mt-5">
-              {FEATURE_HIGHLIGHTS.map((f, idx) => (
-                <FeatureRow
-                  key={f.label}
-                  label={f.label}
-                  delay={120 + idx * 80}
-                />
-              ))}
-            </View>
-
-            <CtaButton
-              testID="upgrade-sheet-cta"
-              loading={isLoading}
-              disabled={isLoading}
-              onPress={handleBuy}
-              label="Upgrade to Premium"
-            />
-
-            {purchase.status === 'error' && purchase.error && (
-              <ErrorBanner message={purchase.error.message} />
-            )}
-
-            <Text className="mt-3 text-center text-xs text-tone-600">
-              Billed via Google Play. Cancel anytime in Play settings.
-            </Text>
-          </>
-        )}
+        <UpgradeSheetBody
+          purchase={purchase}
+          monthlyPackage={monthlyPackage}
+          detail={detail}
+          title={title}
+          isLoading={isLoading}
+          onClose={handleClose}
+          onBuy={handleBuy}
+          onRestore={handleRestore}
+        />
       </View>
     </Modal>
   );

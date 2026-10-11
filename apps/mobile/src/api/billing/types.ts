@@ -4,10 +4,20 @@
  * title to `FEATURE_TITLES` in `src/components/billing/upgrade-sheet.tsx`.
  */
 export type {
+  CanonicalEntitlementId,
+  CanonicalProductId,
   PaymentRequiredProblem,
   PremiumFeature,
+  SubscriptionStatus,
+  SubscriptionStatusResponse,
+  SubscriptionStore,
   UpgradeRequiredDetail,
-  VerifyPurchaseRequest,
-  VerifyPurchaseResponse,
 } from '@repo/api-contract';
-export { isPaymentRequiredProblem, toUpgradeDetail } from '@repo/api-contract';
+export {
+  CANONICAL_ENTITLEMENT_ID,
+  CANONICAL_PRODUCT_IDS,
+  isPaymentRequiredProblem,
+  resolveCanonicalProductId,
+  TARGET_PRICING_USD,
+  toUpgradeDetail,
+} from '@repo/api-contract';

@@ -31,6 +31,7 @@ import {
   usePaletteTokens,
   useSelectedTheme,
 } from '@/lib';
+import { useBillingIdentity } from '@/lib/billing/use-billing-identity';
 import { registerNativeIntegrations } from '@/lib/bootstrap';
 import { useThemeConfig } from '@/lib/use-theme-config';
 
@@ -124,6 +125,11 @@ export default function RootLayout() {
   );
 }
 
+function BillingLifecycleSync() {
+  useBillingIdentity();
+  return null;
+}
+
 function Providers({ children }: { children: React.ReactNode }) {
   const theme = useThemeConfig();
   const paletteTokens = usePaletteTokens();
@@ -145,6 +151,7 @@ function Providers({ children }: { children: React.ReactNode }) {
             <KeyboardProvider>
               <ThemeProvider value={theme}>
                 <APIProvider>
+                  <BillingLifecycleSync />
                   <BottomSheetModalProvider>
                     {children}
                     <UpgradeSheet />
