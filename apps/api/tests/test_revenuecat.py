@@ -5,6 +5,7 @@ from urllib.error import HTTPError, URLError
 
 import pytest
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -138,6 +139,27 @@ class TestRevenueCatWebhookSecurity:
         assert event.event_type == "INITIAL_PURCHASE"
         assert event.app_user_id == str(user_a.id)
         mock_delay.assert_called_once_with(event_id="evt_valid_123")
+
+    @patch("apps.payments.views.process_revenuecat_event.delay")
+    @override_settings(
+        REVENUECAT_WEBHOOK_AUTHORIZATION="",
+        REVENUECAT_WEBHOOK_SECRET="legacy_secret_999",
+    )
+    def test_legacy_webhook_secret_fallback_accepted(self, mock_delay, user_a):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION="Bearer legacy_secret_999")
+        payload = {
+            "event": {
+                "id": "evt_legacy_secret_1",
+                "type": "INITIAL_PURCHASE",
+                "app_user_id": str(user_a.id),
+                "product_id": PRODUCT_PREMIUM_MONTHLY,
+            }
+        }
+        response = client.post(self.url, payload, format="json")
+        assert response.status_code == 200
+        assert response.json()["status"] == "accepted"
+        assert response.json()["event_id"] == "evt_legacy_secret_1"
 
     def test_malformed_json_payload(self):
         client = APIClient()

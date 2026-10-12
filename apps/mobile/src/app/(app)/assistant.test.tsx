@@ -62,9 +62,13 @@ afterEach(() => {
 });
 
 describe('Assistant', () => {
-  it('renders the screen with a welcome message', () => {
+  it('renders the screen with a welcome message and clinical disclaimer banner', () => {
     setup(<Assistant />);
     expect(screen.getByTestId('assistant-screen')).toBeOnTheScreen();
+    expect(screen.getByTestId('assistant-disclaimer-banner')).toBeOnTheScreen();
+    expect(
+      screen.getByText(/Not a substitute for professional medical care/i)
+    ).toBeOnTheScreen();
     expect(screen.getByText(/Ask about your next period/i)).toBeOnTheScreen();
   });
 

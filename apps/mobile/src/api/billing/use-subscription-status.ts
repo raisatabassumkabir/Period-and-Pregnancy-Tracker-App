@@ -4,7 +4,8 @@ import { createQuery } from 'react-query-kit';
 import { useAuth } from '@/lib/auth';
 
 import { client } from '../common';
-import type { ProblemDetail, SubscriptionStatusResponse } from '../types';
+import type { ProblemDetail } from '../types';
+import type { SubscriptionStatusResponse } from './types';
 
 const _usePaymentSubscriptionStatus = createQuery<
   SubscriptionStatusResponse,

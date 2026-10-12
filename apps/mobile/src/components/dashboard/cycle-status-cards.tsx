@@ -1,9 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import colors from '@/components/ui/colors';
 import type { CycleInsights, PregnancyChance } from '@/lib/health';
-import { formatCalendarDate } from '@/lib/health';
+import {
+  CONTRACEPTION_SAFETY_DISCLAIMER,
+  formatCalendarDate,
+} from '@/lib/health';
 
 import { StatusCard } from './status-card';
 
@@ -47,20 +50,28 @@ export function CycleStatusCards({
       : `Estimated for ${formatCalendarDate(chanceDate)}`;
 
   return (
-    <View className="flex-row gap-3" testID="cycle-status-cards">
-      <StatusCard
-        label="Chances of pregnancy"
-        value={CHANCE_LABELS[chance]}
-        caption={chanceCaption}
-        indicatorColor={CHANCE_COLORS[chance]}
-        testID="pregnancy-chance-card"
-      />
-      <StatusCard
-        label="Next period"
-        value={formatCalendarDate(insights.nextPeriodDate)}
-        caption={describeNextPeriod(insights.daysUntilNextPeriod)}
-        testID="next-period-card"
-      />
+    <View testID="cycle-status-cards">
+      <View className="flex-row gap-3">
+        <StatusCard
+          label="Chances of pregnancy"
+          value={CHANCE_LABELS[chance]}
+          caption={chanceCaption}
+          indicatorColor={CHANCE_COLORS[chance]}
+          testID="pregnancy-chance-card"
+        />
+        <StatusCard
+          label="Next period"
+          value={formatCalendarDate(insights.nextPeriodDate)}
+          caption={describeNextPeriod(insights.daysUntilNextPeriod)}
+          testID="next-period-card"
+        />
+      </View>
+      <Text
+        className="mt-2 text-center font-body text-[11px] text-[#8C8C8C]"
+        testID="contraception-safety-disclaimer"
+      >
+        {CONTRACEPTION_SAFETY_DISCLAIMER}
+      </Text>
     </View>
   );
 }

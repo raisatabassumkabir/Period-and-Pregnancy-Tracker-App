@@ -37,8 +37,6 @@ export type {
   RegisterRequest,
   RegisterResponse,
   ResetPasswordRequest,
-  SubscriptionStatus,
-  SubscriptionStatusResponse,
   Symptom,
   TokenPairResponse,
   UserResponse,

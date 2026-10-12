@@ -15,6 +15,14 @@ export type CyclePhase = 'period' | 'fertile' | 'ovulation' | 'none';
 
 export type PregnancyChance = 'low' | 'medium' | 'high';
 
+/**
+ * Clinical safety notice:
+ * Calendar-based fertile window projections are statistical estimates and
+ * must NEVER be used as a method of contraception or family planning.
+ */
+export const CONTRACEPTION_SAFETY_DISCLAIMER =
+  'Calendar projections are mathematical estimates and must not be used as contraception.';
+
 /** Ovulation is assumed a fixed luteal-phase length before the next period. */
 const LUTEAL_PHASE_DAYS = 14;
 /** Sperm survive ~5 days; the egg ~1 day — the classic six-day window. */

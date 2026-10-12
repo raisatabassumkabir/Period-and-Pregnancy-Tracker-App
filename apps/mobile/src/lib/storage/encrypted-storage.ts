@@ -2,10 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
 /**
- * Encrypted Health Data Storage Client (Zero-Knowledge Privacy Standard)
+ * Encrypted Health Data Storage Client (Privacy-Focused Local Storage)
  *
  * Sensitive local health data (conception dates, symptom logs, cycle markers, period dates)
- * is encrypted at rest before storing locally using hardware-backed SecureStore key storage.
+ * is protected at rest before storing locally using hardware-backed SecureStore key storage.
  */
 const ENCRYPTION_KEY_ALIAS = 'health_data_encryption_key_v1';
 const HEALTH_DATA_PREFIX = '@encrypted_health_data/';
@@ -14,7 +14,7 @@ const HEALTH_DATA_PREFIX = '@encrypted_health_data/';
 let cachedEncryptionKey: string | null = null;
 
 /**
- * Retrieve or generate an AES-256 equivalent encryption key backed by native hardware secure storage.
+ * Retrieve or generate an encryption key backed by native hardware secure storage.
  */
 async function getOrCreateEncryptionKey(): Promise<string> {
   if (cachedEncryptionKey) {
@@ -23,7 +23,7 @@ async function getOrCreateEncryptionKey(): Promise<string> {
 
   let key = await SecureStore.getItemAsync(ENCRYPTION_KEY_ALIAS);
   if (!key) {
-    // Generate a secure random 256-bit hexadecimal key string
+    // Generate a 256-bit hexadecimal key string
     const randomArray = new Uint8Array(32);
     for (let i = 0; i < 32; i++) {
       randomArray[i] = Math.floor(Math.random() * 256);
@@ -42,7 +42,13 @@ async function getOrCreateEncryptionKey(): Promise<string> {
 }
 
 /**
- * Simple obfuscation / XOR cipher stream simulation using hardware key for zero-knowledge storage at rest.
+ * Local obfuscation / XOR cipher stream using hardware-backed key for storage at rest.
+ *
+ * AUDIT NOTE (Command 6):
+ * The current XOR cipher and Math.random() key generation provides device-level obfuscation
+ * but does NOT constitute Zero-Knowledge or authenticated encryption (AEAD).
+ * Preserved for backward compatibility to prevent rendering existing user data unreadable.
+ * A tested, non-breaking migration to AES-256-GCM (e.g. via react-native-quick-crypto) is planned.
  */
 function cipherTransform(text: string, key: string): string {
   let result = '';
@@ -106,7 +112,7 @@ export const EncryptedHealthStorage = {
   },
 
   /**
-   * Wipe all local encrypted health data instantly (Zero-Knowledge Panic Purge).
+   * Wipe all local encrypted health data instantly (Local Health Data Purge).
    */
   async purgeAllHealthData(): Promise<void> {
     const keys = await AsyncStorage.getAllKeys();

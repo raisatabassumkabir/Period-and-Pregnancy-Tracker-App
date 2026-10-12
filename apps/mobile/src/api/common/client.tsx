@@ -7,7 +7,7 @@ import { isPaymentRequiredProblem, toUpgradeDetail } from '@/api/billing/types';
 import { signIn, signOut, useAuth } from '@/lib/auth';
 import { isDemoToken } from '@/lib/auth/demo-users';
 import type { TokenType } from '@/lib/auth/utils';
-import { showUpgrade } from '@/lib/upgrade';
+import { getUpgradeState, showUpgrade } from '@/lib/upgrade';
 
 import { queryClient } from './api-provider';
 
@@ -154,15 +154,16 @@ client.interceptors.response.use(
 
     // ── 402: paywall ──────────────────────────────────────────────────
     if (status === 402) {
+      const isSyncRequest = originalRequest?.url?.includes(
+        'payments/subscription-sync/'
+      );
       const body = error.response?.data;
-      if (isPaymentRequiredProblem(body)) {
-        showUpgrade(toUpgradeDetail(body));
-      } else {
-        showUpgrade({
-          message: 'Upgrade to Premium to unlock this feature.',
-          feature: 'premium',
-        });
+      if (!isSyncRequest && isPaymentRequiredProblem(body)) {
+        if (!getUpgradeState().visible) {
+          showUpgrade(toUpgradeDetail(body));
+        }
       }
+      return Promise.reject(error);
     }
 
     // ── Catch-all 401: Unhandled or failed refresh ────────────────────

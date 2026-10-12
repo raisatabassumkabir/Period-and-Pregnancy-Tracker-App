@@ -350,7 +350,7 @@ function CycleSection({
                 {medicalInsight.title}
               </Text>
               <Text className="font-body text-xs text-[#8C8C8C]">
-                Personalized medical guidance
+                Educational health notice
               </Text>
             </View>
           </View>

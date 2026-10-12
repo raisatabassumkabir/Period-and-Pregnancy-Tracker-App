@@ -29,6 +29,8 @@ jest.mock('react-native-purchases', () => {
       restorePurchases: jest.fn(),
       addCustomerInfoUpdateListener: jest.fn(),
       removeCustomerInfoUpdateListener: jest.fn(),
+      setAttributes: jest.fn(),
+      setEmail: jest.fn(),
     },
     PURCHASES_ERROR_CODE: {
       PURCHASE_CANCELLED_ERROR: 1,
@@ -322,6 +324,22 @@ describe('createRevenueCatBillingClient', () => {
       expect(
         mockPurchases.removeCustomerInfoUpdateListener
       ).toHaveBeenCalledWith(listener);
+    });
+  });
+
+  describe('health data privacy and attribute isolation', () => {
+    it('never sends health data or customer attributes to RevenueCat', async () => {
+      mockPurchases.isConfigured.mockResolvedValue(false);
+      const client = createRevenueCatBillingClient({ apiKey: TEST_API_KEY });
+      await client.initialize(USER_ID);
+      await client.identifyUser(USER_ID);
+
+      expect(mockPurchases.configure).toHaveBeenCalledWith({
+        apiKey: TEST_API_KEY,
+        appUserID: USER_ID,
+      });
+      expect(mockPurchases.setAttributes).not.toHaveBeenCalled();
+      expect(mockPurchases.setEmail).not.toHaveBeenCalled();
     });
   });
 });

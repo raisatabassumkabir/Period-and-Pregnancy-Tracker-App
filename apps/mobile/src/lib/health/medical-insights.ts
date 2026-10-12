@@ -14,7 +14,7 @@ export interface MedicalInsightResult {
 export const LATE_PERIOD_THRESHOLD_DAYS = 7;
 
 export const PCOS_LATE_PERIOD_MESSAGE =
-  'Your period is late. Given your logged health profile, cycle irregularities are common. Medical guidelines suggest consulting your doctor if you miss 3 or more consecutive periods.';
+  'Your period appears later than your typical baseline. For individuals with recorded cycle variations such as PCOS or endometriosis, irregular timing is common. This informational notice is not a medical diagnosis. Consult a qualified healthcare professional if your cycle is unexpectedly delayed or you miss consecutive periods.';
 
 /**
  * Checks if the user's recorded health profile contains PCOS or Endometriosis.

@@ -13,7 +13,13 @@ import {
   SuggestionChips,
   TypingIndicator,
 } from '@/components/assistant';
-import { FocusAwareStatusBar, Pill, SafeAreaView, View } from '@/components/ui';
+import {
+  FocusAwareStatusBar,
+  Pill,
+  SafeAreaView,
+  Text,
+  View,
+} from '@/components/ui';
 import { AppHeader } from '@/components/ui/app-header';
 import type { ChatMessage } from '@/lib/assistant/use-chat';
 import { useChat } from '@/lib/assistant/use-chat';
@@ -58,6 +64,15 @@ export default function Assistant() {
           <AppHeader title="Assistant" />
           <View className="mt-2 flex-row gap-2">
             <Pill label="AI Health Guide" tone="accent2-soft" />
+          </View>
+          <View
+            testID="assistant-disclaimer-banner"
+            className="mt-2.5 rounded-[14px] border border-[#F0E5E1] bg-[#FCF8F5] p-2.5"
+          >
+            <Text className="font-body text-[11px] leading-4 text-[#8C8C8C]">
+              Educational guide only. Not a substitute for professional medical
+              care, diagnosis, or treatment.
+            </Text>
           </View>
         </View>
       </SafeAreaView>

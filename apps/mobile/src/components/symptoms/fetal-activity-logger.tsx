@@ -1,4 +1,11 @@
-import { Check, Clock, Footprints, Plus, RotateCcw } from 'lucide-react-native';
+import {
+  AlertTriangle,
+  Check,
+  Clock,
+  Footprints,
+  Plus,
+  RotateCcw,
+} from 'lucide-react-native';
 import React, { useRef } from 'react';
 import {
   Animated,
@@ -125,6 +132,24 @@ export const FetalActivityLogger: React.FC = () => {
           ))}
         </View>
       )}
+
+      {/* Clinical Safety Warning */}
+      <View
+        style={styles.clinicalNoticeCard}
+        testID="fetal-clinical-safety-notice"
+      >
+        <AlertTriangle
+          size={14}
+          color="#FFB020"
+          style={{ marginRight: 6, marginTop: 1 }}
+        />
+        <Text style={styles.clinicalNoticeText}>
+          Safety notice: If you perceive a decrease or cessation in your
+          baby&apos;s movements, contact your maternity triage, midwife, or
+          doctor immediately. Kick counting does not replace clinical
+          evaluation.
+        </Text>
+      </View>
     </View>
   );
 };
@@ -288,6 +313,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#A3E6C8',
+  },
+  clinicalNoticeCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#FFB02018',
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#FFB02033',
+  },
+  clinicalNoticeText: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 16,
+    color: '#FFB020',
+    fontWeight: '500',
   },
 });
 

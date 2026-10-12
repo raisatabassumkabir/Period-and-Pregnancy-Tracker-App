@@ -4,6 +4,7 @@ import { AppState, type AppStateStatus } from 'react-native';
 
 import { useMe } from '@/api/auth';
 import { useAuth } from '@/lib/auth';
+import { hideUpgrade } from '@/lib/upgrade';
 
 import { getBillingClient } from './index';
 
@@ -26,16 +27,31 @@ export function useBillingIdentity(): void {
 
     if (token && user?.id) {
       if (lastIdentifiedId.current !== user.id) {
+        if (lastIdentifiedId.current !== null) {
+          queryClient.removeQueries({ queryKey: ['payments'] });
+          queryClient.removeQueries({ queryKey: ['me'] });
+          hideUpgrade();
+        }
         lastIdentifiedId.current = user.id;
-        billing.identifyUser(user.id).catch(() => {});
+        billing
+          .identifyUser(user.id)
+          .then(() => {
+            queryClient.invalidateQueries({
+              queryKey: ['payments', 'subscription-status'],
+            });
+          })
+          .catch(() => {});
       }
     } else if (!token || status === 'signOut') {
       if (lastIdentifiedId.current !== null) {
         lastIdentifiedId.current = null;
+        queryClient.removeQueries({ queryKey: ['payments'] });
+        queryClient.removeQueries({ queryKey: ['me'] });
+        hideUpgrade();
         billing.resetUser().catch(() => {});
       }
     }
-  }, [token, status, user?.id]);
+  }, [token, status, user?.id, queryClient]);
 
   useEffect(() => {
     const billing = getBillingClient();

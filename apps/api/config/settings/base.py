@@ -171,7 +171,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 # RevenueCat subscription management & webhook integration
 REVENUECAT_SECRET_API_KEY = os.environ.get("REVENUECAT_SECRET_API_KEY", "")
-REVENUECAT_WEBHOOK_AUTHORIZATION = os.environ.get("REVENUECAT_WEBHOOK_AUTHORIZATION", "")
+# Canonical authorization secret, with fallback to legacy REVENUECAT_WEBHOOK_SECRET
+REVENUECAT_WEBHOOK_AUTHORIZATION = (
+    os.environ.get("REVENUECAT_WEBHOOK_AUTHORIZATION")
+    or os.environ.get("REVENUECAT_WEBHOOK_SECRET", "")
+)
 REVENUECAT_API_BASE_URL = os.environ.get(
     "REVENUECAT_API_BASE_URL", "https://api.revenuecat.com/v1"
 )

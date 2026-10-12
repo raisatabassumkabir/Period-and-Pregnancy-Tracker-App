@@ -1,4 +1,4 @@
-import { Flame, Sparkles, Utensils } from 'lucide-react-native';
+import { Flame, Info, Sparkles, Utensils } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -111,6 +111,20 @@ export default function NutritionScreen() {
       {meals.map((meal) => (
         <MealItem key={meal.id} meal={meal} onToggle={toggleMeal} />
       ))}
+
+      {/* Educational & Clinical Disclaimer */}
+      <View style={styles.disclaimerCard} testID="nutrition-disclaimer-card">
+        <Info
+          size={14}
+          color="#A0A0B0"
+          style={{ marginRight: 6, marginTop: 1 }}
+        />
+        <Text style={styles.disclaimerText}>
+          Nutritional suggestions are for educational purposes. Always consult
+          your obstetrician, dietitian, or healthcare provider for specific
+          dietary requirements or medical conditions during pregnancy.
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -244,5 +258,21 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontSize: 11,
     color: '#6E6E80',
+  },
+  disclaimerCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#1E1E24',
+    borderRadius: 14,
+    padding: 12,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: '#33333E',
+  },
+  disclaimerText: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 16,
+    color: '#A0A0B0',
   },
 });

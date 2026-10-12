@@ -6,8 +6,9 @@ import type {
   AssistantReply,
 } from './types';
 
-/** Every rule-based answer is general guidance, never a diagnosis. */
-const DISCLAIMER = 'General guidance, not medical advice.';
+/** Every rule-based answer is educational guidance, never clinical advice or diagnosis. */
+const DISCLAIMER =
+  'General educational guidance, not medical advice or clinical diagnosis.';
 
 /** Told apart from a real answer so demo data is never mistaken for the user's own. */
 const DEMO_SUFFIX =

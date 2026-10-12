@@ -71,9 +71,7 @@ describe('medical-insights', () => {
       });
 
       expect(result.shouldShowLatePeriodCard).toBe(true);
-      expect(result.message).toBe(
-        'Your period is late. Given your logged health profile, cycle irregularities are common. Medical guidelines suggest consulting your doctor if you miss 3 or more consecutive periods.'
-      );
+      expect(result.message).toBe(PCOS_LATE_PERIOD_MESSAGE);
     });
   });
 });

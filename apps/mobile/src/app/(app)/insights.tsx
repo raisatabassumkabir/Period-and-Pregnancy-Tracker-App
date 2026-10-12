@@ -67,15 +67,16 @@ export default function InsightsScreen() {
         </Pressable>
       </View>
 
-      {/* Zero Knowledge Security Card */}
+      {/* Privacy-Focused Security Card */}
       <View style={styles.privacyCard}>
         <View style={styles.privacyHeader}>
           <ShieldCheck size={22} color="#A3E6C8" />
-          <Text style={styles.privacyTitle}>Zero-Knowledge Encrypted</Text>
+          <Text style={styles.privacyTitle}>Privacy-Focused Security</Text>
         </View>
         <Text style={styles.privacyBody}>
-          Your sensitive reproductive health metrics are hardware-encrypted on
-          disk with SecureStore keys. No third party can read your symptom logs.
+          Your sensitive reproductive health metrics are stored locally with
+          device-backed key protection. Your personal records are protected
+          against unauthorized access.
         </Text>
 
         <Pressable style={styles.purgeButton} onPress={handlePurgeData}>

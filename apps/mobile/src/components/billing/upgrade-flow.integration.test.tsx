@@ -117,13 +117,28 @@ describe('Upgrade flow (integration)', () => {
       isAcknowledged: true,
     });
 
+    const mockPkg = {
+      identifier: '$rc_annual',
+      packageType: 'ANNUAL',
+      product: {
+        identifier: PRODUCT_ID,
+        priceString: '$29.99',
+      },
+    } as any;
+
     setBillingClient({
       isAvailable: () => true,
       initialize: async () => {},
       identifyUser: async () => {},
       resetUser: async () => {},
       getProducts: async () => [],
-      getOfferings: async () => null,
+      getOfferings: async () =>
+        ({
+          current: {
+            availablePackages: [mockPkg],
+            annual: mockPkg,
+          },
+        }) as any,
       requestSubscription,
       purchasePackage: async () => ({
         productId: PRODUCT_ID,

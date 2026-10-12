@@ -1,3 +1,4 @@
+import { CANONICAL_PRODUCT_IDS } from '@repo/api-contract';
 import { useEffect, useState } from 'react';
 import {
   PACKAGE_TYPE,
@@ -54,6 +55,8 @@ export function useOfferings(): UseOfferingsResult {
     offerings?.current?.monthly ??
     currentPackages.find(
       (p) =>
+        p.product.identifier === CANONICAL_PRODUCT_IDS.MONTHLY ||
+        p.identifier === CANONICAL_PRODUCT_IDS.MONTHLY ||
         p.packageType === PACKAGE_TYPE.MONTHLY ||
         p.product.identifier.includes('monthly') ||
         p.identifier.includes('monthly')
@@ -64,6 +67,8 @@ export function useOfferings(): UseOfferingsResult {
     offerings?.current?.annual ??
     currentPackages.find(
       (p) =>
+        p.product.identifier === CANONICAL_PRODUCT_IDS.ANNUAL ||
+        p.identifier === CANONICAL_PRODUCT_IDS.ANNUAL ||
         p.packageType === PACKAGE_TYPE.ANNUAL ||
         p.product.identifier.includes('annual') ||
         p.product.identifier.includes('yearly') ||

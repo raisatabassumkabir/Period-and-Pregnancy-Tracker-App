@@ -75,6 +75,13 @@ export function usePurchasePremium(): UsePurchasePremiumResult {
     async (
       packageOrProductId: PurchasesPackage | string = DEFAULT_PRODUCT_ID
     ) => {
+      if (
+        status === 'opening' ||
+        status === 'verifying' ||
+        status === 'acknowledging'
+      ) {
+        return null;
+      }
       const billing = getBillingClient();
       setError(null);
       setResult(null);
@@ -99,10 +106,17 @@ export function usePurchasePremium(): UsePurchasePremiumResult {
         return null;
       }
     },
-    [syncBackend]
+    [status, syncBackend]
   );
 
   const restore = useCallback(async () => {
+    if (
+      status === 'opening' ||
+      status === 'verifying' ||
+      status === 'acknowledging'
+    ) {
+      return null;
+    }
     const billing = getBillingClient();
     setError(null);
     setResult(null);
@@ -118,12 +132,15 @@ export function usePurchasePremium(): UsePurchasePremiumResult {
       setStatus('error');
       return null;
     }
-  }, [syncBackend]);
+  }, [status, syncBackend]);
 
   const retrySync = useCallback(async () => {
+    if (status === 'verifying' || status === 'opening') {
+      return null;
+    }
     setError(null);
     return syncBackend();
-  }, [syncBackend]);
+  }, [status, syncBackend]);
 
   return { status, error, result, buy, restore, retrySync, reset };
 }

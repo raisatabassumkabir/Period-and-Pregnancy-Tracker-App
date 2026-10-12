@@ -27,8 +27,9 @@ export interface ChatMessage {
 }
 
 export const WELCOME_MESSAGE =
-  "Hi! I'm your health guide. Ask about your next period, cycle day, " +
-  "pregnancy week, due date, recent symptoms, today's kicks, or what to eat.";
+  "Hi! I'm your educational health guide. Ask about your next period, cycle day, " +
+  "pregnancy week, due date, recent symptoms, today's kicks, or nutrition. " +
+  '(Educational guidance only — not clinical advice or diagnosis.)';
 
 function recentSymptomsFrom(
   logs: readonly { symptoms: readonly Symptom[] }[]

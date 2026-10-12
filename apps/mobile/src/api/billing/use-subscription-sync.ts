@@ -2,7 +2,8 @@ import type { AxiosError } from 'axios';
 import { createMutation } from 'react-query-kit';
 
 import { client } from '../common';
-import type { ProblemDetail, SubscriptionStatusResponse } from '../types';
+import type { ProblemDetail } from '../types';
+import type { SubscriptionStatusResponse } from './types';
 
 export const useSubscriptionSync = createMutation<
   SubscriptionStatusResponse,

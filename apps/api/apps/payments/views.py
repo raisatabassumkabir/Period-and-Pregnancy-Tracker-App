@@ -140,8 +140,10 @@ class RevenueCatWebhookView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        # 1. Constant-time authentication check
-        expected_secret = getattr(settings, "REVENUECAT_WEBHOOK_AUTHORIZATION", "")
+        # 1. Constant-time authentication check (canonical: REVENUECAT_WEBHOOK_AUTHORIZATION)
+        expected_secret = getattr(
+            settings, "REVENUECAT_WEBHOOK_AUTHORIZATION", ""
+        ) or getattr(settings, "REVENUECAT_WEBHOOK_SECRET", "")
         auth_header = request.headers.get("Authorization") or request.META.get(
             "HTTP_AUTHORIZATION", ""
         )

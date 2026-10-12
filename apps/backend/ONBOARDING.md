@@ -9,14 +9,14 @@ you must not get wrong.
 
 ## 1. Prerequisites
 
-| Tool | Version | Install |
-|---|---|---|
-| Python | 3.12 | `uv python install 3.12` |
-| uv | latest | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| Node | 22 LTS | fnm or nvm |
-| pnpm | 9 | `corepack enable && corepack prepare pnpm@latest --activate` |
-| Docker | any recent | for Postgres locally |
-| Expo Go / dev client | latest | on your Android phone |
+| Tool                 | Version    | Install                                                      |
+| -------------------- | ---------- | ------------------------------------------------------------ |
+| Python               | 3.12       | `uv python install 3.12`                                     |
+| uv                   | latest     | `curl -LsSf https://astral.sh/uv/install.sh \| sh`           |
+| Node                 | 22 LTS     | fnm or nvm                                                   |
+| pnpm                 | 9          | `corepack enable && corepack prepare pnpm@latest --activate` |
+| Docker               | any recent | for Postgres locally                                         |
+| Expo Go / dev client | latest     | on your Android phone                                        |
 
 You do not need the Heroku CLI on day one. Install it when you first deploy.
 
@@ -91,7 +91,7 @@ R2_ACCESS_KEY_ID=         # shared
 R2_SECRET_ACCESS_KEY=     # shared
 R2_BUCKET=femtech-dev
 
-REVENUECAT_WEBHOOK_SECRET=  # only if you're working on billing
+REVENUECAT_WEBHOOK_AUTHORIZATION=  # (canonical, or REVENUECAT_WEBHOOK_SECRET) only if working on billing
 POLAR_WEBHOOK_SECRET=
 ```
 
@@ -209,16 +209,16 @@ real people.
 
 ## 8. Troubleshooting
 
-| Symptom | Cause |
-|---|---|
-| `type "vector" does not exist` | Wrong Postgres image — use the compose file, not your system Postgres |
-| Phone can't reach the API | Using `localhost` instead of LAN IP, or IP missing from `ALLOWED_HOSTS` |
-| `DisallowedHost` in the log | Same thing, add the IP |
-| API client types out of date | You forgot `pnpm --filter api-client generate` |
-| Jobs never run | The Celery worker isn't running in a second terminal |
-| Query returns zero rows in a shell | RLS is on and `app.user_id` isn't set — use the bypass context manager |
-| Chat times out on Heroku staging | Streaming is disabled there by design; it must fall back to the job path |
-| Migration conflict after a rebase | `uv run manage.py makemigrations --merge`, then read what it produced |
+| Symptom                                         | Cause                                                                                               |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `type "vector" does not exist`                  | Wrong Postgres image — use the compose file, not your system Postgres                               |
+| Phone can't reach the API                       | Using `localhost` instead of LAN IP, or IP missing from `ALLOWED_HOSTS`                             |
+| `DisallowedHost` in the log                     | Same thing, add the IP                                                                              |
+| API client types out of date                    | You forgot `pnpm --filter api-client generate`                                                      |
+| Jobs never run                                  | The Celery worker isn't running in a second terminal                                                |
+| Query returns zero rows in a shell              | RLS is on and `app.user_id` isn't set — use the bypass context manager                              |
+| Chat times out on Heroku staging                | Streaming is disabled there by design; it must fall back to the job path                            |
+| Migration conflict after a rebase               | `uv run manage.py makemigrations --merge`, then read what it produced                               |
 | e2e tests fail with `server exited during boot` | The message names the server log; usually an import or settings error, run `uv run manage.py check` |
 
 ---
