@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 from apps.users.models import Profile
 
 DEFAULT_CYCLE_LENGTH = 28

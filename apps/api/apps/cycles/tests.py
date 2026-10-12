@@ -1,9 +1,8 @@
-from datetime import date
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.users.models import User
+
 
 class CycleInitTests(APITestCase):
     def setUp(self):

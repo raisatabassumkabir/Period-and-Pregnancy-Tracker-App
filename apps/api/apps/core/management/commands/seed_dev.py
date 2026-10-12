@@ -1,6 +1,7 @@
 """
 Seed local development data: 3 user gmail accounts representing 3 different user modes
-(cycle tracking, trying to conceive, and pregnancy) plus legacy demo users. Idempotent. Local/dev only.
+(cycle tracking, trying to conceive, and pregnancy) plus legacy demo users.
+Idempotent. Local/dev only.
 """
 
 import datetime
@@ -198,10 +199,23 @@ class Command(BaseCommand):
                 defaults={"mode": Profile.Mode.PREGNANCY, "country": "DE", "language": "en"},
             )
 
-        self.stdout.write(self.style.SUCCESS("Successfully seeded 3 Gmail user accounts across 3 modes (Cycle Tracking, TTC, Pregnancy)."))
-        self.stdout.write(self.style.SUCCESS(f"1. Cycle Tracking: {cycle_email} / Password: {cycle_password}"))
-        self.stdout.write(self.style.SUCCESS(f"2. Trying to Conceive: {ttc_email} / Password: {ttc_password}"))
-        self.stdout.write(self.style.SUCCESS(f"3. Pregnancy: {preg_email} / Password: {preg_password}"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Successfully seeded 3 Gmail user accounts across 3 modes "
+                "(Cycle Tracking, TTC, Pregnancy)."
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"1. Cycle Tracking: {cycle_email} / Password: {cycle_password}")
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"2. Trying to Conceive: {ttc_email} / Password: {ttc_password}"
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"3. Pregnancy: {preg_email} / Password: {preg_password}")
+        )
 
     def _user(self, email, password):
         user = User.objects.filter(email=email).first()

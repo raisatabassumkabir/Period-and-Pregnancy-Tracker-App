@@ -7,6 +7,7 @@ import { showMessage } from 'react-native-flash-message';
 import { useDeleteAccount } from '@/api/auth/use-delete-account';
 import { colors } from '@/components/ui';
 import { translate, useAuth } from '@/lib';
+import { EncryptedHealthStorage } from '@/lib/storage/encrypted-storage';
 
 import { Item } from './item';
 
@@ -28,6 +29,7 @@ export const DeleteAccountItem = () => {
       });
       return;
     }
+    await EncryptedHealthStorage.purgeAllHealthData().catch(() => {});
     queryClient.clear();
     signOut();
     showMessage({

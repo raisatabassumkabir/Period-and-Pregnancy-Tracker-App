@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.core.rls import rls_user
-from apps.cycles.models import Cycle, DailyLog
+from apps.cycles.models import Cycle
 from apps.pregnancy.models import Pregnancy
 from apps.users.models import Profile, User
 

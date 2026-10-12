@@ -55,6 +55,7 @@ class Command(BaseCommand):
             self.stdout.write(f"  • Email: {acc['email']} | Password: {acc['password']}")
         self.stdout.write(
             self.style.NOTICE(
-                "\nAccounts contain 0 attached profiles, forcing immediate routing to Screen 1 of Onboarding.\n"
+                "\nAccounts contain 0 attached profiles, "
+                "forcing immediate routing to Screen 1 of Onboarding.\n"
             )
         )
