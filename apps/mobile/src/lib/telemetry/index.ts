@@ -1,13 +1,15 @@
 import * as amplitude from '@amplitude/analytics-react-native';
-import { SessionReplayPlugin } from '@amplitude/plugin-session-replay-react-native';
 import { Env } from '@env';
 
 let isInitialized = false;
 
 /**
- * Initializes Amplitude Analytics and attaches the Session Replay plugin.
- * Safe to call multiple times (subsequent calls are no-ops). Skipped when
- * no API key is configured, so a fresh app can ship without telemetry.
+ * Initializes Amplitude Analytics (events only). Safe to call multiple times
+ * (subsequent calls are no-ops). Skipped when no API key is configured, so a
+ * fresh app can ship without telemetry.
+ *
+ * Never add Session Replay: it records screens, and every screen here shows
+ * cycle, pregnancy or symptom data.
  */
 export async function initTelemetry(customApiKey?: string): Promise<boolean> {
   if (isInitialized) {
@@ -25,7 +27,6 @@ export async function initTelemetry(customApiKey?: string): Promise<boolean> {
 
   try {
     await amplitude.init(apiKey).promise;
-    await amplitude.add(new SessionReplayPlugin()).promise;
     isInitialized = true;
     return true;
   } catch (error) {

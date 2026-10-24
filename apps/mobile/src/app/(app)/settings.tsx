@@ -22,6 +22,7 @@ import {
   View,
 } from '@/components/ui';
 import { translate } from '@/lib';
+import { FEATURES } from '@/lib/features';
 
 export default function Settings() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function Settings() {
         <View className="mt-4">
           <ProfileHeader />
         </View>
-        <SubscriptionCard />
+        {FEATURES.monetization ? <SubscriptionCard /> : null}
 
         <ItemsContainer title="settings.profile_title">
           <PersonalizationItem />

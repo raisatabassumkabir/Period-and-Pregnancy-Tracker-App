@@ -87,7 +87,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: './assets/favicon.png',
     bundler: 'metro',
   },
-  plugins: [],
+  plugins: [
+    [
+      '@sentry/react-native/expo',
+      {
+        url: 'https://sentry.io/',
+        organization: Env.SENTRY_ORG,
+        project: Env.SENTRY_PROJECT,
+        // SENTRY_AUTH_TOKEN is an EAS secret; without it, skip the upload
+        // instead of failing the build.
+        disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
+      },
+    ],
+  ],
   extra: {
     ...ClientEnv,
     eas: {

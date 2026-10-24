@@ -39,6 +39,8 @@ export const STORAGE_KEYS = {
   LOCAL_DAILY_LOGS: '@app/local_daily_logs',
   /** User personalization profile (name, age/DOB, mode, diet, medical conditions). */
   PERSONALIZATION_PROFILE: '@app/personalization_profile',
+  /** Set once this install has accepted the first-run medical disclaimer. */
+  MEDICAL_DISCLAIMER_ACK: '@app/medical_disclaimer_ack',
 } as const;
 
 let storePromise: Promise<MMKV> | null = null;

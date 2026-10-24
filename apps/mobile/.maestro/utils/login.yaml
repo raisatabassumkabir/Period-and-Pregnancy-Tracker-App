@@ -13,6 +13,15 @@ tags:
 - inputText: ${PASSWORD}
 - tapOn:
     id: 'login-button'
+# First launch on an install shows the medical disclaimer before the tabs.
+- extendedWaitUntil:
+    visible:
+      id: 'medical-disclaimer-accept'
+    timeout: 30000
+    optional: true
+- tapOn:
+    id: 'medical-disclaimer-accept'
+    optional: true
 # The bundle has to hit the API before the tab navigator mounts.
 - extendedWaitUntil:
     visible:

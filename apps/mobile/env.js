@@ -58,12 +58,18 @@ const client = z.object({
   SUPPORT_EMAIL: z.string().email(),
   // Public RevenueCat Android SDK key (e.g. goog_...). Empty disables purchases gracefully.
   REVENUECAT_ANDROID_API_KEY: z.string().default(''),
+  // Sentry DSN (public by design). Empty disables crash reporting.
+  SENTRY_DSN: z.union([z.literal(''), z.string().url()]).default(''),
 });
 
 const buildTime = z.object({
   EXPO_ACCOUNT_OWNER: z.string(),
   EAS_PROJECT_ID: z.string(),
   // ADD YOUR BUILD TIME ENV VARS HERE
+  // Source-map upload target. Upload only runs when SENTRY_AUTH_TOKEN is set
+  // (an EAS secret), so local builds never need Sentry credentials.
+  SENTRY_ORG: z.string().default(''),
+  SENTRY_PROJECT: z.string().default(''),
 });
 
 /**
@@ -87,6 +93,7 @@ const _clientEnv = {
     process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY ??
     process.env.REVENUECAT_ANDROID_API_KEY ??
     '',
+  SENTRY_DSN: process.env.SENTRY_DSN ?? '',
 };
 
 /**
@@ -96,6 +103,8 @@ const _buildTimeEnv = {
   EXPO_ACCOUNT_OWNER,
   EAS_PROJECT_ID,
   // ADD YOUR ENV VARS HERE TOO
+  SENTRY_ORG: process.env.SENTRY_ORG ?? '',
+  SENTRY_PROJECT: process.env.SENTRY_PROJECT ?? '',
 };
 
 const _env = {

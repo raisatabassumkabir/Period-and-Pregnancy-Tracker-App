@@ -106,15 +106,6 @@ jest.mock('@amplitude/analytics-react-native', () => {
   };
 });
 
-jest.mock('@amplitude/plugin-session-replay-react-native', () => ({
-  SessionReplayPlugin: jest.fn().mockImplementation(() => ({
-    name: '@amplitude/plugin-session-replay-react-native',
-    type: 'enrichment',
-    setup: jest.fn().mockResolvedValue(undefined),
-    execute: jest.fn().mockImplementation((event) => Promise.resolve(event)),
-  })),
-}));
-
 // react-hook form setup for testing
 // @ts-ignore
 global.window = {};

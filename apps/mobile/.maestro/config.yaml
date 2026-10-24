@@ -1,15 +1,14 @@
 flows:
   - auth/*
   - app/tabs.yaml
-  - app/upgrade-sheet.yaml
+  # app/upgrade-sheet.yaml is off while v1 ships free (FEATURES.monetization).
 
 excludeTags:
   - util
 
 executionOrder:
-    continueOnFailure: false
-    flowsOrder:
-        - fresh-launch
-        - login-with-validation
-        - tabs
-        - upgrade-sheet
+  continueOnFailure: false
+  flowsOrder:
+    - fresh-launch
+    - login-with-validation
+    - tabs

@@ -1,13 +1,15 @@
 /* eslint-env node */
 
 const path = require('path');
-const { getDefaultConfig } = require('expo/metro-config');
+const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 const { withNativeWind } = require('nativewind/metro');
 
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, '../..');
 
-const config = getDefaultConfig(projectRoot);
+// Expo's default config plus Debug IDs, so Sentry can match release bundles
+// to their uploaded source maps.
+const config = getSentryExpoConfig(projectRoot);
 
 // Monorepo support
 config.watchFolders = [workspaceRoot];

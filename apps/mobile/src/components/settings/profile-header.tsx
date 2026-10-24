@@ -18,6 +18,7 @@ import type {
 } from '@/api/types';
 import { Button, Pill, Pressable, Text, View } from '@/components/ui';
 import { usePaletteColors } from '@/lib';
+import { FEATURES } from '@/lib/features';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
 
 import { DatePickerModal } from './date-of-birth-input';
@@ -138,17 +139,19 @@ export const ProfileHeader = () => {
             Age: {profile.age} yrs • DOB: {profile.dateOfBirth}
           </Text>
           <View className="mt-2 flex-row items-center gap-2">
-            <Pill
-              label={isPremium ? 'Premium plan' : 'Free plan'}
-              tone={isPremium ? 'accent-soft' : 'neutral'}
-              strong={isPremium}
-            >
-              <View
-                className={`size-[7px] rounded-full ${
-                  isPremium ? 'bg-accent' : 'bg-accent2-600'
-                }`}
-              />
-            </Pill>
+            {FEATURES.monetization ? (
+              <Pill
+                label={isPremium ? 'Premium plan' : 'Free plan'}
+                tone={isPremium ? 'accent-soft' : 'neutral'}
+                strong={isPremium}
+              >
+                <View
+                  className={`size-[7px] rounded-full ${
+                    isPremium ? 'bg-accent' : 'bg-accent2-600'
+                  }`}
+                />
+              </Pill>
+            ) : null}
 
             {!user && (
               <Pressable

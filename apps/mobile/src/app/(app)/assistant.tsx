@@ -1,4 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
+import { Redirect } from 'expo-router';
 import { SendHorizontal } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -23,6 +24,7 @@ import {
 import { AppHeader } from '@/components/ui/app-header';
 import type { ChatMessage } from '@/lib/assistant/use-chat';
 import { useChat } from '@/lib/assistant/use-chat';
+import { FEATURES } from '@/lib/features';
 
 const ESTIMATED_ITEM_SIZE = 72;
 
@@ -43,7 +45,13 @@ function keyExtractor(item: ChatMessage): string {
   return item.id;
 }
 
+// Hidden in v1: the tab is gone, and this covers a stale deep link.
 export default function Assistant() {
+  if (!FEATURES.assistant) return <Redirect href="/" />;
+  return <AssistantChat />;
+}
+
+function AssistantChat() {
   const { messages, send, isSending } = useChat();
   const [draft, setDraft] = React.useState('');
 

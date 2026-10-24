@@ -5,7 +5,6 @@ import {
   AuthFooter,
   AuthLayout,
   EmailInput,
-  GoogleButton,
   PasswordHints,
   PasswordInput,
 } from '@/components/auth';
@@ -38,21 +37,6 @@ export default function Register() {
       }
     >
       <ErrorBanner message={errors.root?.message} />
-
-      <GoogleButton
-        testID="google-register-button"
-        onPress={() => {
-          // Trigger Google sign-in
-        }}
-      />
-
-      <View className="my-6 flex-row items-center">
-        <View className="h-[1px] flex-1 bg-divider" />
-        <Text className="mx-3 font-body-semibold text-[13px] text-tone-500">
-          or continue with email
-        </Text>
-        <View className="h-[1px] flex-1 bg-divider" />
-      </View>
 
       <View className="mb-4">
         <Text className="mb-2 font-body-bold text-[13px] text-ink">

@@ -33,6 +33,7 @@ import {
 } from '@/lib';
 import { useBillingIdentity } from '@/lib/billing/use-billing-identity';
 import { registerNativeIntegrations } from '@/lib/bootstrap';
+import { FEATURES } from '@/lib/features';
 import { useThemeConfig } from '@/lib/use-theme-config';
 
 LogBox.ignoreLogs(['SafeAreaView has been deprecated']);
@@ -151,7 +152,7 @@ function Providers({ children }: { children: React.ReactNode }) {
             <KeyboardProvider>
               <ThemeProvider value={theme}>
                 <APIProvider>
-                  <BillingLifecycleSync />
+                  {FEATURES.monetization ? <BillingLifecycleSync /> : null}
                   <BottomSheetModalProvider>
                     {children}
                     <UpgradeSheet />

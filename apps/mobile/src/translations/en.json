@@ -35,7 +35,8 @@
       "confirm": "Delete",
       "done": "Your account has been deleted.",
       "failed": "Could not delete account"
-    }
+    },
+    "medical_disclaimer": "Medical disclaimer"
   },
   "common": {
     "cancel": "Cancel"
@@ -111,5 +112,13 @@
         }
       }
     }
+  },
+  "medical_disclaimer": {
+    "title": "Before you start",
+    "intro": "Happy Women helps you track your cycle, symptoms and pregnancy. It is not a medical device and does not give medical advice, diagnosis or treatment.",
+    "predictions": "Period, fertile-window and ovulation predictions are estimates. Never use them as contraception.",
+    "dating": "Due dates and pregnancy weeks are estimated from your last period. Your clinician may adjust them after an ultrasound.",
+    "care": "Talk to a qualified health professional about any symptoms or concerns. In an emergency, or if your baby is moving less than usual, get medical care right away.",
+    "accept": "I understand"
   }
 }

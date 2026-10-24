@@ -1,5 +1,4 @@
 import * as amplitude from '@amplitude/analytics-react-native';
-import { SessionReplayPlugin } from '@amplitude/plugin-session-replay-react-native';
 
 import {
   identifyUser,
@@ -15,13 +14,12 @@ describe('telemetry', () => {
     jest.clearAllMocks();
   });
 
-  it('initializes Amplitude and adds SessionReplayPlugin', async () => {
+  it('initializes Amplitude without any screen-recording plugin', async () => {
     const success = await initTelemetry('test-api-key');
 
     expect(success).toBe(true);
     expect(amplitude.init).toHaveBeenCalledWith('test-api-key');
-    expect(amplitude.add).toHaveBeenCalled();
-    expect(SessionReplayPlugin).toHaveBeenCalled();
+    expect(amplitude.add).not.toHaveBeenCalled();
     expect(isTelemetryInitialized()).toBe(true);
   });
 

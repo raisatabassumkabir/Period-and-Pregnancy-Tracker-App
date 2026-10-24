@@ -12,9 +12,13 @@ env:
 - assertVisible:
     id: 'home-screen'
 
-# Settings tab
+# v1 hides the assistant
+- assertNotVisible:
+    id: 'assistant-tab'
+
+# Settings opens from the header avatar (its tab has no button)
 - tapOn:
-    id: 'settings-tab'
+    id: 'settings-avatar'
 - assertVisible: 'Settings'
 - scrollUntilVisible:
     element:

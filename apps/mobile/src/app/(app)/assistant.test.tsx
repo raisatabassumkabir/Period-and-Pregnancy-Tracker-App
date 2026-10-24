@@ -1,3 +1,4 @@
+import { Redirect } from 'expo-router';
 import React from 'react';
 
 import { useCycles, useDailyLogs } from '@/api/cycles';
@@ -6,6 +7,19 @@ import { cleanup, screen, setup } from '@/lib/test-utils';
 import { useKickCounter } from '@/lib/tracking';
 
 import Assistant from './assistant';
+
+const mockFeatures = { assistant: true, monetization: false };
+// Getter: jest.mock is hoisted above this const, so read it at render time.
+jest.mock('@/lib/features', () => ({
+  get FEATURES() {
+    return mockFeatures;
+  },
+}));
+
+jest.mock('expo-router', () => ({
+  ...jest.requireActual('expo-router'),
+  Redirect: jest.fn(() => null),
+}));
 
 jest.mock('react-native-edge-to-edge', () => ({
   SystemBars: () => null,
@@ -82,5 +96,19 @@ describe('Assistant', () => {
     await user.press(screen.getByTestId('assistant-send'));
 
     expect(await screen.findByText(/logged 3 kick/i)).toBeOnTheScreen();
+  });
+
+  it('redirects home instead of rendering while the assistant is disabled', () => {
+    mockFeatures.assistant = false;
+    try {
+      setup(<Assistant />);
+      expect(screen.queryByTestId('assistant-screen')).toBeNull();
+      expect(Redirect).toHaveBeenCalledWith(
+        expect.objectContaining({ href: '/' }),
+        undefined
+      );
+    } finally {
+      mockFeatures.assistant = true;
+    }
   });
 });

@@ -2,6 +2,7 @@ import { Env } from '@env';
 import { LifeBuoy, Share2, Star } from 'lucide-react-native';
 import React from 'react';
 
+import { MedicalDisclaimerItem } from '@/components/legal';
 import { usePaletteColors } from '@/lib';
 import {
   openPrivacyPolicy,
@@ -50,6 +51,7 @@ export const SettingsLinks = () => {
           onPress={() => void openPrivacyPolicy()}
         />
         <Item text="settings.terms" onPress={() => void openTerms()} />
+        <MedicalDisclaimerItem />
       </ItemsContainer>
     </>
   );

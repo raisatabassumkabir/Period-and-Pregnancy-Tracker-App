@@ -2,6 +2,7 @@ import type { AxiosError } from 'axios';
 import { createQuery } from 'react-query-kit';
 
 import { useAuth } from '@/lib/auth';
+import { FEATURES } from '@/lib/features';
 
 import { client } from '../common';
 import type { ProblemDetail } from '../types';
@@ -25,6 +26,6 @@ export const usePaymentSubscriptionStatus = (
   const token = useAuth((state) => state.token);
   return _usePaymentSubscriptionStatus({
     ...options,
-    enabled: !!token && (options?.enabled ?? true),
+    enabled: FEATURES.monetization && !!token && (options?.enabled ?? true),
   } as any);
 };

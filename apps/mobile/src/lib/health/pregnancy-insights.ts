@@ -5,6 +5,13 @@ import { daysBetween, parseDateString } from './dates';
 /** Full-term gestation, and the denominator of the dashboard ring. */
 export const FULL_TERM_WEEKS = 40;
 
+/**
+ * Clinical safety notice: the due date comes from Naegele's rule on the last
+ * period, which a dating ultrasound routinely corrects by days to weeks.
+ */
+export const DUE_DATE_DATING_NOTICE =
+  'Estimated from your last period. Your clinician may adjust it after an ultrasound.';
+
 export type Trimester = 1 | 2 | 3;
 
 /** Clinical boundaries: T1 is weeks 1–13, T2 is 14–27, T3 is 28 onward. */

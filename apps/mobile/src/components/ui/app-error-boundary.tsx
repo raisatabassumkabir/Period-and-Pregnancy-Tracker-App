@@ -5,6 +5,8 @@ import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { Pressable, StyleSheet, View } from 'react-native';
 import RNRestart from 'react-native-restart';
 
+import { captureException } from '@/lib/monitoring';
+
 import { Text } from './text';
 
 export function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
@@ -68,6 +70,7 @@ export function AppErrorBoundary({
           error,
           info
         );
+        captureException(error, name);
       }}
     >
       {children}
