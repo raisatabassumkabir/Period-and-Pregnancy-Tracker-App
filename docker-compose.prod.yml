@@ -1,3 +1,28 @@
+# Shared by api and celery-worker so the two can never drift apart (the
+# RevenueCat keys once reached neither container for exactly that reason).
+x-django-env: &django-env
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:?ALLOWED_HOSTS must be set}
+  CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:?CSRF_TRUSTED_ORIGINS must be set}
+  CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+  DATABASE_URL: postgres://${APP_DB_USER:-femtech}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-femtech}
+  REDIS_URL: redis://redis:6379/0
+  DOMAIN: ${DOMAIN:?DOMAIN must be set}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  # Traefik is the only proxy in front of the API; it appends the client IP.
+  DRF_NUM_PROXIES: ${DRF_NUM_PROXIES:-1}
+  ADMIN_URL: ${ADMIN_URL:?ADMIN_URL must be set to a non-guessable path ending in /}
+  API_DOCS_ENABLED: ${API_DOCS_ENABLED:-false}
+  JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-15}
+  SENTRY_DSN: ${SENTRY_DSN:-}
+  SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+  SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}
+  # Optional while v1 ships free; the webhook answers 401 until they are set.
+  REVENUECAT_SECRET_API_KEY: ${REVENUECAT_SECRET_API_KEY:-}
+  REVENUECAT_WEBHOOK_AUTHORIZATION: ${REVENUECAT_WEBHOOK_AUTHORIZATION:-}
+  REVENUECAT_REQUEST_TIMEOUT_SECONDS: ${REVENUECAT_REQUEST_TIMEOUT_SECONDS:-5}
+
 services:
   # -------------------------------------------------------------------------
   # PostgreSQL 16 with pgvector extension & RLS security role setup
@@ -39,8 +64,11 @@ services:
       - internal_network
 
   # -------------------------------------------------------------------------
-  # Django API Web Application (Gunicorn + Uvicorn ASGI workers)
+  # Django API (Gunicorn, threaded WSGI workers)
   # -------------------------------------------------------------------------
+  # No `ports:` on purpose. Traefik reaches the container over dokploy-network
+  # and terminates TLS; a published port would serve plain HTTP on the public
+  # IP, and Docker-published ports bypass ufw.
   api:
     build:
       context: ./apps/api
@@ -53,18 +81,16 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.prod
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:?ALLOWED_HOSTS must be set}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:?CSRF_TRUSTED_ORIGINS must be set}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
-      DATABASE_URL: postgres://${APP_DB_USER:-femtech}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-femtech}
-      REDIS_URL: redis://redis:6379/0
+      <<: *django-env
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
-    ports:
-      - '${API_PORT:-8000}:8000'
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
     healthcheck:
-      test: ['CMD-SHELL', 'curl -f http://localhost:8000/api/schema/ || exit 1']
+      # Host header must be in ALLOWED_HOSTS or Django answers 400.
+      test:
+        [
+          'CMD-SHELL',
+          'curl -fsS -H "Host: $${DOMAIN}" http://localhost:8000/health/ || exit 1',
+        ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -72,15 +98,23 @@ services:
     networks:
       - internal_network
       - dokploy-network
+    # Routing lives here (versioned with the stack), not in Dokploy's Domains UI.
     labels:
       - 'traefik.enable=true'
+      - 'traefik.docker.network=dokploy-network'
       - 'traefik.http.routers.femtech-api.rule=Host(`${DOMAIN:-localhost}`)'
       - 'traefik.http.routers.femtech-api.entrypoints=websecure'
       - 'traefik.http.routers.femtech-api.tls.certresolver=letsencrypt'
       - 'traefik.http.services.femtech-api.loadbalancer.server.port=8000'
+      # Plain HTTP on :80 only ever redirects; Django never sees it.
+      - 'traefik.http.middlewares.femtech-api-https.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.femtech-api-https.redirectscheme.permanent=true'
+      - 'traefik.http.routers.femtech-api-http.rule=Host(`${DOMAIN:-localhost}`)'
+      - 'traefik.http.routers.femtech-api-http.entrypoints=web'
+      - 'traefik.http.routers.femtech-api-http.middlewares=femtech-api-https'
 
   # -------------------------------------------------------------------------
-  # Celery Asynchronous Worker (AI Assistant, predictions, notifications)
+  # Celery worker (RevenueCat webhook reconciliation, password-reset emails)
   # -------------------------------------------------------------------------
   celery-worker:
     build:
@@ -94,35 +128,50 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.prod
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
-      DATABASE_URL: postgres://${APP_DB_USER:-femtech}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-femtech}
-      REDIS_URL: redis://redis:6379/0
+      <<: *django-env
       CELERY_LOG_LEVEL: ${CELERY_LOG_LEVEL:-info}
       CELERY_CONCURRENCY: ${CELERY_CONCURRENCY:-2}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'celery -A config inspect ping -d celery@$${HOSTNAME} --timeout 10 || exit 1',
+        ]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
     networks:
       - internal_network
 
   # -------------------------------------------------------------------------
-  # Celery Beat Periodic Scheduler (Cycle predictions, daily reminders)
+  # Nightly encrypted pg_dump to Cloudflare R2 (see infra/backup/backup.sh and
+  # the restore runbook in DEPLOYMENT.md). Only the age PUBLIC key is here.
   # -------------------------------------------------------------------------
-  celery-beat:
+  db-backup:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: ./infra/backup
     restart: unless-stopped
-    command: beat
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.prod
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
-      DATABASE_URL: postgres://${APP_DB_USER:-femtech}:${APP_DB_PASSWORD}@db:5432/${POSTGRES_DB:-femtech}
-      REDIS_URL: redis://redis:6379/0
-      CELERY_LOG_LEVEL: ${CELERY_LOG_LEVEL:-info}
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB:-femtech}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      BACKUP_AGE_RECIPIENT: ${BACKUP_AGE_RECIPIENT:?BACKUP_AGE_RECIPIENT must be set to the age public key}
+      BACKUP_BUCKET: ${BACKUP_BUCKET:?BACKUP_BUCKET must be set}
+      BACKUP_PREFIX: ${BACKUP_PREFIX:-postgres}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-30}
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
+      RCLONE_CONFIG_BACKUP_TYPE: s3
+      RCLONE_CONFIG_BACKUP_PROVIDER: Cloudflare
+      RCLONE_CONFIG_BACKUP_ENDPOINT: ${BACKUP_S3_ENDPOINT:?BACKUP_S3_ENDPOINT must be set}
+      RCLONE_CONFIG_BACKUP_ACCESS_KEY_ID: ${BACKUP_S3_ACCESS_KEY_ID:?BACKUP_S3_ACCESS_KEY_ID must be set}
+      RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_ACCESS_KEY:?BACKUP_S3_SECRET_ACCESS_KEY must be set}
+      # Bucket-scoped R2 tokens cannot list or create buckets.
+      RCLONE_CONFIG_BACKUP_NO_CHECK_BUCKET: 'true'
     networks:
       - internal_network
 
