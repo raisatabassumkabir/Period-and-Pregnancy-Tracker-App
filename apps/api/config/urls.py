@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from apps.core.legal_views import LegalPageView
 from apps.payments.views import (
     DeprecatedVerifyPurchaseView,
     RevenueCatWebhookView,
@@ -58,6 +59,22 @@ api_patterns = [
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("health/", health),
+    # Public legal pages linked from the Play listing and the app (HTML).
+    path(
+        "legal/privacy/",
+        LegalPageView.as_view(template_name="legal/privacy.html"),
+        name="legal-privacy",
+    ),
+    path(
+        "legal/terms/",
+        LegalPageView.as_view(template_name="legal/terms.html"),
+        name="legal-terms",
+    ),
+    path(
+        "legal/account-deletion/",
+        LegalPageView.as_view(template_name="legal/account_deletion.html"),
+        name="legal-account-deletion",
+    ),
     # Browser pages the reset email links to (HTML, not part of the JSON API).
     path(
         "accounts/password-reset/done/",

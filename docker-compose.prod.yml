@@ -18,6 +18,12 @@ x-django-env: &django-env
   # Password-reset email (Resend via django-anymail). The worker sends it.
   RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY must be set}
   DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:?DEFAULT_FROM_EMAIL must be set, e.g. Happy Women <no-reply@yourdomain.com>}
+  # Shown on /legal/privacy/, /legal/terms/ and /legal/account-deletion/.
+  LEGAL_OPERATOR_NAME: ${LEGAL_OPERATOR_NAME:?LEGAL_OPERATOR_NAME must be set (who runs the app)}
+  SUPPORT_EMAIL: ${SUPPORT_EMAIL:?SUPPORT_EMAIL must be set}
+  LEGAL_EFFECTIVE_DATE: ${LEGAL_EFFECTIVE_DATE:-}
+  # The privacy policy quotes this; keep it equal to the db-backup retention.
+  BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-30}
   SENTRY_DSN: ${SENTRY_DSN:-}
   SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
   SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}

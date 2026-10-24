@@ -1,0 +1,66 @@
+{% extends "legal/base.html" %}
+{% block title %}Privacy policy{% endblock %}
+{% block heading %}Privacy policy{% endblock %}
+{% block content %}
+<p>{{ operator_name }} ("we") makes the Happy Women app for tracking periods, cycles and pregnancy. This policy explains what the app collects, why, where it goes and how to delete it. We do not sell your data, we do not share it for advertising, and the app shows no ads.</p>
+
+<h2>What we collect</h2>
+<ul>
+  <li><strong>Account:</strong> your email address and a hashed password.</li>
+  <li><strong>Profile:</strong> tracking mode (cycle or pregnancy), date of birth, height, weight, country, language, time zone, diet, budget preference, goals, average cycle and period length, how you heard about the app, and any medical conditions you choose to add (for example PCOS or endometriosis).</li>
+  <li><strong>Cycle and daily logs:</strong> period dates, flow, mood, symptoms, basal temperature, whether you logged intercourse, contraception used, and free-text notes.</li>
+  <li><strong>Pregnancy:</strong> last period date, due date, status and notes.</li>
+  <li><strong>Kept only on your phone:</strong> your display name, kick counts and discharge logs.</li>
+  <li><strong>Crash reports:</strong> when the app or our server hits an error, a technical report (error message, stack trace, app version, device model and OS version). Reports never include your health logs, request contents or your IP address.</li>
+</ul>
+<p>We do not use advertising identifiers, analytics or session-recording tools.</p>
+
+<h2>How we use it</h2>
+<ul>
+  <li>To run the app: show your history, calculate cycle and due-date estimates, and keep your data in sync across your devices.</li>
+  <li>To send the password-reset emails you ask for.</li>
+  <li>To keep the service secure, for example rate-limiting sign-in attempts by IP address. For this we keep IP addresses for no more than an hour, never alongside your health data.</li>
+  <li>To find and fix crashes.</li>
+</ul>
+<p>We never use your health data for advertising, never sell it, and never pass it to data brokers.</p>
+
+<h2>Where it is stored and how it is protected</h2>
+<ul>
+  <li>On your phone, health data is encrypted (AES-256-GCM) with a key held in the Android Keystore.</li>
+  <li>Between the app and our server, everything travels over HTTPS.</li>
+  <li>On our server, each account's records are isolated at the database level, so one account cannot read another's.</li>
+  <li>Database backups are encrypted before they leave the server and are kept for {{ backup_retention_days }} days.</li>
+</ul>
+
+<h2>Who processes it for us</h2>
+<ul>
+  <li>Our server hosting provider, which runs the database and API.</li>
+  <li>Cloudflare, which stores our encrypted backups. It cannot read them.</li>
+  <li>Sentry, which receives the crash reports described above.</li>
+  <li>Resend, which delivers password-reset emails and so receives your email address when you request one.</li>
+  <li>Google Play, which distributes the app.</li>
+</ul>
+<p>We disclose data to anyone else only when the law requires it, and we keep what we hold to the minimum the app needs.</p>
+
+<h2>How long we keep it</h2>
+<p>We keep your data until you delete your account. Deleting it removes your data from our live database immediately and from our encrypted backups within {{ backup_retention_days }} days. Deleting the account in the app also erases the health data stored on that phone.</p>
+
+<h2>Your choices and rights</h2>
+<ul>
+  <li>View and edit your profile and logs in the app at any time.</li>
+  <li>Delete your account and data in the app (Settings → Delete account), or follow the steps on our <a href="{% url 'legal-account-deletion' %}">account deletion page</a>.</li>
+  <li>Ask us for a copy of your data, or ask any question about it, at <a href="mailto:{{ support_email }}">{{ support_email }}</a>. Depending on where you live (for example under the GDPR or US state privacy laws) you may have further rights, and you can complain to your local data protection authority.</li>
+</ul>
+
+<h2>Who the app is for</h2>
+<p>Happy Women is for adults aged 18 and over. It is not directed at children.</p>
+
+<h2>Health information</h2>
+<p>The app is not a medical device. Cycle and due-date estimates are not contraception and not a diagnosis. See our <a href="{% url 'legal-terms' %}">terms</a>.</p>
+
+<h2>Changes</h2>
+<p>If we change this policy we will update this page and its effective date, and tell you in the app before material changes take effect.</p>
+
+<h2>Contact</h2>
+<p>{{ operator_name }} · <a href="mailto:{{ support_email }}">{{ support_email }}</a></p>
+{% endblock %}

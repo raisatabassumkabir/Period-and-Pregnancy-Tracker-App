@@ -106,6 +106,11 @@ CELERY_LOG_LEVEL=info
 CELERY_CONCURRENCY=2
 LOG_LEVEL=INFO
 
+# Public legal pages (/legal/privacy/, /legal/terms/, /legal/account-deletion/)
+LEGAL_OPERATOR_NAME=Your Name or Company Ltd
+SUPPORT_EMAIL=support@yourdomain.com
+LEGAL_EFFECTIVE_DATE=1 November 2026
+
 # Password-reset email (Resend). See "Transactional email" below.
 RESEND_API_KEY=
 DEFAULT_FROM_EMAIL=Happy Women <no-reply@yourdomain.com>
@@ -129,6 +134,8 @@ BACKUP_BUCKET=happy-women-backups
 BACKUP_PREFIX=postgres
 BACKUP_KEEP_DAYS=30
 ```
+
+In the Sentry project, enable **Settings → Security & Privacy → Prevent Storing of IP Addresses**; the privacy policy says crash reports carry no IP address.
 
 Optional overrides: `API_DOCS_ENABLED=true` serves `/api/schema/` and `/api/docs/` (off in production by default), `JWT_ACCESS_MINUTES` (default 15; use `1` on staging to exercise token refresh), `DRF_NUM_PROXIES` (default 1).
 

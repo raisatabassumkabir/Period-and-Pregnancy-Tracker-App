@@ -1,0 +1,36 @@
+{% extends "legal/base.html" %}
+{% block title %}Terms of service{% endblock %}
+{% block heading %}Terms of service{% endblock %}
+{% block content %}
+<p>These terms apply when you use the Happy Women app and its service, provided by {{ operator_name }} ("we"). By creating an account you agree to them.</p>
+
+<h2>Not medical advice</h2>
+<p>Happy Women helps you record and understand your cycle, symptoms and pregnancy. It is not a medical device and does not provide medical advice, diagnosis or treatment.</p>
+<ul>
+  <li>Period, fertile-window and ovulation predictions are estimates. Never use them as contraception.</li>
+  <li>Due dates and pregnancy weeks are estimated from your last period. Your clinician may change them, for example after an ultrasound.</li>
+  <li>Talk to a qualified health professional about symptoms or concerns. In an emergency, or if your baby is moving less than usual, get medical care right away.</li>
+</ul>
+
+<h2>Your account</h2>
+<ul>
+  <li>You must be 18 or older.</li>
+  <li>Keep your password private. You are responsible for activity on your account.</li>
+  <li>You can delete your account at any time; see the <a href="{% url 'legal-account-deletion' %}">account deletion page</a>.</li>
+</ul>
+
+<h2>Acceptable use</h2>
+<p>Don't misuse the service: no attempts to access other people's data, disrupt the service, or reverse-engineer it to do either.</p>
+
+<h2>The service</h2>
+<p>The app is currently free. We work to keep it available and accurate, but it is provided "as is" and may change, pause or end. To the extent the law allows, we are not liable for indirect or consequential losses, or for decisions made on the basis of the app's estimates. Nothing in these terms limits rights you have under consumer law that cannot be waived.</p>
+
+<h2>Privacy</h2>
+<p>How we handle your data is described in our <a href="{% url 'legal-privacy' %}">privacy policy</a>.</p>
+
+<h2>Ending</h2>
+<p>You can stop using the app and delete your account at any time. We may suspend accounts that break these terms.</p>
+
+<h2>Changes and contact</h2>
+<p>We will update this page and its effective date if these terms change, and tell you in the app before material changes take effect. Questions: <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+{% endblock %}

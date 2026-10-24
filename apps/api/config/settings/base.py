@@ -221,6 +221,13 @@ PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
 # hashes the current password.
 PASSWORD_RESET_TIMEOUT = 60 * 60
 
+# Shown on the public legal pages (/legal/...), which the Play listing links to.
+LEGAL_OPERATOR_NAME = os.environ.get("LEGAL_OPERATOR_NAME", "Happy Women")
+SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "support@example.com")
+LEGAL_EFFECTIVE_DATE = os.environ.get("LEGAL_EFFECTIVE_DATE", "")
+# Mirrors BACKUP_KEEP_DAYS in docker-compose.prod.yml; the policy promises it.
+BACKUP_RETENTION_DAYS = int(os.environ.get("BACKUP_KEEP_DAYS", "30"))
+
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 LOGGING = {
     "version": 1,
