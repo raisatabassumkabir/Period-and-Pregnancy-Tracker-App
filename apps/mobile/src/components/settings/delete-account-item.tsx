@@ -7,11 +7,32 @@ import { showMessage } from 'react-native-flash-message';
 import { useDeleteAccount } from '@/api/auth/use-delete-account';
 import { colors } from '@/components/ui';
 import { translate, useAuth } from '@/lib';
+import { clear as clearPreferenceStore } from '@/lib/storage';
 import { EncryptedHealthStorage } from '@/lib/storage/encrypted-storage';
 
 import { Item } from './item';
 
 const ICON_SIZE = 20;
+
+// The server copy is already gone at this point; a local wipe failing must
+// not keep the user signed in to a deleted account, so warn and carry on.
+const warnLocalWipeFailed = (store: string) => (error: unknown) =>
+  console.warn(`Account deleted, but clearing ${store} failed`, error);
+
+/**
+ * Health data lives in two on-device stores: the AES-GCM health store and the
+ * MMKV preference store (local daily logs, kick counts, discharge logs and the
+ * personalization profile with medical conditions). Both are per-user, so
+ * deleting the account wipes both.
+ */
+async function wipeLocalUserData(): Promise<void> {
+  await EncryptedHealthStorage.purgeAllHealthData().catch(
+    warnLocalWipeFailed('the health store')
+  );
+  await clearPreferenceStore().catch(
+    warnLocalWipeFailed('the preference store')
+  );
+}
 
 export const DeleteAccountItem = () => {
   const signOut = useAuth.use.signOut();
@@ -29,7 +50,7 @@ export const DeleteAccountItem = () => {
       });
       return;
     }
-    await EncryptedHealthStorage.purgeAllHealthData().catch(() => {});
+    await wipeLocalUserData();
     queryClient.clear();
     signOut();
     showMessage({

@@ -5,6 +5,7 @@ import { showMessage } from 'react-native-flash-message';
 
 import * as deleteHook from '@/api/auth/use-delete-account';
 import { signIn, useAuth } from '@/lib/auth';
+import * as preferenceStore from '@/lib/storage';
 import { EncryptedHealthStorage } from '@/lib/storage/encrypted-storage';
 import { cleanup, fireEvent, render, screen, waitFor } from '@/lib/test-utils';
 
@@ -57,6 +58,9 @@ describe('DeleteAccountItem', () => {
     const purgeSpy = jest
       .spyOn(EncryptedHealthStorage, 'purgeAllHealthData')
       .mockResolvedValue(undefined);
+    const clearSpy = jest
+      .spyOn(preferenceStore, 'clear')
+      .mockResolvedValue(undefined);
     const mutateAsync = jest.fn().mockResolvedValue(undefined);
     mockDeleteHook(mutateAsync);
     wrap(<DeleteAccountItem />);
@@ -66,6 +70,8 @@ describe('DeleteAccountItem', () => {
 
     await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(purgeSpy).toHaveBeenCalledTimes(1));
+    // Local daily logs, kick counts and the medical profile live in MMKV.
+    await waitFor(() => expect(clearSpy).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(useAuth.getState().status).toBe('signOut'));
     expect(showMessage).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'success' })
@@ -76,6 +82,7 @@ describe('DeleteAccountItem', () => {
     const purgeSpy = jest
       .spyOn(EncryptedHealthStorage, 'purgeAllHealthData')
       .mockResolvedValue(undefined);
+    const clearSpy = jest.spyOn(preferenceStore, 'clear');
     const mutateAsync = jest.fn().mockRejectedValue(new Error('boom'));
     mockDeleteHook(mutateAsync);
     wrap(<DeleteAccountItem />);
@@ -89,6 +96,7 @@ describe('DeleteAccountItem', () => {
       )
     );
     expect(purgeSpy).not.toHaveBeenCalled();
+    expect(clearSpy).not.toHaveBeenCalled();
     expect(useAuth.getState().status).toBe('signIn');
   });
 });
