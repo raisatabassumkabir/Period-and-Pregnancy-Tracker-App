@@ -3,6 +3,7 @@ import logging
 import secrets
 
 from django.conf import settings
+from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -138,6 +139,8 @@ class RevenueCatWebhookView(APIView):
 
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+    # RevenueCat redelivers in bursts from a few IPs; the shared secret is the gate.
+    throttle_classes = []
 
     def post(self, request):
         # 1. Constant-time authentication check (canonical: REVENUECAT_WEBHOOK_AUTHORIZATION)
@@ -220,8 +223,9 @@ class RevenueCatWebhookView(APIView):
                 status=status.HTTP_200_OK,
             )
 
-        # 4. Dispatch Celery task for async processing
-        process_revenuecat_event.delay(event_id=event_id)
+        # 4. Dispatch only after RLSMiddleware's transaction commits; otherwise the
+        # worker can run before the WebhookEvent row is visible and drop the event.
+        transaction.on_commit(lambda: process_revenuecat_event.delay(event_id=event_id))
 
         return Response(
             {"status": "accepted", "event_id": event_id},

@@ -7,6 +7,10 @@ from apps.payments.services import process_webhook_event_record
 
 logger = logging.getLogger(__name__)
 
+# The webhook enqueues on commit, so a missing row should be rare: a replica lag
+# or a manual re-enqueue. Retry briefly instead of dropping the event.
+EVENT_NOT_VISIBLE_RETRY_SECONDS = 10
+
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def process_revenuecat_event(self, event_id: str) -> bool:
@@ -16,8 +20,8 @@ def process_revenuecat_event(self, event_id: str) -> bool:
     try:
         event = WebhookEvent.objects.filter(event_id=event_id).first()
         if not event:
-            logger.warning("WebhookEvent %s not found for processing.", event_id)
-            return False
+            logger.warning("WebhookEvent %s not found yet; retrying.", event_id)
+            raise self.retry(countdown=EVENT_NOT_VISIBLE_RETRY_SECONDS)
 
         # Idempotency check: do not re-process already processed events
         if event.status == WebhookEvent.Status.PROCESSED:

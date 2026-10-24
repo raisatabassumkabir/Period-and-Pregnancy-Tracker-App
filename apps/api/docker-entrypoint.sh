@@ -49,12 +49,15 @@ if [ "$1" = "web" ]; then
   echo "Collecting static files..."
   uv run manage.py collectstatic --noinput
 
-  echo "Starting Gunicorn with Uvicorn ASGI workers..."
-  exec uv run gunicorn config.asgi:application \
-    -k uvicorn.workers.UvicornWorker \
+  # Every view is sync, so threaded WSGI beats ASGI here: no sync_to_async hop
+  # per request, and persistent DB connections behave the way Django expects.
+  echo "Starting Gunicorn (WSGI, threaded workers)..."
+  exec uv run gunicorn config.wsgi:application \
+    --worker-class gthread \
     --bind 0.0.0.0:8000 \
     --workers "${GUNICORN_WORKERS:-3}" \
-    --timeout 120 \
+    --threads "${GUNICORN_THREADS:-4}" \
+    --timeout 60 \
     --access-logfile - \
     --error-logfile -
 
@@ -62,11 +65,6 @@ elif [ "$1" = "worker" ]; then
   wait_for_db
   echo "Starting Celery worker..."
   exec uv run celery -A config worker -l "${CELERY_LOG_LEVEL:-info}" --concurrency="${CELERY_CONCURRENCY:-2}"
-
-elif [ "$1" = "beat" ]; then
-  wait_for_db
-  echo "Starting Celery beat..."
-  exec uv run celery -A config beat -l "${CELERY_LOG_LEVEL:-info}" -s /tmp/celerybeat-schedule
 
 else
   exec "$@"

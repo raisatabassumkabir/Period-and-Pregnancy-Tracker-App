@@ -35,7 +35,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Must be a list of condition codes.")
         unknown = {str(v) for v in value} - CONDITION_TAXONOMY
         if unknown:
-            raise serializers.ValidationError(f"Unknown condition codes: {sorted(unknown)}")
+            # Name the problem, never echo the submitted health values (RULE 5).
+            raise serializers.ValidationError("Contains unknown condition codes.")
         return sorted(set(value))
 
     def validate_country(self, value):

@@ -11,6 +11,7 @@ token ourselves here. Session auth (Django admin, browsable API in dev) still
 comes through `request.user` because AuthenticationMiddleware runs before us.
 """
 
+from django.conf import settings
 from django.db import connection, transaction
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -65,7 +66,7 @@ class RLSMiddleware:
         # path-scoped AND staff-scoped; API requests can never reach it.
         user = getattr(request, "user", None)
         return (
-            request.path.startswith("/admin/")
+            request.path.startswith(f"/{settings.ADMIN_URL}")
             and user is not None
             and user.is_authenticated
             and user.is_staff

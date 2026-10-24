@@ -65,4 +65,7 @@ def test_register_rejects_unknown_condition_codes():
         },
         format="json",
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
+    assert "profile" in response.json()["errors"]
+    # Health values never come back in the error body.
+    assert "definitely-not-a-code" not in response.content.decode()

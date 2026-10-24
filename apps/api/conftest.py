@@ -1,9 +1,18 @@
 import pytest
+from django.core.cache import cache
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import AccessToken
 
 from apps.core.rls import rls_bypass
 from tests.factories import UserFactory
+
+
+@pytest.fixture(autouse=True)
+def _fresh_cache():
+    """Throttle counters and idempotency keys live in the cache; isolate tests."""
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture

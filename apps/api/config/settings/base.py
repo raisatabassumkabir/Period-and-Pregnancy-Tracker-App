@@ -21,6 +21,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "insecure-dev-only-key")
 DEBUG = False
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
 
+# A non-guessable admin path in prod keeps the login page off scanners' lists.
+# Must end with "/"; RLSMiddleware scopes the staff bypass to this prefix.
+ADMIN_URL = os.environ.get("ADMIN_URL", "admin/")
+# Schema + Swagger UI are a map of every endpoint; only expose them where wanted.
+API_DOCS_ENABLED = os.environ.get("API_DOCS_ENABLED", "false").lower() == "true"
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -85,6 +91,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default="postgres://femtech:femtech@localhost:5432/femtech",
         conn_max_age=60,
+        conn_health_checks=True,
     )
 }
 
@@ -132,12 +139,30 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
+    "EXCEPTION_HANDLER": "apps.core.exceptions.problem_exception_handler",
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+    # Auth scopes are tight because they guard credential guessing, sign-up
+    # spam and reset-email floods; views opt in via throttle_scope.
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "300/min",
+        "auth-token": "10/min",
+        "auth-register": "5/hour",
+        "password-reset": "5/hour",
+    },
+    # Traefik appends the client IP to X-Forwarded-For. Without this DRF keys
+    # every throttle on the proxy's address and one client throttles everyone.
+    "NUM_PROXIES": int(os.environ.get("DRF_NUM_PROXIES", "1")),
 }
 
 SIMPLE_JWT = {
     # Short-lived access + rotating refresh, per ARCHITECTURE §4.
     # The mobile client stores the refresh token in expo-secure-store.
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    # Overridable so staging can exercise the refresh path with 1-minute tokens.
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(os.environ.get("JWT_ACCESS_MINUTES", "15"))),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -179,6 +204,26 @@ REVENUECAT_WEBHOOK_AUTHORIZATION = (
 REVENUECAT_API_BASE_URL = os.environ.get(
     "REVENUECAT_API_BASE_URL", "https://api.revenuecat.com/v1"
 )
+# Keep below the mobile client's 15s request timeout so a slow upstream fails
+# here first and the app gets a real response instead of its own timeout.
 REVENUECAT_REQUEST_TIMEOUT_SECONDS = int(
-    os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "8")
+    os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "5")
 )
+
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "root": {"handlers": ["console"], "level": LOG_LEVEL},
+    "loggers": {
+        # Without this, DEBUG=False routes request tracebacks only to
+        # mail_admins, and with no ADMINS configured they vanish.
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+    },
+}

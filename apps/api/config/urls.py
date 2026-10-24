@@ -1,8 +1,8 @@
+from django.conf import settings
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.payments.views import (
     DeprecatedVerifyPurchaseView,
@@ -11,9 +11,10 @@ from apps.payments.views import (
     SubscriptionSyncView,
 )
 from apps.users.views import (
-    AssistantChatView,
     MeView,
     RegisterView,
+    ThrottledTokenObtainPairView,
+    ThrottledTokenRefreshView,
 )
 from config.api_router import router
 
@@ -24,8 +25,8 @@ def health(_request):
 
 api_patterns = [
     path("auth/register/", RegisterView.as_view(), name="auth-register"),
-    path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/token/", ThrottledTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/token/refresh/", ThrottledTokenRefreshView.as_view(), name="token_refresh"),
     path("me", MeView.as_view(), name="user-me"),
     path("me/", MeView.as_view(), name="user-me-slash"),
     path(
@@ -48,16 +49,19 @@ api_patterns = [
         DeprecatedVerifyPurchaseView.as_view(),
         name="verify-purchase",
     ),
-    path("assistant/chat/", AssistantChatView.as_view(), name="assistant-chat"),
     path("", include(router.urls)),
 ]
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path("health/", health),
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
     path("api/", include(api_patterns)),
     path("api/v1/", include(api_patterns)),
 ]
+
+if settings.API_DOCS_ENABLED:
+    urlpatterns += [
+        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
+    ]
 

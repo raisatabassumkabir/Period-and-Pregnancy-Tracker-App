@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError, URLError
 
 import pytest
+from celery.exceptions import Retry
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -27,7 +28,7 @@ from apps.payments.services import (
     reconcile_subscription_state,
     sync_user_subscription,
 )
-from apps.payments.tasks import process_revenuecat_event
+from apps.payments.tasks import EVENT_NOT_VISIBLE_RETRY_SECONDS, process_revenuecat_event
 from conftest import create_owned
 from tests.factories import SubscriptionFactory, WebhookEventFactory
 
@@ -114,7 +115,9 @@ class TestRevenueCatWebhookSecurity:
         assert "Invalid or missing" in response.json()["detail"]
 
     @patch("apps.payments.views.process_revenuecat_event.delay")
-    def test_valid_authorization_secret_accepts_event(self, mock_delay, user_a):
+    def test_valid_authorization_secret_accepts_event(
+        self, mock_delay, user_a, django_capture_on_commit_callbacks
+    ):
         client = APIClient()
         secret = getattr(settings, "REVENUECAT_WEBHOOK_AUTHORIZATION", "test_webhook_secret")
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {secret}")
@@ -128,7 +131,8 @@ class TestRevenueCatWebhookSecurity:
                 "entitlement_id": ENTITLEMENT_PREMIUM,
             }
         }
-        response = client.post(self.url, payload, format="json")
+        with django_capture_on_commit_callbacks(execute=True):
+            response = client.post(self.url, payload, format="json")
         assert response.status_code == 200
         assert response.json()["status"] == "accepted"
         assert response.json()["event_id"] == "evt_valid_123"
@@ -197,7 +201,9 @@ class TestRevenueCatWebhookSecurity:
         assert "must contain 'id' and 'type'" in response.json()["detail"]
 
     @patch("apps.payments.views.process_revenuecat_event.delay")
-    def test_unknown_event_type_is_accepted_safely(self, mock_delay, user_a):
+    def test_unknown_event_type_is_accepted_safely(
+        self, mock_delay, user_a, django_capture_on_commit_callbacks
+    ):
         client = APIClient()
         secret = getattr(settings, "REVENUECAT_WEBHOOK_AUTHORIZATION", "test_webhook_secret")
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {secret}")
@@ -209,10 +215,36 @@ class TestRevenueCatWebhookSecurity:
                 "app_user_id": str(user_a.id),
             }
         }
-        response = client.post(self.url, payload, format="json")
+        with django_capture_on_commit_callbacks(execute=True):
+            response = client.post(self.url, payload, format="json")
         assert response.status_code == 200
         assert response.json()["status"] == "accepted"
         mock_delay.assert_called_once_with(event_id="evt_unknown_999")
+
+
+    @patch("apps.payments.views.process_revenuecat_event.delay")
+    def test_task_is_enqueued_only_after_commit(
+        self, mock_delay, user_a, django_capture_on_commit_callbacks
+    ):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {settings.REVENUECAT_WEBHOOK_AUTHORIZATION}")
+        payload = {
+            "event": {
+                "id": "evt_after_commit_1",
+                "type": "INITIAL_PURCHASE",
+                "app_user_id": str(user_a.id),
+            }
+        }
+
+        with django_capture_on_commit_callbacks() as callbacks:
+            response = client.post(self.url, payload, format="json")
+            # The row is not committed yet, so the worker must not see the job.
+            mock_delay.assert_not_called()
+
+        assert response.status_code == 200
+        assert len(callbacks) == 1
+        callbacks[0]()
+        mock_delay.assert_called_once_with(event_id="evt_after_commit_1")
 
 
 # =========================================================================
@@ -250,7 +282,9 @@ class TestRevenueCatWebhookIdempotency:
         mock_delay.assert_not_called()
 
     @patch("apps.payments.views.process_revenuecat_event.delay")
-    def test_redelivery_of_pending_or_failed_event_triggers_task(self, mock_delay, user_a):
+    def test_redelivery_of_pending_or_failed_event_triggers_task(
+        self, mock_delay, user_a, django_capture_on_commit_callbacks
+    ):
         WebhookEventFactory(
             event_id="evt_retry_1",
             status=WebhookEvent.Status.FAILED,
@@ -268,7 +302,8 @@ class TestRevenueCatWebhookIdempotency:
                 "app_user_id": str(user_a.id),
             }
         }
-        response = client.post(self.url, payload, format="json")
+        with django_capture_on_commit_callbacks(execute=True):
+            response = client.post(self.url, payload, format="json")
         assert response.status_code == 200
         assert response.json()["status"] == "accepted"
         mock_delay.assert_called_once_with(event_id="evt_retry_1")
@@ -626,6 +661,13 @@ class TestRevenueCatHttpClient:
 
 
 class TestCeleryTaskExecution:
+    def test_celery_task_retries_when_event_not_yet_visible(self):
+        with patch.object(process_revenuecat_event, "retry", side_effect=Retry()) as retry:
+            with pytest.raises(Retry):
+                process_revenuecat_event.run("evt_not_committed_yet")
+
+        retry.assert_called_once_with(countdown=EVENT_NOT_VISIBLE_RETRY_SECONDS)
+
     @patch("apps.payments.services.fetch_revenuecat_subscriber")
     def test_celery_task_processes_valid_event(self, mock_fetch, user_a):
         future = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)

@@ -1,6 +1,8 @@
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.core.rls import rls_user
 from apps.users.models import Profile
@@ -11,6 +13,20 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth-register"
+
+
+# simplejwt's views can't take throttle_scope through as_view(): Django only
+# accepts kwargs that already exist as class attributes, and APIView has none.
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth-token"
+
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth-token"
 
 
 class ProfileViewSet(
@@ -56,16 +72,17 @@ class MeView(APIView):
         user = request.user
         full_name = None
         is_premium = False
-        try:
-            with rls_user(str(user.pk)):
-                profile = getattr(user, "profile", None)
-                if profile:
-                    full_name = getattr(profile, "full_name", None)
-                subscription = getattr(user, "subscription", None)
-                if subscription:
-                    is_premium = subscription.has_active_access()
-        except Exception:
-            pass
+        # getattr's default already covers a missing profile/subscription
+        # (RelatedObjectDoesNotExist is an AttributeError). Anything else is a
+        # real failure: let it 500 and reach Sentry instead of reporting a
+        # paying user as free.
+        with rls_user(str(user.pk)):
+            profile = getattr(user, "profile", None)
+            if profile:
+                full_name = getattr(profile, "full_name", None)
+            subscription = getattr(user, "subscription", None)
+            if subscription:
+                is_premium = subscription.has_active_access()
 
         return Response(
             {
@@ -82,30 +99,4 @@ class MeView(APIView):
         user = request.user
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class AssistantChatView(APIView):
-    """
-    AI Assistant chat endpoint responding to health questions.
-    """
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        _query = request.data.get("query", "")
-        reply = (
-            "Thank you for sharing your symptoms and questions. "
-            "Based on your profile, tracking daily symptoms helps identify patterns over time. "
-            "Please consult your healthcare provider for clinical diagnosis or urgent advice."
-        )
-        return Response(
-            {
-                "reply": reply,
-                "answer": reply,
-                "text": reply,
-                "message": reply,
-                "status": "ok",
-            },
-            status=status.HTTP_200_OK,
-        )
 
