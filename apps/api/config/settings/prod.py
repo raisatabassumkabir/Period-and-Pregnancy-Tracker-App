@@ -18,6 +18,10 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+PUBLIC_BASE_URL = f"https://{os.environ['DOMAIN']}"
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+ANYMAIL = {"RESEND_API_KEY": os.environ.get("RESEND_API_KEY", "")}
+
 # Error reporting. The API holds reproductive-health data, so nothing that could
 # contain it leaves the server: no request bodies, no cookies/headers/user PII.
 # Celery task args are ids only.

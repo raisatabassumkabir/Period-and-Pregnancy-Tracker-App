@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
@@ -67,11 +68,13 @@ export default function Login() {
       </View>
 
       <View className="mb-6 items-end">
-        <Pressable onPress={() => {}}>
-          <Text className="font-body-semibold text-[13px] text-ink">
-            Forgot password?
-          </Text>
-        </Pressable>
+        <Link href="/forgot-password" asChild>
+          <Pressable testID="forgot-password-link">
+            <Text className="font-body-semibold text-[13px] text-ink">
+              Forgot password?
+            </Text>
+          </Pressable>
+        </Link>
       </View>
 
       <Button

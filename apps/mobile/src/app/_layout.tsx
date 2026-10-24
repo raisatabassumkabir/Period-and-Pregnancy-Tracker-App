@@ -52,7 +52,12 @@ loadSelectedPalette();
 SplashScreen.preventAutoHideAsync();
 
 /** Top-level routes that are valid for both signed-in and signed-out users. */
-const AUTH_ROUTES = new Set(['login', 'register', 'onboarding']);
+const AUTH_ROUTES = new Set([
+  'login',
+  'register',
+  'onboarding',
+  'forgot-password',
+]);
 
 export default function RootLayout() {
   const segments = useSegments();
@@ -121,6 +126,7 @@ export default function RootLayout() {
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
       </Stack>
     </Providers>
   );

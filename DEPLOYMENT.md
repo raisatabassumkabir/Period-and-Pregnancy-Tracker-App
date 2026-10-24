@@ -106,6 +106,10 @@ CELERY_LOG_LEVEL=info
 CELERY_CONCURRENCY=2
 LOG_LEVEL=INFO
 
+# Password-reset email (Resend). See "Transactional email" below.
+RESEND_API_KEY=
+DEFAULT_FROM_EMAIL=Happy Women <no-reply@yourdomain.com>
+
 # Error reporting
 SENTRY_DSN=
 SENTRY_ENVIRONMENT=production
@@ -127,6 +131,16 @@ BACKUP_KEEP_DAYS=30
 ```
 
 Optional overrides: `API_DOCS_ENABLED=true` serves `/api/schema/` and `/api/docs/` (off in production by default), `JWT_ACCESS_MINUTES` (default 15; use `1` on staging to exercise token refresh), `DRF_NUM_PROXIES` (default 1).
+
+#### Transactional email (password reset)
+
+Password-reset emails go out through [Resend](https://resend.com) from the Celery worker.
+
+1. In Resend, add and verify your sending domain (it gives you SPF/DKIM DNS records; add them at your DNS provider). Until the domain verifies, Resend only delivers to your own address.
+2. Create an API key with **Sending access** only, scoped to that domain, and set it as `RESEND_API_KEY`.
+3. Set `DEFAULT_FROM_EMAIL` to an address on the verified domain.
+
+The email links to `https://<DOMAIN>/accounts/password-reset/...`, a page served by the API where the user picks a new password. Every refresh token for that user is then revoked, so all devices are signed out.
 
 > [!IMPORTANT]
 > **Row-Level Security (RLS) Requirement:**

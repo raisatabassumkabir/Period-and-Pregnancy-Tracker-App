@@ -17,6 +17,7 @@ dependencies = [
     "gunicorn>=23.0",
     "whitenoise>=6.12.0",
     "sentry-sdk[celery,django]>=2.20",
+    "django-anymail[resend]>=13",
 ]
 
 [dependency-groups]

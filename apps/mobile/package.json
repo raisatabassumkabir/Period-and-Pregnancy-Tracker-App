@@ -29,7 +29,7 @@
     "app-release": "cross-env SKIP_BRANCH_PROTECTION=true np --no-publish --no-cleanup --no-release-draft",
     "version": "pnpm run prebuild && git add .",
     "lint": "eslint .",
-    "type-check": "tsc --noemit",
+    "type-check": "node scripts/generate-route-types.js && tsc --noemit",
     "test": "jest",
     "check-all": "pnpm run lint && pnpm run type-check && pnpm run test",
     "test:ci": "pnpm run test --coverage",

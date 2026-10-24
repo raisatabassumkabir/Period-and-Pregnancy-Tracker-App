@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
+    "anymail",
     # local
     "apps.core",
     "apps.users",
@@ -209,6 +210,16 @@ REVENUECAT_API_BASE_URL = os.environ.get(
 REVENUECAT_REQUEST_TIMEOUT_SECONDS = int(
     os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "5")
 )
+
+# Transactional email (password resets). Console locally; prod.py swaps in
+# Resend through django-anymail.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Happy Women <no-reply@localhost>")
+# Absolute origin for links inside emails. prod.py derives it from DOMAIN.
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
+# Reset links expire after an hour, and die on first use because the token
+# hashes the current password.
+PASSWORD_RESET_TIMEOUT = 60 * 60
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 LOGGING = {

@@ -15,6 +15,9 @@ x-django-env: &django-env
   ADMIN_URL: ${ADMIN_URL:?ADMIN_URL must be set to a non-guessable path ending in /}
   API_DOCS_ENABLED: ${API_DOCS_ENABLED:-false}
   JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-15}
+  # Password-reset email (Resend via django-anymail). The worker sends it.
+  RESEND_API_KEY: ${RESEND_API_KEY:?RESEND_API_KEY must be set}
+  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:?DEFAULT_FROM_EMAIL must be set, e.g. Happy Women <no-reply@yourdomain.com>}
   SENTRY_DSN: ${SENTRY_DSN:-}
   SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
   SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0}

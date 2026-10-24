@@ -45,6 +45,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         return value.upper()
 
 
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     profile = ProfileSerializer(required=False)

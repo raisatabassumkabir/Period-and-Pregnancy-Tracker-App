@@ -32,6 +32,7 @@ jest.mock('expo-crypto', () => ({
   getRandomBytesAsync: jest.fn(async (length: number) =>
     Uint8Array.from({ length }, (_, index) => index)
   ),
+  randomUUID: jest.fn(() => '00000000-0000-4000-8000-000000000000'),
 }));
 
 // `@env` reads `Constants.expoConfig.extra`, which jest-expo leaves empty — so

@@ -37,28 +37,21 @@ export interface RegisterResponse {
   profile?: import('./health').Profile;
 }
 
-export interface GoogleAuthRequest {
-  id_token: string;
-}
-
-export interface GoogleAuthResponse {
-  access_token: string;
-  token_type: 'bearer';
-  is_new_user: boolean;
-}
-
-export interface ForgotPasswordRequest {
+/**
+ * `POST auth/password-resets/`. Send an `Idempotency-Key` header per user tap;
+ * a replay with the same key and email is a no-op, a different email is 409.
+ */
+export interface PasswordResetRequest {
   email: string;
 }
 
-export interface ForgotPasswordResponse {
-  message: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  new_password: string;
-  confirm_password: string;
+/**
+ * 202 body. Identical whether or not the email has an account. The emailed
+ * link opens a page on the API domain where the new password is set; there is
+ * no in-app reset endpoint.
+ */
+export interface PasswordResetResponse {
+  detail: string;
 }
 
 export interface LogoutResponse {

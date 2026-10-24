@@ -57,7 +57,7 @@ Never return an error with 200.
 
 ## What the Django API implements today
 
-`apps/backend` currently serves the endpoints marked **live** below. The rest of
+`apps/api` currently serves the endpoints marked **live** below. The rest of
 this document is the target contract: the types exist and the client compiles
 against them, but calling those paths returns 404 until the backend catches up.
 
@@ -70,15 +70,17 @@ against them, but calling those paths returns 404 until the backend catches up.
 | `cycles/`, `cycles/{id}/`                   | full CRUD, `Cycle`; 409 on a duplicate `start_date`                                    |
 | `daily-logs/`, `daily-logs/{id}/`           | full CRUD, `DailyLog`; one per calendar day, 409 on a duplicate `date`                 |
 | `pregnancies/`, `pregnancies/{id}/`         | full CRUD, `Pregnancy`; 409 on a second `active` row                                   |
+| `POST auth/password-resets/`                | `PasswordResetRequest` → 202 `PasswordResetResponse`; `Idempotency-Key` honoured       |
+| `GET me`, `DELETE me`                       | `UserResponse`; DELETE → 204                                                           |
 
 Trailing slashes are required. Every list endpoint returns `PaginateQuery<T>`
 (`{ count, next, previous, results }`, page size 50, `?page=<n>`); there is no
 client-controlled page size. `temperature_celsius` is a DRF decimal and so
 crosses the wire as a **string** (`"36.60"`), in both directions.
 
-Not yet implemented: `me`, `logout`, `google`, `forgot-password`,
-`reset-password`, and everything under `payments/`. No endpoint returns 402 yet,
-though the server-side `PaymentRequired` exception is ready to raise.
+Not yet implemented: `logout` and Google sign-in. No endpoint returns 402 yet,
+though the server-side `PaymentRequired` exception is ready to raise. Every
+error body is Problem+JSON; requests are rate limited (429 with `Retry-After`).
 
 ## Auth
 
@@ -86,17 +88,20 @@ Bearer JWT in `Authorization: Bearer <access_token>` on every request after
 login. The client stores the token in the device secure store. Access tokens
 last 15 minutes; refresh tokens 30 days.
 
-| Endpoint                            | Request                 | Response                                  |
-| ----------------------------------- | ----------------------- | ----------------------------------------- |
-| `POST auth/token/` **live**         | `LoginRequest`          | `TokenPairResponse`                       |
-| `POST auth/token/refresh/` **live** | `RefreshTokenRequest`   | `TokenPairResponse`                       |
-| `POST auth/register/` **live**      | `RegisterRequest`       | `RegisterResponse` (201)                  |
-| `POST google`                       | `GoogleAuthRequest`     | `GoogleAuthResponse`                      |
-| `POST forgot-password`              | `ForgotPasswordRequest` | `ForgotPasswordResponse`                  |
-| `POST reset-password`               | `ResetPasswordRequest`  | `{ message }`                             |
-| `POST logout`                       | —                       | `LogoutResponse`                          |
-| `GET me`                            | —                       | `UserResponse`                            |
-| `DELETE me`                         | —                       | 204 (Google Play account-deletion policy) |
+| Endpoint                              | Request                | Response                                  |
+| ------------------------------------- | ---------------------- | ----------------------------------------- |
+| `POST auth/token/` **live**           | `LoginRequest`         | `TokenPairResponse`                       |
+| `POST auth/token/refresh/` **live**   | `RefreshTokenRequest`  | `TokenPairResponse`                       |
+| `POST auth/register/` **live**        | `RegisterRequest`      | `RegisterResponse` (201)                  |
+| `POST auth/password-resets/` **live** | `PasswordResetRequest` | `PasswordResetResponse` (202)             |
+| `POST logout`                         | —                      | `LogoutResponse`                          |
+| `GET me` **live**                     | —                      | `UserResponse`                            |
+| `DELETE me` **live**                  | —                      | 204 (Google Play account-deletion policy) |
+
+Password reset finishes in the browser: the emailed link opens
+`/accounts/password-reset/<uid>/<token>/` on the API domain, which sets the new
+password and revokes every refresh token for the account. The app only sends
+the request and shows "check your inbox".
 
 ## Health data
 
