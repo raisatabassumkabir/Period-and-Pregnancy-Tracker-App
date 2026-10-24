@@ -89,7 +89,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-400': '120 225 180',
       '--color-accent-2-500': '80 200 150',
       '--color-accent-2-600': '50 170 120',
-      '--color-accent-2-700': '30 140 90',
+      '--color-accent-2-700': '24 115 70',
       '--color-accent-2-800': '15 100 60',
       '--color-accent-2-900': '5 70 40',
     },

@@ -52,10 +52,9 @@ describe('Login', () => {
 
     expect(screen.getByTestId('auth-brand')).toBeOnTheScreen();
     expect(screen.getByText('Happy Women')).toBeOnTheScreen();
-    expect(screen.getByText('WELCOME BACK')).toBeOnTheScreen();
-    // "Log in" is both the screen title and the button label.
+    expect(screen.getByText('Welcome back')).toBeOnTheScreen();
     expect(screen.getByTestId('login-button-label')).toHaveTextContent(
-      'Log in'
+      '→ Sign in'
     );
   });
 

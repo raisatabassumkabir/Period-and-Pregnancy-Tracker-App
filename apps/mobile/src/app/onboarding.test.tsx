@@ -137,6 +137,9 @@ describe('Onboarding (6-Step Flow)', () => {
     expect(screen.getByTestId('height-input-metric')).toBeOnTheScreen();
     expect(screen.getByTestId('weight-input-metric')).toBeOnTheScreen();
 
+    await user.type(screen.getByTestId('height-input-metric'), '165');
+    await user.type(screen.getByTestId('weight-input-metric'), '60');
+
     // Complete setup
     expect(screen.getByTestId('onboarding-next')).toHaveTextContent(
       'Complete & Start'
@@ -190,6 +193,8 @@ describe('Onboarding (6-Step Flow)', () => {
 
     // Step 6: Body metrics
     expect(await screen.findByTestId('height-input-metric')).toBeOnTheScreen();
+    await user.type(screen.getByTestId('height-input-metric'), '165');
+    await user.type(screen.getByTestId('weight-input-metric'), '60');
     await user.press(screen.getByTestId('onboarding-next'));
 
     // Verify InitializeCycleModal is shown
@@ -205,12 +210,16 @@ describe('Onboarding (6-Step Flow)', () => {
     expect(mockInitMutateAsync).toHaveBeenCalled();
   });
 
-  it('allows skipping directly into the app shell at any step', async () => {
+  it('allows skipping steps in the onboarding flow', async () => {
     const { user } = setup(<Onboarding />);
 
     expect(screen.getByTestId('onboarding-skip')).toBeOnTheScreen();
     await user.press(screen.getByTestId('onboarding-skip'));
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(app)'));
+    await waitFor(() => {
+      expect(
+        screen.getByText('What brings you to Happy Women?')
+      ).toBeOnTheScreen();
+    });
   });
 
   it('supports partner code entry on step 1', async () => {

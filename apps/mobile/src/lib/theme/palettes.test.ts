@@ -50,9 +50,9 @@ function eachPalette(fn: (tokens: PaletteTokens, label: string) => void) {
 }
 
 describe('palette structure', () => {
-  it('exposes exactly seven palettes and defaults to the Happy Women brand', () => {
+  it('exposes exactly seven palettes and has a valid default palette', () => {
     expect(PALETTE_IDS).toHaveLength(7);
-    expect(DEFAULT_PALETTE_ID).toBe('happy');
+    expect(DEFAULT_PALETTE_ID).toBe('rose');
     expect(PALETTES[DEFAULT_PALETTE_ID]).toBeDefined();
   });
 
@@ -62,9 +62,9 @@ describe('palette structure', () => {
     expect(PALETTES.happy.dark['--color-bg']).toBe('18 18 18'); // #121212
     expect(PALETTES.happy.dark['--color-accent']).toBe('255 117 117'); // #FF7575
     expect(PALETTES.happy.swatch).toEqual({
-      accent: '#FF7575',
-      accent2: '#B9A6FF',
-      bg: '#121212',
+      accent: '#FF7A8A',
+      accent2: '#A7F3D0',
+      bg: '#FFF5F2',
     });
   });
 

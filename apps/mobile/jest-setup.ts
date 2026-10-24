@@ -4,6 +4,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
+jest.mock('expo-font', () => ({
+  ...jest.requireActual('expo-font'),
+  useFonts: () => [true],
+  isLoaded: () => true,
+  loadAsync: jest.fn().mockResolvedValue(undefined),
+}));
+
 // The encrypted preference store (`src/lib/storage.tsx`) needs the OS keystore
 // and a random key at open time. Both are native; give them in-memory stand-ins
 // so any test that touches a preference works without a device. A test file may

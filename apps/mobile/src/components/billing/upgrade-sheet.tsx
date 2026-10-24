@@ -36,7 +36,7 @@ const CLOSE_ICON_SIZE = 18;
 
 const FEATURE_HIGHLIGHTS: { icon: string; label: string }[] = [
   { icon: 'check', label: 'Advanced cycle & symptom analytics' },
-  { icon: 'check', label: 'Doctor-ready health reports' },
+  { icon: 'check', label: 'Personalized cycle & ovulation forecasts' },
   { icon: 'check', label: 'Full trimester meal & nutrition plans' },
   { icon: 'check', label: 'AI Health Guide with deeper insights' },
 ];
