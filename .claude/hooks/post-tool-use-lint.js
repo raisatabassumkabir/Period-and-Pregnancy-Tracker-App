@@ -2,7 +2,7 @@
 // Post-tool-use hook: after Edit/Write/MultiEdit to
 //   - a .ts(x) file under src/: run pnpm exec eslint on the file (non-blocking —
 //     exit 0, lint output on stderr for the model to address);
-//   - a .py file under apps/backend/apps/api: run `uv run ruff check --fix` on the
+//   - a .py file under apps/api: run `uv run ruff check --fix` on the
 //     file and, for views.py, the RULE 1 owned-queryset lint. These exit 2 on
 //     failure so the model sees the violations and fixes them before moving on.
 
@@ -84,10 +84,10 @@ const normalized = target.replace(/\\/g, '/');
 
 // --- Python (Django API) -------------------------------------------------------
 if (/\.py$/.test(normalized)) {
-  const marker = '/apps/backend/apps/api/';
+  const marker = '/apps/api/';
   const idx = normalized.indexOf(marker);
   if (idx === -1 || normalized.includes('/migrations/')) process.exit(0);
-  const apiRoot = path.join(projectRoot(), 'apps', 'backend', 'apps', 'api');
+  const apiRoot = path.join(projectRoot(), 'apps', 'api');
   const relPy = normalized.slice(idx + marker.length);
   const problems = [];
   const run = (args) =>
@@ -115,7 +115,7 @@ if (/\.py$/.test(normalized)) {
     }
   }
   if (problems.length) {
-    process.stderr.write(`[post-lint] apps/backend/apps/api/${relPy}\n${problems.join('\n')}\n`);
+    process.stderr.write(`[post-lint] apps/api/${relPy}\n${problems.join('\n')}\n`);
     process.exit(2);
   }
   process.exit(0);

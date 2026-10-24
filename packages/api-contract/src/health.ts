@@ -2,7 +2,7 @@
 // Health data: profiles, cycles, daily logs, pregnancies
 // ============================================
 //
-// Mirrors the DRF serializers in `apps/backend/apps/api/apps/{users,cycles,pregnancy}`.
+// Mirrors the DRF serializers in `apps/api/apps/{users,cycles,pregnancy}`.
 // Dates are `YYYY-MM-DD` strings; datetimes are RFC 3339 UTC strings.
 // Every list endpoint returns a `PaginateQuery<T>` envelope.
 

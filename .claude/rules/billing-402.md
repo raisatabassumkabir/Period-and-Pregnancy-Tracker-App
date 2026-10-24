@@ -64,41 +64,56 @@ premium" button that opens the sheet for marketing).
    `visible: true` and `detail.feature` matches the new key. See
    `src/api/common/client.test.ts` for the pattern.
 
+## v1 status: monetization is off
+
+v1 ships free. `FEATURES.monetization` (`src/lib/features.ts`) is `false`, so
+RevenueCat is never configured, billing identity sync is skipped, the
+subscription-status query is disabled, and the settings card, plan pill and
+premium badge are hidden. The 402 interceptor and `UpgradeSheet` stay wired.
+Before turning the flag on, a real premium feature must be gated **on the
+backend** with `PaymentRequired` (`apps/api/apps/core/exceptions.py`); the
+paywall copy in `upgrade-sheet.tsx` must only list features that are gated.
+
 ## Subscription status
 
-- Source of truth: `GET /api/payments/subscription-status/`.
+- Source of truth: `GET /api/v1/payments/subscription-status/`.
 - Hook: `usePaymentSubscriptionStatus` in
-  `src/api/billing/use-subscription-status.ts`.
+  `src/api/billing/use-subscription-status.ts` (disabled while monetization is off).
 - Always wire `refetchOnWindowFocus: true` on the subscription status query so
   a purchase completed elsewhere shows on foreground.
 
-## Purchase flow
+## Purchase flow (RevenueCat)
 
 Orchestrator: `usePurchasePremium` in `src/lib/billing/use-purchase-premium.ts`.
-Sequence: `opening → requestSubscription → verifying → POST
-/payments/google-play/verify-purchase/ → acknowledging → success → invalidate
-['payments', 'subscription-status'] + ['me']`.
+Sequence: `opening → RevenueCat purchasePackage → verifying → POST
+payments/subscription-sync/ (no body; the server reads the user from the JWT
+and pulls RevenueCat's REST API) → success → invalidate
+['payments', 'subscription-status'] + ['me']`. If the sync call fails the state
+is `pending_sync` and the sheet offers "Retry Verification"; the RevenueCat
+webhook (`payments/revenuecat/webhook/`, processed in Celery after commit)
+reconciles it either way.
 
-- Errors map to user-facing copy via the message itself.
-- 409 ("already on another account") and 404 ("token not found") are surfaced
-  to the sheet's error banner, not thrown.
 - User cancel (`PurchaseCancelledError`) resets to idle with no banner.
+- The interceptor never raises the paywall for a 402 from `subscription-sync`.
+- `payments/google-play/verify-purchase/` is deprecated and answers 410.
 
 ## Billing client facade
 
 `src/lib/billing/index.ts` exports a pluggable `BillingClient` interface and a
-no-op stub. `src/lib/bootstrap.ts` registers the `expo-iap` implementation
-(`src/lib/billing/expo-iap-client.ts`) at startup on Android. Do not import
-`expo-iap` directly from feature code — only the facade is allowed, and keep the
-native import out of `@/lib` barrel exports so Jest never loads it.
+no-op stub. `src/lib/bootstrap.ts` registers the RevenueCat implementation
+(`src/lib/billing/revenuecat-client.ts`) on Android only when
+`FEATURES.monetization` is on. Do not import `react-native-purchases` from
+feature code — only the facade is allowed, and keep the native import out of
+`@/lib` barrel exports so Jest never loads it.
 
-Product ids live in `PREMIUM_PRODUCT_IDS` / `DEFAULT_PRODUCT_ID` in the facade
-and must match the Play Console and the backend allow-list.
+Product ids (`premium_monthly`, `premium_annual`) and the `premium` entitlement
+live in `packages/api-contract/src/billing.ts` and must match Play Console,
+RevenueCat and the backend allow-list.
 
 ## Don't
 
 - Don't add 402 tests per feature; assert the contract once in the
   `client` / integration tests.
 - Don't pass `feature` as a free-form string in the API — keep the union.
-- Don't acknowledge a purchase client-side only. The backend re-verifies via
-  Google Play; the client ack just clears Play's 3-day refund window.
+- Don't trust client-side entitlement for anything that matters. Gate on the
+  backend; the app's `is_premium` is display only.

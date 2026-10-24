@@ -54,3 +54,6 @@ apps/backend/.appwrite/
 .idea/
 *.swp
 scratch/
+
+# pnpm workspace: an npm lockfile makes `expo install` pick npm instead of pnpm.
+package-lock.json

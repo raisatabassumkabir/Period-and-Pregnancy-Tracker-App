@@ -1,6 +1,6 @@
 # HTTP contract
 
-What `apps/mobile` expects from whatever lives in `apps/backend`. The TypeScript
+What `apps/mobile` expects from the Django API in `apps/api`. The TypeScript
 types in `src/` are the machine-readable half; this file is the half a Django or
 Appwrite implementer reads.
 
@@ -178,7 +178,7 @@ resource instead.
 
 ## Implementing this in Django
 
-- DRF + `djangorestframework-simplejwt` covers auth. `apps/backend` already
+- DRF + `djangorestframework-simplejwt` covers auth. `apps/api` already
   ships the Problem+JSON exception handler (`apps/core/exceptions.py`, wired as
   `REST_FRAMEWORK["EXCEPTION_HANDLER"]`) — raise DRF exceptions, never build
   error dicts. `ValidationError` → 422, uniqueness → 409, `Conflict(...)` for

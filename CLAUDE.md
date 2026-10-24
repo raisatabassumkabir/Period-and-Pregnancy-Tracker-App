@@ -9,7 +9,7 @@ cost real debugging time. `.claude/CLAUDE.md` has the one-page conventions.
 
 ```
 apps/mobile/            the Expo client — every `src/…` path below is relative to it
-apps/backend/           Django or Appwrite; README only until an app needs it
+apps/api/               Django 6 + DRF API (own CLAUDE.md, ARCHITECTURE.md, ONBOARDING.md)
 packages/api-contract/  @repo/api-contract — TS types + CONTRACT.md shared by client and server
 patches/                pnpm patch for react-native-css-interop (must stay at the root)
 ```
@@ -35,34 +35,34 @@ same reason; `lint-staged.config.js` runs eslint inside `apps/mobile` via
 
 ## What the template ships (apps/mobile unless noted)
 
-| Area | Files |
-| --- | --- |
-| Env loading + validation (zod, per-`APP_ENV` files) | `env.js`, `src/lib/env.js`, `.env.example` |
-| Axios client with auth header + global 402 interceptor | `src/api/common/client.tsx` |
-| React Query provider | `src/api/common/api-provider.tsx` |
-| Auth API hooks (login, register, me, logout, delete, google, forgot/reset) | `src/api/auth/` |
-| Auth store + secure token storage | `src/lib/auth/` |
-| Root auth gate (single redirect point) | `src/app/_layout.tsx` |
-| Auth screens | `src/app/{onboarding,login,register}.tsx`, `src/components/auth/`, `src/hooks/use-register-logic.ts` |
-| Tab shell (Home · Settings) | `src/app/(app)/` |
-| Settings (profile, subscription, language, theme, palette, links, delete account, logout) | `src/components/settings/` |
-| Six-palette light/dark theming through CSS variables | `src/lib/theme/`, `tailwind.config.js`, `src/lib/use-theme-config.tsx` |
-| Design-system atoms | `src/components/ui/` |
-| Upgrade store + animated upgrade sheet + premium badge + subscription card | `src/lib/upgrade/`, `src/components/billing/` |
-| Play Billing facade + expo-iap implementation + purchase orchestrator | `src/lib/billing/` |
-| Billing API hooks (verify-purchase, subscription-status) | `src/api/billing/` |
-| Shared HTTP contract (types + prose) | `packages/api-contract/` (root) |
-| Backend slot with Django / Appwrite notes | `apps/backend/README.md` (root) |
-| File-share facade (expo-sharing impl) | `src/lib/sharing/` |
-| Amplitude telemetry facade | `src/lib/telemetry/` |
-| i18n (en, ar, RTL) | `src/lib/i18n/`, `src/translations/` |
-| Store / legal / support links | `src/lib/external-links.ts` |
-| Reanimated wrappers | `src/components/animations/` |
-| Jest setup + mocks + colocated tests | `jest.config.js`, `jest-setup.ts`, `__mocks__/`, `**/*.test.ts(x)` |
-| Maestro E2E (fresh launch, login validation, tabs, upgrade sheet) | `.maestro/` |
-| EAS profiles | `eas.json` |
-| Claude Code rules, hooks, agents, skills | `.claude/` (root) |
-| Identity rename script | `scripts/init-app.js` (root) |
+| Area                                                                                      | Files                                                                                                |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Env loading + validation (zod, per-`APP_ENV` files)                                       | `env.js`, `src/lib/env.js`, `.env.example`                                                           |
+| Axios client with auth header + global 402 interceptor                                    | `src/api/common/client.tsx`                                                                          |
+| React Query provider                                                                      | `src/api/common/api-provider.tsx`                                                                    |
+| Auth API hooks (login, register, me, logout, delete, google, forgot/reset)                | `src/api/auth/`                                                                                      |
+| Auth store + secure token storage                                                         | `src/lib/auth/`                                                                                      |
+| Root auth gate (single redirect point)                                                    | `src/app/_layout.tsx`                                                                                |
+| Auth screens                                                                              | `src/app/{onboarding,login,register}.tsx`, `src/components/auth/`, `src/hooks/use-register-logic.ts` |
+| Tab shell (Home · Settings)                                                               | `src/app/(app)/`                                                                                     |
+| Settings (profile, subscription, language, theme, palette, links, delete account, logout) | `src/components/settings/`                                                                           |
+| Six-palette light/dark theming through CSS variables                                      | `src/lib/theme/`, `tailwind.config.js`, `src/lib/use-theme-config.tsx`                               |
+| Design-system atoms                                                                       | `src/components/ui/`                                                                                 |
+| Upgrade store + animated upgrade sheet + premium badge + subscription card                | `src/lib/upgrade/`, `src/components/billing/`                                                        |
+| Play Billing facade + RevenueCat implementation + purchase orchestrator                   | `src/lib/billing/`                                                                                   |
+| Billing API hooks (subscription-sync, subscription-status)                                | `src/api/billing/`                                                                                   |
+| Shared HTTP contract (types + prose)                                                      | `packages/api-contract/` (root)                                                                      |
+| Django API (auth, health data, payments, password reset)                                  | `apps/api/` (root)                                                                                   |
+| File-share facade (expo-sharing impl)                                                     | `src/lib/sharing/`                                                                                   |
+| Amplitude telemetry facade                                                                | `src/lib/telemetry/`                                                                                 |
+| i18n (en, ar, RTL)                                                                        | `src/lib/i18n/`, `src/translations/`                                                                 |
+| Store / legal / support links                                                             | `src/lib/external-links.ts`                                                                          |
+| Reanimated wrappers                                                                       | `src/components/animations/`                                                                         |
+| Jest setup + mocks + colocated tests                                                      | `jest.config.js`, `jest-setup.ts`, `__mocks__/`, `**/*.test.ts(x)`                                   |
+| Maestro E2E (fresh launch, login validation, tabs, upgrade sheet)                         | `.maestro/`                                                                                          |
+| EAS profiles                                                                              | `eas.json`                                                                                           |
+| Claude Code rules, hooks, agents, skills                                                  | `.claude/` (root)                                                                                    |
+| Identity rename script                                                                    | `scripts/init-app.js` (root)                                                                         |
 
 ## Architecture
 
@@ -75,7 +75,15 @@ store in `src/lib/upgrade/index.tsx`. `UpgradeSheet` is mounted once in
 lights up the same sheet with no per-screen wiring.
 
 ```json
-{ "type": "https://apiguide.dev/status-codes/402/", "title": "Payment Required", "status": 402, "detail": "…", "feature": "premium", "current_usage": 15, "limit": 15 }
+{
+  "type": "https://apiguide.dev/status-codes/402/",
+  "title": "Payment Required",
+  "status": 402,
+  "detail": "…",
+  "feature": "premium",
+  "current_usage": 15,
+  "limit": 15
+}
 ```
 
 Every error body is an RFC 9457 Problem Details object (`ProblemDetail` in
@@ -89,36 +97,32 @@ To gate a new feature: add the key to `PremiumFeature`
 (`packages/api-contract/src/billing.ts`), add a title to `FEATURE_TITLES`
 (`src/components/billing/upgrade-sheet.tsx`), have the backend send it. Done.
 
-### Google Play Billing — pluggable facade
+### Google Play Billing — pluggable facade (RevenueCat)
 
-`src/lib/billing/index.ts` exposes a minimal `BillingClient` interface
-(`getProducts`, `requestSubscription`, `acknowledgePurchase`,
-`getAvailablePurchases`). The production implementation is
-`expo-iap-client.ts` (expo-iap 5, needs a dev client / EAS build, not Expo
-Go). `src/lib/bootstrap.ts` registers it on Android at startup. The no-op stub
-is the default so unit tests never touch the native module.
-
-Error mapping: `user-cancelled` → `PurchaseCancelledError` (hook resets to
-idle, no banner); `pending` → `PurchasePendingError` (entitlement arrives via
-RTDN); everything else → `BillingError` with the Play code.
+`src/lib/billing/index.ts` exposes a minimal `BillingClient` interface; the
+production implementation is `revenuecat-client.ts` (`react-native-purchases`,
+needs a dev client / EAS build, not Expo Go). `src/lib/bootstrap.ts` registers
+it on Android **only when `FEATURES.monetization` is on** (`src/lib/features.ts`).
+v1 ships free with the flag off: RevenueCat is never configured and every
+paywall entry point is hidden. The no-op stub is the default so unit tests
+never touch the native module.
 
 `usePurchasePremium` orchestrates:
 
 ```
-opening → requestSubscription
-verifying → POST /payments/google-play/verify-purchase/
-acknowledging → acknowledgePurchase (Play SDK)
+opening → RevenueCat purchasePackage
+verifying → POST payments/subscription-sync/ (server pulls RevenueCat REST)
 success → invalidate ['payments', 'subscription-status'] + ['me']
+(sync failed → pending_sync + "Retry Verification"; the webhook reconciles)
 ```
 
-Set `PREMIUM_PRODUCT_IDS` / `DEFAULT_PRODUCT_ID` to the app's Play Console
-subscription ids. If the app has no IAP, delete `src/lib/billing/expo-iap-client.ts`,
-its test, the `expo-iap` plugin line in `app.config.ts`, and the registration
-in `bootstrap.ts`; the facade stub keeps the upgrade sheet compiling.
+Product ids and the `premium` entitlement live in
+`packages/api-contract/src/billing.ts`. The rules form is
+`.claude/rules/billing-402.md`.
 
 ### Subscription status
 
-Source of truth is `GET /api/payments/subscription-status/` via
+Source of truth is `GET /api/v1/payments/subscription-status/` via
 `usePaymentSubscriptionStatus`. Callers pass `refetchOnWindowFocus: true` so a
 purchase completed elsewhere shows on foreground. A successful purchase
 invalidates the same query so the UI flips to Premium immediately.
@@ -167,7 +171,7 @@ Couldn't find a navigation context. Have you wrapped your app with 'NavigationCo
 ```
 
 `${selected ? 'bg-accent shadow-sm' : ''}` crashes on tap; drop `shadow-sm`
-and it never does. A *constant* shadow is fine. **Toggle colour, keep shadows
+and it never does. A _constant_ shadow is fine. **Toggle colour, keep shadows
 constant.** `grep -rn "? '[^']*shadow" src` should stay empty.
 
 ### Never put `vars()`, a `className`, or the `dark` class on a third-party root
@@ -203,7 +207,7 @@ graph; Jest never sees that list.
 ### Hardware back over a bottom sheet
 
 `src/components/ui/modal.tsx` registers a `BackHandler` while open. Without it
-the press pops the route *behind* the sheet.
+the press pops the route _behind_ the sheet.
 
 ### Bundling `@env`
 
@@ -222,7 +226,7 @@ pnpm mobile e2e-test # Maestro (needs a dev build on an emulator)
 ```
 
 Key suites: `client.test.ts` (402 interceptor), `upgrade-flow.integration.test.tsx`
-(402 → sheet → buy → success), `expo-iap-client.test.ts` (Play mapping),
+(402 → sheet → buy → success), `revenuecat-client.test.ts` (SDK mapping),
 `palettes.test.ts` (theme invariants), `auth/utils.test.ts` (secure storage +
 migration).
 

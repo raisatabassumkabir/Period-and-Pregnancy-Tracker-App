@@ -1,18 +1,19 @@
 # Femtech monorepo — Claude notes
 
 Reproductive-health tracker (cycles, pregnancy, postpartum). This directory
-(`apps/backend`, its own git repo inside the Expo monorepo) holds the Django 6 + DRF +
-drf-spectacular API at `apps/api`, on Postgres 16/pgvector + Redis/Celery; the client is
-`apps/mobile`. Read `ARCHITECTURE.md` for the why, `ONBOARDING.md` for setup. This file is
-the rules.
+(`apps/api` in the monorepo) is the Django 6 + DRF + drf-spectacular API, on Postgres
+16/pgvector + Redis/Celery; the client is `apps/mobile`. Read `ARCHITECTURE.md` for the
+why, `ONBOARDING.md` for setup. This file is the rules.
 
 ## Commands (run from `apps/api`)
+
 - `uv sync` · `uv run manage.py migrate` · `uv run manage.py runserver`
 - `uv run pytest` (all) · `uv run pytest tests/test_cross_user_access.py -v` (the one that matters)
 - `uv run ruff check . && uv run mypy .` · `uv run python scripts/lint_owned_queries.py`
 - Endpoint/schema changed → update `packages/api-contract` (types + CONTRACT.md) in the same PR.
 
 ## Non-negotiable rules (ONBOARDING §6 — health data)
+
 1. Views query via `.objects.for_user(user)` only — never `.all()` / bare `.filter()`. CI lints it.
 2. RLS policy ships in the SAME migration that creates a user-owned table.
 3. Another user's object → **404, never 403**. Existence is never confirmed.
@@ -23,6 +24,7 @@ the rules.
 8. `screening/` EPDS scoring and escalation: don't touch without flagging for review.
 
 ## API conventions (source: https://apiguide.dev — details in the monorepo's `.claude/skills/api-design`)
+
 Load the `api-design` skill before adding or changing any endpoint, serializer, error
 response, pagination, or webhook. The client-side mirror of these rules is
 `packages/api-contract/CONTRACT.md`; a change to an error shape or status code updates both.
@@ -30,7 +32,7 @@ response, pagination, or webhook. The client-side mirror of these rules is
 - **Errors are RFC 9457 Problem+JSON**, `Content-Type: application/problem+json`, via the
   central handler `apps.core.exceptions.problem_exception_handler` (REST_FRAMEWORK
   `EXCEPTION_HANDLER`). Never hand-build error dicts in a view; raise the DRF exception or
-  one from `apps/core/exceptions.py` (`Conflict`, `PaymentRequired`, `ServiceUnavailable`…).
+  one from `apps/core/exceptions.py` (`Conflict`, `IdempotencyKeyConflict`, `PaymentRequired`).
   - `type` = `https://apiguide.dev/errors/<slug>` (catalog in the skill); `title`, `status`,
     `detail`, `instance` (= request path). Field errors → `"errors": {"field": ["msg"]}`.
   - 400 malformed syntax · **422 valid syntax, failed validation** · 409 conflict (duplicate,
@@ -61,5 +63,6 @@ response, pagination, or webhook. The client-side mirror of these rules is
   asserting the Problem+JSON shape, plus the cross-user 404 test where it's user-owned.
 
 ## Working agreements
+
 Branches `feat/` `fix/` `chore/`; small PRs to `main`; anything touching authorization gets an
 explicit callout in the PR description; architectural changes get a two-paragraph ADR.

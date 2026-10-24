@@ -44,10 +44,10 @@ datacenter.** That rule is not negotiable.
 
 So we flip it:
 
-| | Production | Staging |
-|---|---|---|
-| Host | Hetzner CX22 or similar, Falkenstein | Heroku, paid by credits |
-| Cost | €5–10/month | $13/month in credits |
+|       | Production                                                     | Staging                                                   |
+| ----- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| Host  | Hetzner CX22 or similar, Falkenstein                           | Heroku, paid by credits                                   |
+| Cost  | €5–10/month                                                    | $13/month in credits                                      |
 | Stack | Caddy, Gunicorn/Uvicorn, Postgres 16 + pgvector, Redis, Celery | Eco dyno $5 + Postgres Essential-0 $5 + Key-Value Mini $3 |
 
 What this buys:
@@ -124,15 +124,15 @@ skills and hooks (ruff/mypy on write, secret guard, pytest smoke).
 
 **Changes on adoption — do these in the first PR:**
 
-| Change | Why |
-|---|---|
-| allauth session auth → **JWT** (`dj-rest-auth` + `simplejwt`, or allauth headless) | A mobile client can't use session cookies. Access ~15min, rotating refresh in `expo-secure-store`. |
-| **Remove Temporal** (`temporal_app/`, `temporalio`) | Durable workflows are overkill for two devs. Celery covers everything we have. |
-| Celery broker **RabbitMQ → Redis** | One less service on a 4 GB box. Redis is already there for cache. |
-| **Restrict `SoftDeleteModel`** | Soft delete on health tables breaks "delete my data". Use it for providers and checklists; clinical tables get real deletes. |
-| **Keep Channels, but SSE first** | Streaming the assistant over SSE needs no channel layer. Revisit websockets only if something genuinely needs bidirectional. |
-| nginx → **Caddy** | Automatic TLS renewal. The boilerplate's `nginx/prod.conf` is a reference for headers. |
-| **Add** `pgvector` + `django-storages[s3]` + `django-ratelimit` | Not in the boilerplate; all required. |
+| Change                                                                             | Why                                                                                                                          |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| allauth session auth → **JWT** (`dj-rest-auth` + `simplejwt`, or allauth headless) | A mobile client can't use session cookies. Access ~15min, rotating refresh in `expo-secure-store`.                           |
+| **Remove Temporal** (`temporal_app/`, `temporalio`)                                | Durable workflows are overkill for two devs. Celery covers everything we have.                                               |
+| Celery broker **RabbitMQ → Redis**                                                 | One less service on a 4 GB box. Redis is already there for cache.                                                            |
+| **Restrict `SoftDeleteModel`**                                                     | Soft delete on health tables breaks "delete my data". Use it for providers and checklists; clinical tables get real deletes. |
+| **Keep Channels, but SSE first**                                                   | Streaming the assistant over SSE needs no channel layer. Revisit websockets only if something genuinely needs bidirectional. |
+| nginx → **Caddy**                                                                  | Automatic TLS renewal. The boilerplate's `nginx/prod.conf` is a reference for headers.                                       |
+| **Add** `pgvector` + `django-storages[s3]` + `django-ratelimit`                    | Not in the boilerplate; all required.                                                                                        |
 
 DRF, not django-ninja — that's what the boilerplate ships and it is not worth
 rewriting. Schemas are DRF serializers; the OpenAPI document comes from
@@ -241,17 +241,17 @@ screening results, stop and raise it first.
 
 ## 7. Data model
 
-| App | Models |
-|---|---|
-| users | `User` (email login), `Profile` (mode, locale, region, budget tier) |
-| cycles | `Cycle`, `DailyLog` (unique per user/date), `Prediction` |
-| pregnancy | `Pregnancy`, `KickSession` + `Kick`, `ContractionSession` + `Contraction`, `Measurement`, `Checklist` + `ChecklistItem` |
-| nutrition | `MealPlan`, `MealPlanItem` |
-| assistant | `KBDocument`, `KBChunk` (embedding `vector(1536)`), `Chat`, `Message`, `DailyUsage` |
-| screening | `Screening` (instrument, item scores, total, flagged) |
-| sharing | `PartnerLink`, `SharedStatus` |
-| billing | `Entitlement`, `WebhookEvent` (idempotency) |
-| telehealth | `Provider`, `Slot`, `Appointment` |
+| App        | Models                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| users      | `User` (email login), `Profile` (mode, locale, region, budget tier)                                                     |
+| cycles     | `Cycle`, `DailyLog` (unique per user/date), `Prediction`                                                                |
+| pregnancy  | `Pregnancy`, `KickSession` + `Kick`, `ContractionSession` + `Contraction`, `Measurement`, `Checklist` + `ChecklistItem` |
+| nutrition  | `MealPlan`, `MealPlanItem`                                                                                              |
+| assistant  | `KBDocument`, `KBChunk` (embedding `vector(1536)`), `Chat`, `Message`, `DailyUsage`                                     |
+| screening  | `Screening` (instrument, item scores, total, flagged)                                                                   |
+| sharing    | `PartnerLink`, `SharedStatus`                                                                                           |
+| billing    | `Entitlement`, `WebhookEvent` (idempotency)                                                                             |
+| telehealth | `Provider`, `Slot`, `Appointment`                                                                                       |
 
 - `Measurement` is deliberately generic — blood pressure and glucose are coming.
 - `DailyLog.symptoms` is JSONB against the taxonomy in `packages/shared`. Structured
@@ -348,16 +348,16 @@ Owning the box is the price of Hetzner. Make it boring on day one.
 
 ## 12. Key decisions
 
-| Decision | Why | Trade-off accepted |
-|---|---|---|
-| Django over a BaaS | Vector search, relational queries and scoped sharing in one place; admin manages providers and corpus free | We own auth and permissions, and their bugs |
-| Postgres + pgvector over a separate vector DB | One database to back up and reason about | Lower performance ceiling; fine at our corpus size |
-| Hetzner production, Heroku staging | Removes the 30s timeout and the Redis budget problem; EU residency; credits still fully used | Backups, patching and uptime are ours |
-| RLS as a second layer | Catches the forgotten filter that application code misses | Migration complexity, an escape hatch to maintain |
-| Adopt the Django boilerplate | Logging, health checks, CI, test setup and Claude rules already done | Inherits choices we must actively strip (Temporal, RabbitMQ, session auth) |
-| Fork the Expo boilerplate rather than use it | Feature-first structure and theming are worth having | A day of removal work before feature one |
-| SSE streaming with a job record | Better perceived latency without losing durability | Two code paths to keep working |
-| Monorepo | Generated client stays in sync with the API | Polyglot tooling, slightly awkward |
+| Decision                                      | Why                                                                                                        | Trade-off accepted                                                         |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Django over a BaaS                            | Vector search, relational queries and scoped sharing in one place; admin manages providers and corpus free | We own auth and permissions, and their bugs                                |
+| Postgres + pgvector over a separate vector DB | One database to back up and reason about                                                                   | Lower performance ceiling; fine at our corpus size                         |
+| Hetzner production, Heroku staging            | Removes the 30s timeout and the Redis budget problem; EU residency; credits still fully used               | Backups, patching and uptime are ours                                      |
+| RLS as a second layer                         | Catches the forgotten filter that application code misses                                                  | Migration complexity, an escape hatch to maintain                          |
+| Adopt the Django boilerplate                  | Logging, health checks, CI, test setup and Claude rules already done                                       | Inherits choices we must actively strip (Temporal, RabbitMQ, session auth) |
+| Fork the Expo boilerplate rather than use it  | Feature-first structure and theming are worth having                                                       | A day of removal work before feature one                                   |
+| SSE streaming with a job record               | Better perceived latency without losing durability                                                         | Two code paths to keep working                                             |
+| Monorepo                                      | Generated client stays in sync with the API                                                                | Polyglot tooling, slightly awkward                                         |
 
 Anything overturned here gets an ADR in `docs/adr/`.
 

@@ -5,21 +5,22 @@ description: HTTP/REST conventions for the femtech DRF API, distilled from apigu
 
 # API design (Django REST Framework)
 
-Rules live in `apps/backend/CLAUDE.md`; the client-side mirror is
-`packages/api-contract/CONTRACT.md`. This skill is the *how* and the *why*. Reference files:
+Rules live in `apps/api/CLAUDE.md`; the client-side mirror is
+`packages/api-contract/CONTRACT.md`. This skill is the _how_ and the _why_. Reference files:
+
 - `errors.md` — the Problem+JSON error catalog: slug → status → which DRF exception raises it
 - `guides.md` — index of apiguide.dev guides; fetch one with WebFetch only when implementing that pattern
 
 ## 1. Before writing code: classify the endpoint
 
-| Question | Answer decides |
-|---|---|
-| Is the resource user-owned? | `OwnedModelViewSet` + `for_user()` + cross-user 404 test (`tests/test_cross_user_access.py` walks the router and fails if missing) |
-| Does it mutate? | Method: POST create, PUT full replace/upsert, PATCH partial (JSON Merge Patch semantics), DELETE → 204 |
-| Can a mobile client retry it? | Make it idempotent: prefer a natural key (e.g. one log per user per date → `PUT /daily-logs/{date}/` semantics or `update_or_create`); otherwise `Idempotency-Key` header stored in Redis with the response, 409 `idempotency-key-conflict` on different payload |
-| Does it take > ~2 s or call an LLM/PDF/ingest? | `202 Accepted` + `{"id","status","..."}` job resource, `Location` header to `GET /jobs/{id}/`, `Retry-After` on the 202; result via polling or SSE (ARCHITECTURE §8) |
-| Is it a list? | Filters as query params; page-number for small static sets, `CursorPagination` (`ordering = "-date"`) for time-ordered feeds; never both on one endpoint |
-| Public (no JWT)? | Explicit `permission_classes` on the view, throttle it, and say so in the PR |
+| Question                                       | Answer decides                                                                                                                                                                                                                                                   |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Is the resource user-owned?                    | `OwnedModelViewSet` + `for_user()` + cross-user 404 test (`tests/test_cross_user_access.py` walks the router and fails if missing)                                                                                                                               |
+| Does it mutate?                                | Method: POST create, PUT full replace/upsert, PATCH partial (JSON Merge Patch semantics), DELETE → 204                                                                                                                                                           |
+| Can a mobile client retry it?                  | Make it idempotent: prefer a natural key (e.g. one log per user per date → `PUT /daily-logs/{date}/` semantics or `update_or_create`); otherwise `Idempotency-Key` header stored in Redis with the response, 409 `idempotency-key-conflict` on different payload |
+| Does it take > ~2 s or call an LLM/PDF/ingest? | `202 Accepted` + `{"id","status","..."}` job resource, `Location` header to `GET /jobs/{id}/`, `Retry-After` on the 202; result via polling or SSE (ARCHITECTURE §8)                                                                                             |
+| Is it a list?                                  | Filters as query params; page-number for small static sets, `CursorPagination` (`ordering = "-date"`) for time-ordered feeds; never both on one endpoint                                                                                                         |
+| Public (no JWT)?                               | Explicit `permission_classes` on the view, throttle it, and say so in the PR                                                                                                                                                                                     |
 
 ## 2. Errors — the one thing to get right
 
@@ -29,6 +30,7 @@ exceptions or the ones in `apps/core/exceptions.py` (`Conflict`, `PaymentRequire
 never return error dicts.
 
 Shape (RFC 9457):
+
 ```json
 {
   "type": "https://apiguide.dev/errors/validation-failed",
@@ -36,9 +38,10 @@ Shape (RFC 9457):
   "status": 422,
   "detail": "end_date must be after start_date.",
   "instance": "/api/cycles/",
-  "errors": {"end_date": ["end_date must be after start_date."]}
+  "errors": { "end_date": ["end_date must be after start_date."] }
 }
 ```
+
 - `Content-Type: application/problem+json`. `type` is a dereferenceable apiguide.dev URL — the
   client can open it. Keep `title` fixed per type; put specifics in `detail`.
 - 400 vs 422: 400 = the body could not be parsed / wrong JSON types (`ParseError`); 422 =
@@ -54,25 +57,25 @@ Shape (RFC 9457):
 
 ## 3. Status-code cheatsheet
 
-| Situation | Code |
-|---|---|
-| Created | 201 + body + `Location` |
-| Deleted / no body | 204 |
-| Async job accepted | 202 + job body + `Location` |
-| Conditional GET matched `If-None-Match` | 304 |
-| Auth missing/invalid/expired | 401 |
-| Authenticated, lacks role/scope | 403 |
-| Not found / not yours | 404 |
-| Wrong verb on a real path | 405 + `Allow` |
-| Client can't accept our media type | 406 |
-| Duplicate / stale version / idempotency mismatch | 409 |
-| `If-Match` failed | 412 |
-| Body too big | 413 |
-| Wrong `Content-Type` | 415 |
-| Parsed but invalid | 422 |
-| Throttled | 429 + `Retry-After` |
-| Bug | 500 (never expose why) |
-| Upstream (LLM provider, payment) down | 502/503/504 + `Retry-After` when known |
+| Situation                                        | Code                                   |
+| ------------------------------------------------ | -------------------------------------- |
+| Created                                          | 201 + body + `Location`                |
+| Deleted / no body                                | 204                                    |
+| Async job accepted                               | 202 + job body + `Location`            |
+| Conditional GET matched `If-None-Match`          | 304                                    |
+| Auth missing/invalid/expired                     | 401                                    |
+| Authenticated, lacks role/scope                  | 403                                    |
+| Not found / not yours                            | 404                                    |
+| Wrong verb on a real path                        | 405 + `Allow`                          |
+| Client can't accept our media type               | 406                                    |
+| Duplicate / stale version / idempotency mismatch | 409                                    |
+| `If-Match` failed                                | 412                                    |
+| Body too big                                     | 413                                    |
+| Wrong `Content-Type`                             | 415                                    |
+| Parsed but invalid                               | 422                                    |
+| Throttled                                        | 429 + `Retry-After`                    |
+| Bug                                              | 500 (never expose why)                 |
+| Upstream (LLM provider, payment) down            | 502/503/504 + `Retry-After` when known |
 
 ## 4. Headers we use
 
@@ -103,6 +106,7 @@ responses to every operation. `tests/test_problem_details.py` covers every type 
 `errors.md` the API can produce.
 
 Adding a new problem type:
+
 1. Subclass `ProblemException` with `status_code`, `default_detail`, `problem_type`,
    `problem_title`; pass `extensions={...}` for RFC 9457 extension members (see
    `PaymentRequired`).
@@ -133,5 +137,6 @@ current_usage=3, limit=3, resets_at=...)`. `feature` must be a `PremiumFeature` 
 - [ ] Tests: success + each error path + Problem+JSON shape; OpenAPI regenerated
 
 ## Sources
+
 apiguide.dev — https://apiguide.dev/guides/ (index in `guides.md`) · RFC 9457
 (Problem Details) · RFC 9110 (HTTP semantics) · RFC 8594/9745 (Sunset/Deprecation).
