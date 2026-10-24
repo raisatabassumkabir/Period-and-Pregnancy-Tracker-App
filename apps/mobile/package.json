@@ -35,7 +35,7 @@
     "test:ci": "pnpm run test --coverage",
     "test:watch": "pnpm run test --watch",
     "install-maestro": "curl -Ls 'https://get.maestro.mobile.dev' | bash",
-    "e2e-test": "maestro test .maestro/ -e APP_ID=com.example.app.development",
+    "e2e-test": "maestro test .maestro/ -e APP_ID=com.happywomen.app.development",
     "react-doctor": "npx react-doctor@latest"
   },
   "dependencies": {

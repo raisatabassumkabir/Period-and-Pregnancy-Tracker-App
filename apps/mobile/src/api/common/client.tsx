@@ -11,16 +11,23 @@ import { getUpgradeState, showUpgrade } from '@/lib/upgrade';
 
 import { queryClient } from './api-provider';
 
+// Must stay above the backend's slowest upstream call (RevenueCat sync, 5s)
+// so a slow sync fails on the server first and comes back as a problem body.
+export const REQUEST_TIMEOUT_MS = 15_000;
+
+// Relative, no leading slash: axios joins it onto baseURL whether that ends
+// in `/api/` (prod) or `/api/v1` (Android dev) without doubling the slash.
+export const REFRESH_PATH = 'auth/token/refresh/';
+
 // ---------------------------------------------------------------------------
 // Auth-exempt paths: 401 interceptor must never trigger logout for these
 // because the user is not yet authenticated (onboarding / login flow).
 // ---------------------------------------------------------------------------
 const AUTH_EXEMPT_PATHS = [
   'auth/token/',
-  'auth/token/refresh/',
+  REFRESH_PATH,
   'auth/register/',
-  'auth/login/',
-  'auth/forgot-password/',
+  'auth/password-resets/',
 ] as const;
 
 const isAuthExempt = (url: string | undefined): boolean => {
@@ -36,7 +43,7 @@ export const client = axios.create({
     Platform.OS === 'android' && __DEV__
       ? 'http://10.0.2.2:8000/api/v1'
       : (Env.API_URL ?? process.env.EXPO_PUBLIC_API_URL),
-  timeout: 8000,
+  timeout: REQUEST_TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -54,9 +61,13 @@ async function refreshAccessToken(
   try {
     // Use a raw axios call to bypass our own interceptors entirely.
     const response = await axios.post<TokenType>(
-      `${client.defaults.baseURL}/auth/token/refresh/`,
+      REFRESH_PATH,
       { refresh: refreshToken },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 8000 }
+      {
+        baseURL: client.defaults.baseURL,
+        headers: { 'Content-Type': 'application/json' },
+        timeout: REQUEST_TIMEOUT_MS,
+      }
     );
     return response.data;
   } catch {
