@@ -1,0 +1,32 @@
+name: mobile-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'patches/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/mobile-ci.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Version comes from "packageManager" in the root package.json.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter mobile lint
+      # Regenerates expo-router's typed routes (gitignored) before tsc.
+      - run: pnpm --filter mobile type-check
+      - run: pnpm --filter @repo/api-contract type-check
+      # --forceExit: a native-module mock keeps a handle open after the run.
+      - run: pnpm --filter mobile test --ci --forceExit
