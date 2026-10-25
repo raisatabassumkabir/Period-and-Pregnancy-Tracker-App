@@ -26,8 +26,8 @@ require('dotenv').config({
 const BUNDLE_ID = 'com.happywomen.app'; // ios bundle id
 const PACKAGE = 'com.happywomen.app'; // android package name
 const NAME = 'Happy Women'; // app name
-const EXPO_ACCOUNT_OWNER = 'happywomen'; // expo account owner
-const EAS_PROJECT_ID = '00000000-0000-0000-0000-000000000000'; // eas project id
+const EXPO_ACCOUNT_OWNER = 'halalswag'; // expo account owner
+const EAS_PROJECT_ID = '34162047-1ae2-41ba-8574-8103a72eeaa0'; // eas project id
 const SCHEME = 'happywomen'; // deep-link scheme
 
 /**
