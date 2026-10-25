@@ -194,6 +194,7 @@ The `db-backup` service (`infra/backup/`) runs `pg_dump` once at start and then 
 2. Store `happy-women-backup.key` (the private key) in your password manager, then delete the local file. **Without it no backup can be restored. It must never be on the VPS.**
 3. In Cloudflare R2, create a private bucket (`BACKUP_BUCKET`) and an API token scoped to **Object Read & Write on that bucket only**. Use its access key and secret for `BACKUP_S3_ACCESS_KEY_ID` / `BACKUP_S3_SECRET_ACCESS_KEY`, and the account's S3 endpoint for `BACKUP_S3_ENDPOINT`.
 4. Deploy, then check: `docker compose -f docker-compose.prod.yml logs db-backup` shows `[backup] done`, and the object appears in the bucket.
+5. Watch the `db-backup` container's health in Dokploy. It turns **unhealthy** if no backup has succeeded within a day plus two hours (wrong key, expired R2 token, full disk).
 
 **Take a backup now** (e.g. before a risky migration):
 
