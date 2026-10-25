@@ -16,6 +16,10 @@ set -o pipefail
 BACKUP_PREFIX="${BACKUP_PREFIX:-postgres}"
 BACKUP_KEEP_DAYS="${BACKUP_KEEP_DAYS:-30}"
 BACKUP_INTERVAL_SECONDS="${BACKUP_INTERVAL_SECONDS:-86400}"
+# The container healthcheck reads this; see `backup.sh healthcheck`.
+LAST_SUCCESS_FILE=/tmp/last-backup-success
+# One interval plus two hours of slack before the container reports unhealthy.
+HEALTHY_WITHIN_SECONDS=$((BACKUP_INTERVAL_SECONDS + 7200))
 
 # rclone reads the "backup" remote from RCLONE_CONFIG_BACKUP_* env vars.
 REMOTE_DIR="backup:${BACKUP_BUCKET}/${BACKUP_PREFIX}"
@@ -42,7 +46,15 @@ take_backup() {
 
   echo "[backup] pruning objects older than ${BACKUP_KEEP_DAYS} days"
   rclone delete --min-age "${BACKUP_KEEP_DAYS}d" "${REMOTE_DIR}" || return 1
+  date +%s > "${LAST_SUCCESS_FILE}"
   echo "[backup] done"
+}
+
+# Unhealthy until a backup has succeeded recently, so Dokploy shows a red
+# container instead of failures hiding in the logs.
+check_health() {
+  last="$(cat "${LAST_SUCCESS_FILE}" 2>/dev/null || echo 0)"
+  [ $(( $(date +%s) - last )) -lt "${HEALTHY_WITHIN_SECONDS}" ]
 }
 
 case "${1:-schedule}" in
@@ -56,8 +68,11 @@ case "${1:-schedule}" in
       sleep "${BACKUP_INTERVAL_SECONDS}"
     done
     ;;
+  healthcheck)
+    check_health
+    ;;
   *)
-    echo "usage: backup.sh [once|schedule]" >&2
+    echo "usage: backup.sh [once|schedule|healthcheck]" >&2
     exit 64
     ;;
 esac

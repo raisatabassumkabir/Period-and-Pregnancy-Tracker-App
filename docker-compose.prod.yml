@@ -181,6 +181,13 @@ services:
       RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_ACCESS_KEY:?BACKUP_S3_SECRET_ACCESS_KEY must be set}
       # Bucket-scoped R2 tokens cannot list or create buckets.
       RCLONE_CONFIG_BACKUP_NO_CHECK_BUCKET: 'true'
+    healthcheck:
+      # Unhealthy if no backup has succeeded within one interval + 2h.
+      test: ['CMD', 'backup.sh', 'healthcheck']
+      interval: 5m
+      timeout: 10s
+      retries: 1
+      start_period: 15m
     networks:
       - internal_network
 
