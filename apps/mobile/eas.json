@@ -20,7 +20,8 @@
         "APP_ENV": "production",
         "FLIPPER_DISABLE": "1"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "environment": "production"
     },
     "staging": {
       "channel": "staging",
@@ -37,7 +38,8 @@
         "APP_ENV": "staging",
         "EXPO_NO_DOTENV": "1",
         "FLIPPER_DISABLE": "1"
-      }
+      },
+      "environment": "preview"
     },
     "development": {
       "developmentClient": true,
@@ -52,7 +54,8 @@
       "env": {
         "APP_ENV": "development",
         "EXPO_NO_DOTENV": "1"
-      }
+      },
+      "environment": "development"
     },
     "simulator": {
       "pnpm": "9.12.3",
@@ -66,7 +69,8 @@
       "env": {
         "APP_ENV": "development",
         "EXPO_NO_DOTENV": "1"
-      }
+      },
+      "environment": "development"
     }
   },
   "submit": {
