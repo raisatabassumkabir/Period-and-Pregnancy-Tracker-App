@@ -104,7 +104,7 @@ export function SexualHealthSelector({
             <Text
               className={`text-[13px] ${
                 selected
-                  ? 'font-body-bold text-accent-100'
+                  ? 'font-body-bold text-white'
                   : 'font-body-semibold text-ink'
               }`}
             >

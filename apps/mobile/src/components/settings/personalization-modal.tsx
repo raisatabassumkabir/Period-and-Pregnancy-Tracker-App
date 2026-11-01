@@ -207,7 +207,7 @@ export function PersonalizationOptionsModal({
                       }`}
                     >
                       <Text
-                        className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}
+                        className={`font-body-semibold text-[13px] ${active ? 'text-white' : 'text-ink'}`}
                       >
                         {MODE_LABELS[m]}
                       </Text>
@@ -245,7 +245,7 @@ export function PersonalizationOptionsModal({
                       }`}
                     >
                       <Text
-                        className={`font-body-semibold text-[13px] ${active ? 'text-accent-100' : 'text-ink'}`}
+                        className={`font-body-semibold text-[13px] ${active ? 'text-white' : 'text-ink'}`}
                       >
                         {DIET_LABELS[d]}
                       </Text>

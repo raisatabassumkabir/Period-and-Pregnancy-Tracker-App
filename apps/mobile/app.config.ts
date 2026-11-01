@@ -8,12 +8,16 @@ import { ClientEnv, Env } from './env';
 const SLUG = 'happy-women';
 
 /**
- * Brand charcoal — the same value as `PALETTES.happy.dark['--color-bg']` in
- * `src/lib/theme/palettes.ts`. Sharing it means the splash, the adaptive-icon
- * ground and the first painted screen are one continuous surface, so the
- * handover from native splash to JS has no visible seam.
+ * Splash grounds: the default Blossom palette's `--color-bg` in light and dark
+ * (`src/lib/theme/palettes.ts`). Matching them makes the native splash and the
+ * first painted screen one continuous surface, with no flash at handover.
  */
-const BRAND_BACKGROUND = '#FCF8F5';
+const SPLASH_BACKGROUND_LIGHT = '#FFF8F9';
+const SPLASH_BACKGROUND_DARK = '#1A1117';
+/** Rosewood end of the icon gradient; shown if the background image fails. */
+const BRAND_ROSEWOOD = '#C85A86';
+/** dp width of the splash mark; Android 12+ masks it to a circle anyway. */
+const SPLASH_IMAGE_WIDTH = 200;
 
 const appIconBadgeConfig: AppIconBadgeConfig = {
   enabled: false,
@@ -41,7 +45,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   version: Env.VERSION.toString(),
   orientation: 'portrait',
   icon: './assets/icon.png',
-  userInterfaceStyle: 'light',
+  // `automatic` lets Settings → Theme → System follow the OS. Pinning `light`
+  // made the OS always report light, so dark mode could never switch on.
+  // Native setting: takes effect on the next dev-client / EAS build.
+  userInterfaceStyle: 'automatic',
   newArchEnabled: false,
   updates: {
     fallbackToCacheTimeout: 0,
@@ -66,7 +73,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#FCF8F5',
+      backgroundImage: './assets/adaptive-icon-background.png',
+      backgroundColor: BRAND_ROSEWOOD,
     },
     package: Env.PACKAGE,
     versionCode: 1,
@@ -88,6 +96,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundler: 'metro',
   },
   plugins: [
+    [
+      'expo-splash-screen',
+      {
+        image: './assets/splash-icon.png',
+        imageWidth: SPLASH_IMAGE_WIDTH,
+        resizeMode: 'contain',
+        backgroundColor: SPLASH_BACKGROUND_LIGHT,
+        dark: {
+          image: './assets/splash-icon.png',
+          backgroundColor: SPLASH_BACKGROUND_DARK,
+        },
+      },
+    ],
     [
       '@sentry/react-native/expo',
       {

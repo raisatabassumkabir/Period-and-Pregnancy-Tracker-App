@@ -67,7 +67,7 @@ export function CycleStatusCards({
         />
       </View>
       <Text
-        className="mt-2 text-center font-body text-[11px] text-[#8C8C8C]"
+        className="mt-2 text-center font-body text-[11px] text-tone-500"
         testID="contraception-safety-disclaimer"
       >
         {CONTRACEPTION_SAFETY_DISCLAIMER}

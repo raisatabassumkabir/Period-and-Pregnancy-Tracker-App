@@ -23,7 +23,7 @@ export function LoginActions({ isSubmitting, onPress }: Props) {
           isSubmitting ? 'opacity-60' : ''
         }`}
       >
-        <Text className="font-body-bold text-[16px] text-accent-100">
+        <Text className="font-body-bold text-[16px] text-white">
           {isSubmitting ? 'Logging in…' : 'Log in'}
         </Text>
       </TouchableOpacity>

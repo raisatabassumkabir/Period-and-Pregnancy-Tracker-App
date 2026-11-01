@@ -3,9 +3,9 @@ import {
   DarkTheme as _DarkTheme,
   DefaultTheme,
 } from '@react-navigation/native';
-import { useColorScheme } from 'nativewind';
 import React from 'react';
 
+import { useIsDarkMode } from './hooks/use-selected-theme';
 import { usePaletteColors } from './theme';
 
 /**
@@ -16,9 +16,8 @@ import { usePaletteColors } from './theme';
  * transitions.
  */
 export function useThemeConfig(): Theme {
-  const { colorScheme } = useColorScheme();
   const palette = usePaletteColors();
-  const isDark = colorScheme === 'dark';
+  const isDark = useIsDarkMode();
 
   return React.useMemo(() => {
     const base = isDark ? _DarkTheme : DefaultTheme;

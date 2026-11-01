@@ -105,7 +105,7 @@ export function DatePickerModal({
                   }`}
                 >
                   <Text
-                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                    className={`font-body-semibold text-xs ${active ? 'text-white' : 'text-ink'}`}
                   >
                     {y}
                   </Text>
@@ -133,7 +133,7 @@ export function DatePickerModal({
                   }`}
                 >
                   <Text
-                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                    className={`font-body-semibold text-xs ${active ? 'text-white' : 'text-ink'}`}
                   >
                     {name}
                   </Text>
@@ -164,7 +164,7 @@ export function DatePickerModal({
                   }`}
                 >
                   <Text
-                    className={`font-body-semibold text-xs ${active ? 'text-accent-100' : 'text-ink'}`}
+                    className={`font-body-semibold text-xs ${active ? 'text-white' : 'text-ink'}`}
                   >
                     {d}
                   </Text>

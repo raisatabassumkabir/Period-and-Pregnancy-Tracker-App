@@ -1,8 +1,9 @@
 import { Shield } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { AppState, type AppStateStatus, StyleSheet, View } from 'react-native';
+import { AppState, type AppStateStatus, View } from 'react-native';
 
 import { Text } from '@/components/ui';
+import { usePaletteColors } from '@/lib/theme';
 
 /**
  * HealthTech Background Privacy Shield.
@@ -28,20 +29,24 @@ export function PrivacyShield({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isObscured = appState === 'inactive' || appState === 'background';
+  const palette = usePaletteColors();
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       {children}
       {isObscured && (
-        <View style={styles.overlay} testID="privacy-shield-overlay">
-          <View style={styles.content}>
-            <View style={styles.iconCircle}>
-              <Shield size={36} color="#B83253" strokeWidth={2.2} />
+        <View
+          className="absolute inset-0 z-50 items-center justify-center bg-canvas"
+          testID="privacy-shield-overlay"
+        >
+          <View className="items-center justify-center">
+            <View className="size-[72px] items-center justify-center rounded-full bg-accent-200">
+              <Shield size={36} color={palette.accent} strokeWidth={2.2} />
             </View>
-            <Text className="mt-4 font-heading text-xl text-[#2D2D2D]">
+            <Text className="mt-4 font-heading text-xl text-ink">
               Happy Women
             </Text>
-            <Text className="mt-1 font-body text-sm text-[#7A7A7A]">
+            <Text className="mt-1 font-body text-sm text-tone-600">
               Protected for your privacy
             </Text>
           </View>
@@ -50,28 +55,3 @@ export function PrivacyShield({ children }: { children: React.ReactNode }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#FCF8F5',
-    zIndex: 999999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#FFE5E8',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

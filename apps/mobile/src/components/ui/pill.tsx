@@ -25,7 +25,7 @@ const CONTAINER_CLASSES: Record<PillTone, string> = {
 };
 
 const LABEL_CLASSES: Record<PillTone, string> = {
-  accent: 'text-accent-100',
+  accent: 'text-white',
   'accent-soft': 'text-accent-800',
   accent2: 'text-accent2-100',
   'accent2-soft': 'text-accent2-900',

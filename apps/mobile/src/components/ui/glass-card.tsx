@@ -21,7 +21,7 @@ export function GlassCard({ children, className = '', testID }: Props) {
   return (
     <View
       testID={testID}
-      className={`rounded-card border border-black/5 bg-white/60 p-5 dark:border-white/10 dark:bg-white/5 ${className}`}
+      className={`rounded-card border border-divider bg-surface/70 p-5 ${className}`}
     >
       {children}
     </View>

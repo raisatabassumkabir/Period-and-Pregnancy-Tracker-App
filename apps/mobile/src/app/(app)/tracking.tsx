@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { showMessage } from 'react-native-flash-message';
 
@@ -18,10 +18,13 @@ import {
   SafeAreaView,
   ScreenHeader,
   ScrollView,
-  Text,
   View,
 } from '@/components/ui';
-import { formatCalendarDate, todayDateString } from '@/lib/health';
+import {
+  formatCalendarDate,
+  todayDateString,
+  useIsPregnancyMode,
+} from '@/lib/health';
 import { useTodayLog } from '@/lib/tracking';
 
 /** Keeps the last section clear of the pinned Apply bar. */
@@ -49,6 +52,27 @@ interface ApplyBarProps {
   onPress: () => void;
 }
 
+interface TrackHeaderProps {
+  onBack?: () => void;
+}
+
+/**
+ * Date kicker over a friendly question, with a hairline under it so content
+ * scrolling beneath reads as passing under the header, not cut off by it.
+ */
+function TrackHeader({ onBack }: TrackHeaderProps) {
+  return (
+    <SafeAreaView edges={['top']} className="border-b border-divider bg-canvas">
+      <View className="px-4 pb-3 pt-2">
+        <Kicker>{`Today · ${formatCalendarDate(todayDateString())}`}</Kicker>
+        <View className="mt-1">
+          <ScreenHeader title="How are you feeling?" onBack={onBack} />
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
 /** Full-width coral Apply, pinned above the home indicator. */
 function ApplyBar({ label, error, loading, onPress }: ApplyBarProps) {
   return (
@@ -74,6 +98,10 @@ function ApplyBar({ label, error, loading, onPress }: ApplyBarProps) {
 /** Symptom logger: physical symptoms, mood, flow and discharge for today. */
 export default function Tracking() {
   const router = useRouter();
+  // The calendar's "Add Symptom" pushes this screen with a `date` param; from
+  // the tab bar there is nothing to go back to, so no arrow.
+  const { date } = useLocalSearchParams<{ date?: string }>();
+  const openedFromCalendar = Boolean(date) && router.canGoBack();
   const {
     draft,
     setFlow,
@@ -86,6 +114,7 @@ export default function Tracking() {
     hasExistingLog,
     saveError,
   } = useTodayLog();
+  const isPregnant = useIsPregnancyMode();
 
   const handleApply = async () => {
     try {
@@ -105,18 +134,7 @@ export default function Tracking() {
   return (
     <View className="flex-1 bg-canvas" testID="tracking-screen">
       <FocusAwareStatusBar />
-      <SafeAreaView edges={['top']}>
-        <View className="px-4 pt-3">
-          {/* Reached from a tab (no history) or pushed from the calendar FAB. */}
-          <ScreenHeader
-            title="Symptom"
-            onBack={router.canGoBack() ? router.back : undefined}
-          />
-          <Text className="text-[13px] text-tone-600">
-            {formatCalendarDate(todayDateString())}
-          </Text>
-        </View>
-      </SafeAreaView>
+      <TrackHeader onBack={openedFromCalendar ? router.back : undefined} />
 
       <ScrollView
         className="flex-1"
@@ -148,9 +166,11 @@ export default function Tracking() {
           />
         </Section>
 
-        <Section title="Movements">
-          <KickCounter />
-        </Section>
+        {isPregnant && (
+          <Section title="Baby movements">
+            <KickCounter />
+          </Section>
+        )}
       </ScrollView>
 
       <ApplyBar

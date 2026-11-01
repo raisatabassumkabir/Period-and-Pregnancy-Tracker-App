@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C85A86"/>
+      <stop offset="1" stop-color="#9A7ED6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  
+  <g transform="translate(512 512) scale(1)">
+    <circle r="330" fill="none" stroke="#FFFFFF" stroke-opacity="0.38" stroke-width="14"/>
+    <circle r="330" fill="none" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="14"
+            stroke-linecap="round" stroke-dasharray="120 2074" transform="rotate(-100)"/>
+    <g>
+      <path d="M0 -30 C-80 -52 -114 -150 -98 -210 C-86 -254 -42 -272 0 -272 C42 -272 86 -254 98 -210 C114 -150 80 -52 0 -30 Z" fill="#FFFFFF" transform="rotate(-45)"/>
+      <path d="M0 -30 C-80 -52 -114 -150 -98 -210 C-86 -254 -42 -272 0 -272 C42 -272 86 -254 98 -210 C114 -150 80 -52 0 -30 Z" fill="#FFE6EE" transform="rotate(45)"/>
+      <path d="M0 -30 C-80 -52 -114 -150 -98 -210 C-86 -254 -42 -272 0 -272 C42 -272 86 -254 98 -210 C114 -150 80 -52 0 -30 Z" fill="#F2EAFF" transform="rotate(135)"/>
+      <path d="M0 -30 C-80 -52 -114 -150 -98 -210 C-86 -254 -42 -272 0 -272 C42 -272 86 -254 98 -210 C114 -150 80 -52 0 -30 Z" fill="#FFF0E8" transform="rotate(225)"/>
+    </g>
+    <circle r="62" fill="#FFFFFF"/>
+    <g transform="translate(-36 -30) scale(0.72)">
+      <path d="M50 88 C20 64 0 46 0 26 C0 11 11 0 25 0 C36 0 45 6 50 15 C55 6 64 0 75 0 C89 0 100 11 100 26 C100 46 80 64 50 88 Z" fill="#B24C74"/>
+    </g>
+  </g>
+</svg>

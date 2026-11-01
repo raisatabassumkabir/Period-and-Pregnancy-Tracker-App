@@ -1,5 +1,6 @@
-import { useColorScheme } from 'nativewind';
 import React from 'react';
+
+import { useIsDarkMode } from '@/lib/hooks/use-selected-theme';
 
 import type { PaletteId, PaletteTokens, ThemeMode } from './palettes';
 import { getPaletteTokens } from './palettes';
@@ -75,8 +76,7 @@ export function resolvePaletteColors(tokens: PaletteTokens): PaletteColors {
  */
 export function usePaletteColors(): PaletteColors {
   const paletteId: PaletteId = usePaletteStore.use.paletteId();
-  const { colorScheme } = useColorScheme();
-  const mode: ThemeMode = colorScheme === 'dark' ? 'dark' : 'light';
+  const mode: ThemeMode = useIsDarkMode() ? 'dark' : 'light';
 
   return React.useMemo(
     () => resolvePaletteColors(getPaletteTokens(paletteId, mode)),

@@ -56,9 +56,7 @@ const MEDICAL_CONDITIONS_LIST: { id: MedicalCondition; label: string }[] = [
 function Avatar({ initial }: { initial: string }) {
   return (
     <View className="size-[58px] items-center justify-center rounded-full bg-accent">
-      <Text className="font-heading text-[24px] text-accent-100">
-        {initial}
-      </Text>
+      <Text className="font-heading text-[24px] text-white">{initial}</Text>
     </View>
   );
 }
@@ -251,7 +249,7 @@ export const ProfileHeader = () => {
                       >
                         <Text
                           className={`font-body-semibold text-[13px] ${
-                            active ? 'text-accent-100' : 'text-ink'
+                            active ? 'text-white' : 'text-ink'
                           }`}
                         >
                           {MODE_LABELS[m]}
@@ -291,7 +289,7 @@ export const ProfileHeader = () => {
                       >
                         <Text
                           className={`font-body-semibold text-[13px] ${
-                            active ? 'text-accent-100' : 'text-ink'
+                            active ? 'text-white' : 'text-ink'
                           }`}
                         >
                           {DIET_LABELS[d]}

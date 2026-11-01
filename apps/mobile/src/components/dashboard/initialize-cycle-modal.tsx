@@ -1,29 +1,48 @@
-/* eslint-disable max-lines-per-function */
 import { useQueryClient } from '@tanstack/react-query';
-import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
+import { isAxiosError } from 'axios';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import React from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useInitCycle } from '@/api/cycles';
+import { Button } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import {
   addDays,
   buildMonthMatrix,
+  daysBetween,
   formatCalendarDate,
   parseDateString,
   toDateString,
   todayDateString,
 } from '@/lib/health';
+import { usePaletteColors } from '@/lib/theme';
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'] as const;
+const NAV_ICON_SIZE = 18;
+const CLOSE_ICON_SIZE = 18;
+const SHEET_BOTTOM_PADDING = 16;
+const UNAUTHORIZED = 401;
+const DEFAULT_ERROR = 'Failed to initialize cycle. Please try again.';
+const SKIP_ERROR = 'Failed to skip. Please try again.';
+/** Offline demo/test accounts have no server session, so writes get a 401. */
+const DEMO_TOKEN_ERROR =
+  "This is an offline test account, so your cycle can't be saved. Sign in with your own account to save it.";
+
+const QUICK_PICKS = [
+  { label: 'Today', daysAgo: 0 },
+  { label: 'Yesterday', daysAgo: 1 },
+  { label: '3 days ago', daysAgo: 3 },
+  { label: '1 week ago', daysAgo: 7 },
+] as const;
+
+const CYCLE_QUERY_KEYS = [
+  ['cycles'],
+  ['dashboard'],
+  ['dashboard', 'current-cycle'],
+  ['daily-logs'],
+] as const;
 
 export interface InitializeCycleModalProps {
   visible: boolean;
@@ -31,148 +50,338 @@ export interface InitializeCycleModalProps {
   onSuccess?: () => void;
 }
 
+/** `today`, `yesterday`, `5 days ago` — how long ago the chosen start was. */
+function relativeDayLabel(date: string): string {
+  const parsed = parseDateString(date);
+  if (!parsed) return '';
+  const elapsed = daysBetween(parsed, new Date());
+  if (elapsed <= 0) return 'today';
+  if (elapsed === 1) return 'yesterday';
+  return `${elapsed} days ago`;
+}
+
+function monthStartOf(date: string): Date | null {
+  const parsed = parseDateString(date);
+  return parsed ? new Date(parsed.getFullYear(), parsed.getMonth(), 1) : null;
+}
+
+function messageFromError(error: unknown): string | null {
+  if (!isAxiosError(error)) {
+    return error instanceof Error ? error.message : DEFAULT_ERROR;
+  }
+  // The interceptor purged the token: we are being signed out, say nothing.
+  if (error.response?.status === UNAUTHORIZED) {
+    return useAuth.getState().token ? DEMO_TOKEN_ERROR : null;
+  }
+  const body: unknown = error.response?.data;
+  if (body && typeof body === 'object') {
+    const { message, detail } = body as Record<string, unknown>;
+    if (typeof message === 'string') return message;
+    if (typeof detail === 'string') return detail;
+    return JSON.stringify(body);
+  }
+  return body ? String(body) : error.message || DEFAULT_ERROR;
+}
+
+interface QuickPicksProps {
+  selectedDate: string;
+  onSelect: (date: string) => void;
+}
+
+function QuickPicks({ selectedDate, onSelect }: QuickPicksProps) {
+  const options = React.useMemo(
+    () =>
+      QUICK_PICKS.map((pick) => ({
+        label: pick.label,
+        date: toDateString(addDays(new Date(), -pick.daysAgo)),
+      })),
+    []
+  );
+
+  return (
+    <View className="mt-5 flex-row flex-wrap gap-2">
+      {options.map((option) => {
+        const isSelected = option.date === selectedDate;
+        return (
+          <Pressable
+            key={option.label}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isSelected }}
+            onPress={() => onSelect(option.date)}
+            testID={`init-cycle-quick-${option.label.toLowerCase().replace(/\s+/g, '-')}`}
+            className={`rounded-pill border px-4 py-2 ${
+              isSelected
+                ? 'border-accent bg-accent'
+                : 'border-divider bg-canvas active:bg-accent-200'
+            }`}
+          >
+            <Text
+              className={`font-body-semibold text-[13px] ${
+                isSelected ? 'text-white' : 'text-ink'
+              }`}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+interface DayProps {
+  date: string;
+  today: string;
+  isSelected: boolean;
+  onSelect: (date: string) => void;
+}
+
+function dayTextClass({ date, today, isSelected }: Omit<DayProps, 'onSelect'>) {
+  if (isSelected) return 'font-body-bold text-white';
+  if (date > today) return 'font-body text-tone-400';
+  if (date === today) return 'font-body-bold text-accent';
+  return 'font-body-semibold text-ink';
+}
+
+function Day({ date, today, isSelected, onSelect }: DayProps) {
+  const isFuture = date > today;
+  const isToday = date === today;
+  const ring = isToday && !isSelected ? 'border-accent' : 'border-transparent';
+  const fill = isSelected ? 'bg-accent' : 'active:bg-accent-200';
+
+  return (
+    <View className="h-11 w-[14.28%] items-center justify-center">
+      <Pressable
+        disabled={isFuture}
+        accessibilityRole="button"
+        accessibilityState={{ selected: isSelected, disabled: isFuture }}
+        accessibilityLabel={formatCalendarDate(date)}
+        onPress={() => onSelect(date)}
+        testID={`init-cycle-day-${date}`}
+        className={`size-10 items-center justify-center rounded-pill border ${ring} ${fill}`}
+      >
+        <Text
+          className={`text-sm ${dayTextClass({ date, today, isSelected })}`}
+        >
+          {String(Number(date.slice(-2)))}
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+interface MonthCalendarProps {
+  month: Date;
+  today: string;
+  selectedDate: string;
+  onSelect: (date: string) => void;
+  onChangeMonth: (month: Date) => void;
+}
+
+function MonthCalendar(props: MonthCalendarProps) {
+  const { month, today, selectedDate, onSelect, onChangeMonth } = props;
+  const palette = usePaletteColors();
+  const year = month.getFullYear();
+  const monthIndex = month.getMonth();
+  const weeks = React.useMemo(
+    () => buildMonthMatrix(year, monthIndex),
+    [year, monthIndex]
+  );
+  const now = new Date();
+  const isLatestMonth =
+    year > now.getFullYear() ||
+    (year === now.getFullYear() && monthIndex >= now.getMonth());
+  const title = month.toLocaleDateString('en', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <View className="mt-5 rounded-panel border border-divider bg-canvas px-2 pb-2 pt-3">
+      <View className="flex-row items-center justify-between px-1">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Previous month"
+          onPress={() => onChangeMonth(new Date(year, monthIndex - 1, 1))}
+          className="size-10 items-center justify-center rounded-pill active:bg-accent-200"
+          testID="init-cycle-prev-month"
+        >
+          <ChevronLeft size={NAV_ICON_SIZE} color={palette.ink} />
+        </Pressable>
+        <Text className="font-heading text-[15px] text-ink">{title}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Next month"
+          accessibilityState={{ disabled: isLatestMonth }}
+          disabled={isLatestMonth}
+          onPress={() => onChangeMonth(new Date(year, monthIndex + 1, 1))}
+          className={`size-10 items-center justify-center rounded-pill ${
+            isLatestMonth ? 'opacity-30' : 'active:bg-accent-200'
+          }`}
+          testID="init-cycle-next-month"
+        >
+          <ChevronRight size={NAV_ICON_SIZE} color={palette.ink} />
+        </Pressable>
+      </View>
+
+      <View className="mt-2 flex-row">
+        {WEEKDAYS.map((weekday, index) => (
+          <View key={index} className="w-[14.28%] items-center py-1">
+            <Text className="font-body-semibold text-[11px] text-tone-500">
+              {weekday}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {weeks.map((week, weekIndex) => (
+        <View key={weekIndex} className="flex-row">
+          {week.map((date, dayIndex) =>
+            date ? (
+              <Day
+                key={date}
+                date={date}
+                today={today}
+                isSelected={date === selectedDate}
+                onSelect={onSelect}
+              />
+            ) : (
+              <View
+                key={`empty-${weekIndex}-${dayIndex}`}
+                className="h-11 w-[14.28%]"
+              />
+            )
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function SelectedDateSummary({ date }: { date: string }) {
+  return (
+    <View className="mt-4 flex-row items-center justify-between rounded-panel bg-accent-100 px-4 py-3">
+      <Text className="font-body text-[13px] text-tone-600">
+        Period started
+      </Text>
+      <Text
+        testID="init-cycle-selected-date"
+        className="font-body-bold text-[13px] text-accent"
+      >
+        {formatCalendarDate(date)} · {relativeDayLabel(date)}
+      </Text>
+    </View>
+  );
+}
+
+function SheetHeader({
+  onClose,
+  disabled,
+}: {
+  onClose: () => void;
+  disabled: boolean;
+}) {
+  const palette = usePaletteColors();
+  return (
+    <>
+      <View className="mb-4 h-1 w-10 self-center rounded-pill bg-tone-300" />
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-1">
+          <Text className="font-body-bold text-[11px] uppercase tracking-[1.5px] text-accent">
+            Cycle setup
+          </Text>
+          <Text className="mt-1 font-heading text-[22px] leading-7 text-ink">
+            When did your last period start?
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          onPress={onClose}
+          disabled={disabled}
+          hitSlop={8}
+          testID="init-cycle-cancel-button"
+          className="size-9 items-center justify-center rounded-pill bg-canvas active:opacity-70"
+        >
+          <X size={CLOSE_ICON_SIZE} color={palette.ink} />
+        </Pressable>
+      </View>
+      <Text className="mt-2 font-body text-[13px] leading-5 text-tone-600">
+        Pick the first day of bleeding. We use it to estimate your cycle day,
+        fertile window and next period.
+      </Text>
+    </>
+  );
+}
+
+/** Starts a cycle on `date` and refreshes everything derived from cycles. */
+function useStartCycle(onDone: () => void) {
+  const queryClient = useQueryClient();
+  const initCycle = useInitCycle();
+
+  return React.useCallback(
+    async (date: string) => {
+      await initCycle.mutateAsync({ start_date: date });
+      await Promise.all(
+        CYCLE_QUERY_KEYS.map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey: [...queryKey] })
+        )
+      );
+      onDone();
+    },
+    [initCycle, queryClient, onDone]
+  );
+}
+
 export function InitializeCycleModal({
   visible,
   onClose,
   onSuccess,
 }: InitializeCycleModalProps) {
-  const queryClient = useQueryClient();
-  const initCycle = useInitCycle();
-  const insets = React.useContext(SafeAreaInsetsContext) ?? {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  };
-
-  const today = React.useMemo(() => todayDateString(), []);
-  const [selectedDate, setSelectedDate] = React.useState<string>(today);
-  const [currentMonth, setCurrentMonth] = React.useState<Date>(
-    () => new Date()
-  );
+  const insets = React.useContext(SafeAreaInsetsContext);
+  const today = todayDateString();
+  const [selectedDate, setSelectedDate] = React.useState(today);
+  const [month, setMonth] = React.useState(() => new Date());
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Sync state when modal is opened
   React.useEffect(() => {
-    if (visible) {
-      setSelectedDate(todayDateString());
-      setCurrentMonth(new Date());
-      setErrorMessage(null);
-      setIsSubmitting(false);
-    }
+    if (!visible) return;
+    setSelectedDate(todayDateString());
+    setMonth(new Date());
+    setErrorMessage(null);
+    setIsSubmitting(false);
   }, [visible]);
 
-  const year = currentMonth.getFullYear();
-  const monthIndex = currentMonth.getMonth();
-  const monthWeeks = React.useMemo(
-    () => buildMonthMatrix(year, monthIndex),
-    [year, monthIndex]
-  );
-
-  const monthTitle = React.useMemo(
-    () =>
-      currentMonth.toLocaleDateString('en', {
-        month: 'long',
-        year: 'numeric',
-      }),
-    [currentMonth]
-  );
-
-  const isCurrentMonthOrFuture = React.useMemo(() => {
-    const now = new Date();
-    return (
-      year > now.getFullYear() ||
-      (year === now.getFullYear() && monthIndex >= now.getMonth())
-    );
-  }, [year, monthIndex]);
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(new Date(year, monthIndex - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    if (!isCurrentMonthOrFuture) {
-      setCurrentMonth(new Date(year, monthIndex + 1, 1));
-    }
-  };
-
-  const quickOptions = React.useMemo(() => {
-    const now = new Date();
-    return [
-      { label: 'Today', date: today },
-      { label: 'Yesterday', date: toDateString(addDays(now, -1)) },
-      { label: '3 days ago', date: toDateString(addDays(now, -3)) },
-      { label: '1 week ago', date: toDateString(addDays(now, -7)) },
-    ];
-  }, [today]);
-
-  const handleQuickSelect = (date: string) => {
-    setSelectedDate(date);
-    const parsed = parseDateString(date);
-    if (parsed) {
-      setCurrentMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
-    }
-  };
-
-  const handleDismiss = React.useCallback(() => {
-    if (isSubmitting) return;
-    setErrorMessage(null);
+  const handleDone = React.useCallback(() => {
+    onSuccess?.();
     onClose();
-  }, [isSubmitting, onClose]);
+  }, [onSuccess, onClose]);
+  const startCycle = useStartCycle(handleDone);
 
-  const handleConfirm = async () => {
+  const submit = async (date: string, fallbackMessage?: string) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     setErrorMessage(null);
-
-    // Strictly format selected date as YYYY-MM-DD
-    const formattedStartDate =
-      typeof selectedDate === 'string'
-        ? selectedDate.trim().split('T')[0]
-        : toDateString(selectedDate);
-
     try {
-      await initCycle.mutateAsync({ start_date: formattedStartDate });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['cycles'] }),
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({
-          queryKey: ['dashboard', 'current-cycle'],
-        }),
-        queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
-      ]);
-      onSuccess?.();
-      onClose();
-    } catch (err: any) {
-      // If the interceptor purged the token, we are logging out. Clear the banner.
-      if (err?.response?.status === 401 && !useAuth.getState().token) {
-        setErrorMessage(null);
-        return;
-      }
-
-      const responseData = err?.response?.data;
-      let msg = 'Failed to initialize cycle. Please try again.';
-      if (err?.response?.status === 401) {
-        msg = 'Demo tokens cannot initialize cycles without a mock backend.';
-      } else if (responseData) {
-        if (typeof responseData.message === 'string') {
-          msg = responseData.message;
-        } else if (typeof responseData.detail === 'string') {
-          msg = responseData.detail;
-        } else {
-          msg =
-            typeof responseData === 'object'
-              ? JSON.stringify(responseData)
-              : String(responseData);
-        }
-      } else if (err?.message) {
-        msg = err.message;
-      }
-      setErrorMessage(msg);
+      await startCycle(date);
+    } catch (error: unknown) {
+      setErrorMessage(fallbackMessage ?? messageFromError(error));
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSelect = (date: string) => {
+    setSelectedDate(date);
+    const start = monthStartOf(date);
+    if (start) setMonth(start);
+  };
+
+  const handleDismiss = () => {
+    if (isSubmitting) return;
+    setErrorMessage(null);
+    onClose();
   };
 
   return (
@@ -186,257 +395,47 @@ export function InitializeCycleModal({
       <View className="flex-1 justify-end bg-black/50">
         <Pressable className="absolute inset-0" onPress={handleDismiss} />
         <View
-          className="max-h-[90%] rounded-t-[28px] bg-white p-6"
+          className="max-h-[92%] rounded-t-[28px] bg-surface px-5 pt-3"
           style={{
-            paddingBottom: insets.bottom + 20,
-            shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: -6 },
-            shadowOpacity: 0.9,
-            shadowRadius: 20,
-            elevation: 8,
+            paddingBottom: (insets?.bottom ?? 0) + SHEET_BOTTOM_PADDING,
           }}
         >
-          {/* Header */}
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-              <View className="size-10 items-center justify-center rounded-full bg-[#FFE5E8]">
-                <Calendar size={20} color="#FF9FA8" strokeWidth={2.5} />
-              </View>
-              <Text className="font-heading text-lg text-[#2A2321]">
-                Initialize Cycle
-              </Text>
-            </View>
-            <Pressable
-              onPress={handleDismiss}
-              disabled={isSubmitting}
-              hitSlop={8}
-              testID="init-cycle-cancel-button"
-              className={`p-1 ${isSubmitting ? 'opacity-40' : 'active:opacity-60'}`}
-            >
-              <X size={20} color="#A0A0B0" />
-            </Pressable>
-          </View>
+          <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+            <SheetHeader onClose={handleDismiss} disabled={isSubmitting} />
+            <QuickPicks selectedDate={selectedDate} onSelect={handleSelect} />
+            <MonthCalendar
+              month={month}
+              today={today}
+              selectedDate={selectedDate}
+              onSelect={setSelectedDate}
+              onChangeMonth={setMonth}
+            />
+            <SelectedDateSummary date={selectedDate} />
 
-          <ScrollView showsVerticalScrollIndicator={false} className="mt-4">
-            <Text className="font-heading text-[17px] text-[#2A2321]">
-              When did your last period start?
-            </Text>
-            <Text className="mt-1 font-body text-xs text-[#8C8C8C]">
-              We need an anchor date to compute your cycle days, fertile window,
-              and period predictions.
-            </Text>
-
-            {/* Quick Pick Chips */}
-            <View className="mt-4 flex-row flex-wrap gap-2">
-              {quickOptions.map((opt) => {
-                const isSelected = selectedDate === opt.date;
-                return (
-                  <Pressable
-                    key={opt.label}
-                    onPress={() => handleQuickSelect(opt.date)}
-                    className={`rounded-full border px-3.5 py-1.5 ${
-                      isSelected
-                        ? 'border-[#FF9FA8] bg-[#FFE5E8]'
-                        : 'border-[#F0E5E1] bg-white'
-                    }`}
-                    testID={`init-cycle-quick-${opt.label.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    <Text
-                      className={`text-xs ${
-                        isSelected
-                          ? 'font-body-bold text-[#E06B78]'
-                          : 'font-body text-[#6A6A6A]'
-                      }`}
-                    >
-                      {opt.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {/* Calendar View */}
-            <View className="mt-4 rounded-2xl border border-[#F0E5E1] bg-[#FCF8F5] p-3">
-              {/* Month Navigation */}
-              <View className="flex-row items-center justify-between pb-2">
-                <Pressable
-                  onPress={handlePrevMonth}
-                  className="rounded-full p-2 active:bg-white"
-                  testID="init-cycle-prev-month"
-                >
-                  <ChevronLeft size={18} color="#6A6A6A" />
-                </Pressable>
-                <Text className="font-heading text-sm text-[#2A2321]">
-                  {monthTitle}
-                </Text>
-                <Pressable
-                  onPress={handleNextMonth}
-                  disabled={isCurrentMonthOrFuture}
-                  className={`rounded-full p-2 ${
-                    isCurrentMonthOrFuture ? 'opacity-30' : 'active:bg-white'
-                  }`}
-                  testID="init-cycle-next-month"
-                >
-                  <ChevronRight size={18} color="#6A6A6A" />
-                </Pressable>
-              </View>
-
-              {/* Weekday headers - Strict 7-column 14.28% grid */}
-              <View className="flex-row border-b border-[#F0E5E1] pb-2">
-                {WEEKDAYS.map((wd, i) => (
-                  <View
-                    key={i}
-                    style={{ width: '14.28%', alignItems: 'center' }}
-                  >
-                    <Text className="font-body-bold text-[11px] text-[#A0A0B0]">
-                      {wd}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Month day grid - Strict 7-column 14.28% grid with 48x48 min touch targets */}
-              <View className="mt-2">
-                {monthWeeks.map((week, wIdx) => (
-                  <View key={wIdx} className="flex-row">
-                    {week.map((dateStr, dIdx) => {
-                      if (!dateStr) {
-                        return (
-                          <View
-                            key={`empty-${wIdx}-${dIdx}`}
-                            style={{ width: '14.28%', aspectRatio: 1 }}
-                          />
-                        );
-                      }
-                      const isSelected = dateStr === selectedDate;
-                      const isFuture = dateStr > today;
-                      const dayNumber = String(Number(dateStr.slice(-2)));
-
-                      return (
-                        <View
-                          key={dateStr}
-                          style={{
-                            width: '14.28%',
-                            aspectRatio: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Pressable
-                            disabled={isFuture}
-                            onPress={() => setSelectedDate(dateStr)}
-                            testID={`init-cycle-day-${dateStr}`}
-                            style={{
-                              width: 36,
-                              height: 36,
-                              minWidth: 48,
-                              minHeight: 48,
-                              borderRadius: 24,
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                            className={`${
-                              isSelected
-                                ? 'bg-[#FF9FA8]'
-                                : isFuture
-                                  ? 'opacity-25'
-                                  : 'active:bg-[#FFE5E8]'
-                            }`}
-                          >
-                            <Text
-                              className={`text-xs ${
-                                isSelected
-                                  ? 'font-body-bold text-white'
-                                  : isFuture
-                                    ? 'font-body text-[#A0A0B0]'
-                                    : 'font-body-medium text-[#2A2321]'
-                              }`}
-                            >
-                              {dayNumber}
-                            </Text>
-                          </Pressable>
-                        </View>
-                      );
-                    })}
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Selected Date Indicator */}
-            <View className="mt-3 flex-row items-center justify-between rounded-xl bg-[#FFE5E8]/50 px-4 py-2.5">
-              <Text className="font-body text-xs text-[#8C8C8C]">
-                Selected Date:
-              </Text>
-              <Text
-                testID="init-cycle-selected-date"
-                className="font-heading text-xs text-[#E06B78]"
-              >
-                {formatCalendarDate(selectedDate)}
-              </Text>
-            </View>
-
-            {errorMessage && (
-              <View className="mt-3 rounded-xl bg-red-50 p-2.5">
-                <Text className="font-body text-xs text-red-600">
+            {errorMessage ? (
+              <View className="mt-3 rounded-panel bg-danger-50 px-4 py-3">
+                <Text className="font-body text-[13px] text-danger-600">
                   {errorMessage}
                 </Text>
               </View>
-            )}
+            ) : null}
 
-            {/* Submit Button */}
-            <Pressable
-              disabled={isSubmitting}
-              onPress={handleConfirm}
+            <Button
+              label="Confirm & start cycle"
+              size="lg"
+              loading={isSubmitting}
+              onPress={() => submit(selectedDate)}
               testID="init-cycle-confirm-button"
-              className="h-13 mt-5 flex-row items-center justify-center rounded-pill bg-[#FF9FA8] active:scale-[0.98]"
-              style={{
-                shadowColor: '#FF9FA8',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.4,
-                shadowRadius: 10,
-                elevation: 3,
-              }}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text className="font-body-bold text-base text-white">
-                  Confirm & Start Cycle
-                </Text>
-              )}
-            </Pressable>
-
-            {/* Skip Button */}
+              className="mt-5 rounded-pill shadow-none"
+            />
             <Pressable
+              accessibilityRole="button"
               disabled={isSubmitting}
-              onPress={async () => {
-                if (isSubmitting) return;
-                setIsSubmitting(true);
-                try {
-                  await initCycle.mutateAsync({
-                    start_date: todayDateString(),
-                  });
-                  await Promise.all([
-                    queryClient.invalidateQueries({ queryKey: ['cycles'] }),
-                    queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-                    queryClient.invalidateQueries({
-                      queryKey: ['dashboard', 'current-cycle'],
-                    }),
-                    queryClient.invalidateQueries({ queryKey: ['daily-logs'] }),
-                  ]);
-                  onSuccess?.();
-                  onClose();
-                } catch (_err: unknown) {
-                  setErrorMessage('Failed to skip. Please try again.');
-                } finally {
-                  setIsSubmitting(false);
-                }
-              }}
+              onPress={() => submit(todayDateString(), SKIP_ERROR)}
               testID="init-cycle-skip-button"
-              className="mt-4 flex-row items-center justify-center py-2"
+              className="items-center py-3 active:opacity-60"
             >
-              <Text className="font-body-bold text-sm text-[#8C8C8C]">
+              <Text className="font-body-semibold text-sm text-tone-600">
                 Skip for now
               </Text>
             </Pressable>

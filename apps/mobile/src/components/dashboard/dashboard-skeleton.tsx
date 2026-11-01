@@ -8,206 +8,65 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-const RING_SIZE = 240;
-const STROKE_WIDTH = 16;
+const PULSE_MIN_OPACITY = 0.4;
+const PULSE_MAX_OPACITY = 0.85;
+const PULSE_STEP_MS = 800;
 
-export function DashboardSkeleton() {
-  const opacity = useSharedValue(0.4);
+/** One shared breathing pulse, so every placeholder fades in step. */
+function usePulseStyle() {
+  const opacity = useSharedValue(PULSE_MIN_OPACITY);
 
   useEffect(() => {
     opacity.value = withRepeat(
       withSequence(
-        withTiming(0.85, { duration: 800 }),
-        withTiming(0.4, { duration: 800 })
+        withTiming(PULSE_MAX_OPACITY, { duration: PULSE_STEP_MS }),
+        withTiming(PULSE_MIN_OPACITY, { duration: PULSE_STEP_MS })
       ),
       -1,
       true
     );
   }, [opacity]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
+  return useAnimatedStyle(() => ({ opacity: opacity.value }));
+}
+
+function StatusCardPlaceholder() {
+  return (
+    <View className="h-[105px] flex-1 rounded-panel bg-surface p-4">
+      <View className="mb-3 h-3.5 w-3/5 rounded-pill bg-tone-200" />
+      <View className="mb-2 h-[22px] w-4/5 rounded-pill bg-tone-300" />
+      <View className="h-3 w-2/5 rounded-pill bg-tone-200" />
+    </View>
+  );
+}
+
+/** Theme-aware loading shape of the dashboard: week strip, ring, action, tiles. */
+export function DashboardSkeleton() {
+  const pulseStyle = usePulseStyle();
 
   return (
     <View testID="dashboard-skeleton" className="w-full">
-      {/* Week strip placeholder */}
-      <Animated.View
-        style={[
-          {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingVertical: 12,
-            paddingHorizontal: 4,
-          },
-          animatedStyle,
-        ]}
-      >
-        {Array.from({ length: 7 }).map((_, index) => (
-          <View
-            key={`skeleton-day-${index}`}
-            style={{
-              width: 44,
-              height: 58,
-              borderRadius: 22,
-              backgroundColor: '#F3EAE6',
-            }}
-          />
-        ))}
-      </Animated.View>
-
-      {/* Progress ring placeholder */}
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginVertical: 24,
-        }}
-      >
+      {/* The real week strip stays on screen above, so no placeholder for it. */}
+      <View className="my-6 items-center justify-center">
         <Animated.View
-          style={[
-            {
-              width: RING_SIZE,
-              height: RING_SIZE,
-              borderRadius: RING_SIZE / 2,
-              borderWidth: STROKE_WIDTH,
-              borderColor: '#F3EAE6',
-              alignItems: 'center',
-              justifyContent: 'center',
-            },
-            animatedStyle,
-          ]}
+          className="size-60 items-center justify-center rounded-pill border-[16px] border-tone-200"
+          style={pulseStyle}
         >
-          {/* Inner content placeholder */}
-          <View
-            style={{
-              width: 90,
-              height: 32,
-              borderRadius: 16,
-              backgroundColor: '#EAE1DC',
-              marginBottom: 10,
-            }}
-          />
-          <View
-            style={{
-              width: 120,
-              height: 16,
-              borderRadius: 8,
-              backgroundColor: '#EAE1DC',
-            }}
-          />
+          <View className="mb-2.5 h-8 w-[90px] rounded-pill bg-tone-300" />
+          <View className="h-4 w-[120px] rounded-pill bg-tone-300" />
         </Animated.View>
       </View>
 
-      {/* Action button placeholder */}
-      <View style={{ alignItems: 'center', marginBottom: 20 }}>
+      <View className="mb-5 items-center">
         <Animated.View
-          style={[
-            {
-              width: 180,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: '#F3EAE6',
-            },
-            animatedStyle,
-          ]}
+          className="h-12 w-[180px] rounded-pill bg-tone-200"
+          style={pulseStyle}
         />
       </View>
 
-      {/* Status cards placeholder */}
-      <Animated.View
-        style={[
-          {
-            flexDirection: 'row',
-            gap: 12,
-            marginTop: 8,
-          },
-          animatedStyle,
-        ]}
-      >
-        <View
-          style={{
-            flex: 1,
-            height: 105,
-            borderRadius: 20,
-            backgroundColor: '#FFFFFF',
-            padding: 16,
-            shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.05,
-            shadowRadius: 6,
-            elevation: 1,
-          }}
-        >
-          <View
-            style={{
-              width: '60%',
-              height: 14,
-              borderRadius: 7,
-              backgroundColor: '#F3EAE6',
-              marginBottom: 12,
-            }}
-          />
-          <View
-            style={{
-              width: '80%',
-              height: 22,
-              borderRadius: 11,
-              backgroundColor: '#EAE1DC',
-              marginBottom: 8,
-            }}
-          />
-          <View
-            style={{
-              width: '40%',
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: '#F3EAE6',
-            }}
-          />
-        </View>
-
-        <View
-          style={{
-            flex: 1,
-            height: 105,
-            borderRadius: 20,
-            backgroundColor: '#FFFFFF',
-            padding: 16,
-            shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.05,
-            shadowRadius: 6,
-            elevation: 1,
-          }}
-        >
-          <View
-            style={{
-              width: '60%',
-              height: 14,
-              borderRadius: 7,
-              backgroundColor: '#F3EAE6',
-              marginBottom: 12,
-            }}
-          />
-          <View
-            style={{
-              width: '75%',
-              height: 22,
-              borderRadius: 11,
-              backgroundColor: '#EAE1DC',
-              marginBottom: 8,
-            }}
-          />
-          <View
-            style={{
-              width: '45%',
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: '#F3EAE6',
-            }}
-          />
-        </View>
+      <Animated.View className="mt-2 flex-row gap-3" style={pulseStyle}>
+        <StatusCardPlaceholder />
+        <StatusCardPlaceholder />
       </Animated.View>
     </View>
   );

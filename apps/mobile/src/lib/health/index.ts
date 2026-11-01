@@ -6,5 +6,7 @@ export * from './demo-fallback';
 export * from './demo-seed';
 export * from './medical-insights';
 export * from './pregnancy-insights';
+export * from './use-demo-seed-allowed';
+export * from './use-is-pregnancy-mode';
 export * from './use-personalization-profile';
 export * from './use-tracking-mode';

@@ -20,6 +20,7 @@ import {
   deriveCycleInsights,
   formatCalendarDate,
   todayDateString,
+  useDemoSeedAllowed,
   withDemoFallback,
 } from '@/lib/health';
 import { usePaletteColors } from '@/lib/theme';
@@ -50,9 +51,7 @@ function AddSymptomButton({ date }: { date: string }) {
         color={palette.accentScale[100]}
         strokeWidth={3}
       />
-      <Text className="font-body-bold text-[15px] text-accent-100">
-        Add Symptom
-      </Text>
+      <Text className="font-body-bold text-[15px] text-white">Add Symptom</Text>
     </Pressable>
   );
 }
@@ -67,14 +66,17 @@ export function CalendarScreen() {
 
   const { data: cyclesPage, isError: cyclesFailed } = useCycles();
   const { data: dailyLogsPage, isError: dailyLogsFailed } = useDailyLogs();
+  const allowSeed = useDemoSeedAllowed();
 
   const { rows: cycles } = withDemoFallback(
     { data: cyclesPage, isError: cyclesFailed },
-    DEMO_CYCLES
+    DEMO_CYCLES,
+    allowSeed
   );
   const { rows: logs } = withDemoFallback(
     { data: dailyLogsPage, isError: dailyLogsFailed },
-    DEMO_DAILY_LOGS
+    DEMO_DAILY_LOGS,
+    allowSeed
   );
 
   const cycleLengthDays = deriveCycleInsights(cycles)?.cycleLengthDays;

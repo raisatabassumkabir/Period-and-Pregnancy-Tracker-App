@@ -157,7 +157,7 @@ const PlanOptionCard = ({
     >
       {!!badge && (
         <View className="absolute -top-2.5 right-3 rounded-full bg-accent px-2 py-0.5">
-          <Text className="font-body-bold text-[10px] uppercase text-accent-100">
+          <Text className="font-body-bold text-[10px] uppercase text-white">
             {badge}
           </Text>
         </View>
@@ -215,7 +215,7 @@ const CtaButton = ({
         ) : (
           <Text
             className={`font-body-bold text-[15px] ${
-              disabled ? 'text-tone-600' : 'text-accent-100'
+              disabled ? 'text-tone-600' : 'text-white'
             }`}
           >
             {label}

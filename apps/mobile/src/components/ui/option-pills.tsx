@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Text } from './text';
 
@@ -29,43 +29,38 @@ export function OptionPills<T extends string>({
   testID,
 }: OptionPillsProps<T>) {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
+    <View
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
       testID={testID}
+      className="flex-row flex-wrap gap-2"
     >
-      <View className="flex-row gap-2">
-        {options.map((option) => {
-          const selected = option.value === value;
-          return (
-            <Pressable
-              key={option.value}
-              accessibilityRole="radio"
-              accessibilityState={{ selected }}
-              testID={testID ? `${testID}-${option.value}` : undefined}
-              onPress={() => onChange(option.value)}
-              // Colour-only toggle — a runtime-toggled shadow crashes css-interop.
-              className={`h-11 items-center justify-center rounded-pill border px-5 ${
+      {options.map((option) => {
+        const selected = option.value === value;
+        return (
+          <Pressable
+            key={option.value}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            testID={testID ? `${testID}-${option.value}` : undefined}
+            onPress={() => onChange(option.value)}
+            // Colour-only toggle — a runtime-toggled shadow crashes css-interop.
+            className={`h-11 items-center justify-center rounded-pill border px-5 ${
+              selected ? 'border-accent bg-accent' : 'border-divider bg-surface'
+            }`}
+          >
+            <Text
+              className={`text-[14px] ${
                 selected
-                  ? 'border-accent bg-accent'
-                  : 'border-divider bg-surface'
+                  ? 'font-body-bold text-white'
+                  : 'font-body-semibold text-ink'
               }`}
             >
-              <Text
-                className={`text-[14px] ${
-                  selected
-                    ? 'font-body-bold text-accent-100'
-                    : 'font-body-semibold text-ink'
-                }`}
-              >
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </ScrollView>
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }

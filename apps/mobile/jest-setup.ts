@@ -199,3 +199,31 @@ jest.mock('react-native-purchases', () => {
     },
   };
 });
+
+// Local notifications are a native module; tests assert on these calls instead.
+jest.mock(
+  'expo-notifications',
+  () => ({
+    setNotificationHandler: jest.fn(),
+    setNotificationChannelAsync: jest.fn(async () => null),
+    getPermissionsAsync: jest.fn(async () => ({
+      granted: true,
+      canAskAgain: true,
+    })),
+    requestPermissionsAsync: jest.fn(async () => ({
+      granted: true,
+      canAskAgain: true,
+    })),
+    getAllScheduledNotificationsAsync: jest.fn(async () => []),
+    cancelScheduledNotificationAsync: jest.fn(async () => undefined),
+    scheduleNotificationAsync: jest.fn(async () => 'notification-id'),
+    AndroidImportance: { MAX: 5 },
+    AndroidNotificationPriority: { MAX: 'max' },
+    AndroidNotificationVisibility: { PRIVATE: 0 },
+    SchedulableTriggerInputTypes: {
+      DATE: 'date',
+      TIME_INTERVAL: 'timeInterval',
+    },
+  }),
+  { virtual: true }
+);

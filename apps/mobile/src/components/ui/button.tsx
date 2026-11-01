@@ -4,6 +4,20 @@ import { ActivityIndicator, Pressable, Text } from 'react-native';
 import type { VariantProps } from 'tailwind-variants';
 import { tv } from 'tailwind-variants';
 
+import type { PaletteColors } from '@/lib/theme';
+import { usePaletteColors } from '@/lib/theme';
+
+type ButtonVariant = NonNullable<VariantProps<typeof button>['variant']>;
+
+/** ActivityIndicator ignores `className` colour, so it needs a literal. */
+function spinnerColor(variant: ButtonVariant, palette: PaletteColors): string {
+  if (variant === 'secondary') return palette.accent2Scale[100];
+  if (variant === 'outline') return palette.ink;
+  if (variant === 'ghost' || variant === 'link')
+    return palette.accentScale[700];
+  return '#FFFFFF';
+}
+
 const button = tv({
   slots: {
     container:
@@ -108,6 +122,7 @@ export const Button = React.forwardRef<View, Props>(
     },
     ref
   ) => {
+    const palette = usePaletteColors();
     const styles = React.useMemo(
       () => button({ variant, disabled, size }),
       [variant, disabled, size]
@@ -128,6 +143,7 @@ export const Button = React.forwardRef<View, Props>(
             {loading ? (
               <ActivityIndicator
                 size="small"
+                color={spinnerColor(variant ?? 'default', palette)}
                 className={styles.indicator()}
                 testID={testID ? `${testID}-activity-indicator` : undefined}
               />

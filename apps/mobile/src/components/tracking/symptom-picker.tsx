@@ -135,6 +135,8 @@ export function SymptomPicker({ selected, onToggle }: Props) {
       horizontal
       showsHorizontalScrollIndicator={false}
       testID="symptom-picker"
+      className="-mx-4"
+      contentContainerClassName="px-4"
     >
       <View className="flex-row gap-3">
         {SYMPTOM_OPTIONS.map(({ code, label, icon }) => (

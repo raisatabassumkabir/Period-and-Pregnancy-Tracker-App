@@ -1,7 +1,7 @@
-import { useColorScheme } from 'nativewind';
 import React from 'react';
 import { create } from 'zustand';
 
+import { useIsDarkMode } from '../hooks/use-selected-theme';
 import { getItem, setItem, STORAGE_KEYS } from '../storage';
 import { createSelectors } from '../utils';
 import type { PaletteId, PaletteTokens, ThemeMode } from './palettes';
@@ -66,8 +66,7 @@ export const useSelectedPalette = () => {
 /** The active palette's tokens for the current light/dark mode. */
 export const usePaletteTokens = (): PaletteTokens => {
   const paletteId = usePaletteStore.use.paletteId();
-  const { colorScheme } = useColorScheme();
-  const mode: ThemeMode = colorScheme === 'dark' ? 'dark' : 'light';
+  const mode: ThemeMode = useIsDarkMode() ? 'dark' : 'light';
 
   return React.useMemo(
     () => getPaletteTokens(paletteId, mode),

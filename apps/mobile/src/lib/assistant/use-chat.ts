@@ -11,6 +11,7 @@ import {
   DEMO_PREGNANCY,
   deriveCycleInsights,
   derivePregnancyProgress,
+  useDemoSeedAllowed,
   withDemoFallback,
 } from '@/lib/health';
 import { useKickCounter } from '@/lib/tracking';
@@ -48,9 +49,15 @@ export function useAssistantContext(): AssistantContext {
   const pregnanciesQuery = usePregnancies();
   const { count: kicksToday } = useKickCounter();
 
-  const cycles = withDemoFallback(cyclesQuery, DEMO_CYCLES);
-  const logs = withDemoFallback(logsQuery, DEMO_DAILY_LOGS);
-  const pregnancies = withDemoFallback(pregnanciesQuery, [DEMO_PREGNANCY]);
+  const allowSeed = useDemoSeedAllowed();
+
+  const cycles = withDemoFallback(cyclesQuery, DEMO_CYCLES, allowSeed);
+  const logs = withDemoFallback(logsQuery, DEMO_DAILY_LOGS, allowSeed);
+  const pregnancies = withDemoFallback(
+    pregnanciesQuery,
+    [DEMO_PREGNANCY],
+    allowSeed
+  );
   const pregnancy = pregnancies.rows.find((row) => row.status === 'active');
 
   return React.useMemo<AssistantContext>(

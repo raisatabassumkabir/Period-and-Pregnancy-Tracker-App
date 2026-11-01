@@ -56,7 +56,7 @@ export function SegmentedControl<T extends string | number>({
             <Text
               className={
                 selected
-                  ? 'font-heading text-[15px] text-accent-100'
+                  ? 'font-heading text-[15px] text-white'
                   : 'font-body-semibold text-sm text-tone-700'
               }
             >

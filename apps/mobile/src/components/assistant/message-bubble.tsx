@@ -20,7 +20,7 @@ export function MessageBubble({ role, text }: Props) {
         isUser ? 'self-end bg-accent' : 'self-start bg-surface'
       }`}
     >
-      <Text className={isUser ? 'text-accent-100' : 'text-ink'}>{text}</Text>
+      <Text className={isUser ? 'text-white' : 'text-ink'}>{text}</Text>
     </View>
   );
 }

@@ -205,7 +205,7 @@ export default function Onboarding() {
   };
 
   return (
-    <View className="flex-1 bg-[#FCF8F5]" testID="onboarding-screen">
+    <View className="flex-1 bg-canvas" testID="onboarding-screen">
       <FocusAwareStatusBar />
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         {/* Header with Back, Step Progress, and Skip */}
@@ -268,7 +268,7 @@ export default function Onboarding() {
         </View>
 
         {/* Bottom Action Button */}
-        <View className="bg-[#FCF8F5] px-6 pb-6 pt-2">
+        <View className="bg-canvas px-6 pb-6 pt-2">
           <Button
             label={currentStep === TOTAL_STEPS ? 'Complete & Start' : 'Next'}
             size="lg"

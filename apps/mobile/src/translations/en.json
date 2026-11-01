@@ -110,7 +110,88 @@
           "name": "Dates with a handful of walnuts",
           "focus": "Energy-dense and rich in fibre"
         }
+      },
+      "menstrual": {
+        "breakfast": {
+          "name": "Spinach and egg scramble on wholegrain toast",
+          "focus": "Iron and protein to replace what bleeding uses"
+        },
+        "lunch": {
+          "name": "Lentil and tomato soup",
+          "focus": "Plant iron, with vitamin C to help absorb it"
+        },
+        "dinner": {
+          "name": "Salmon with sweet potato and greens",
+          "focus": "Omega-3s that may ease cramps"
+        },
+        "snack": {
+          "name": "Dark chocolate with a few almonds",
+          "focus": "Magnesium, which may help cramps and mood"
+        }
+      },
+      "follicular": {
+        "breakfast": {
+          "name": "Greek yoghurt with berries and oats",
+          "focus": "Protein and fibre as your energy rises"
+        },
+        "lunch": {
+          "name": "Quinoa salad with chickpeas and vegetables",
+          "focus": "Fresh, light meals to match rising oestrogen"
+        },
+        "dinner": {
+          "name": "Chicken or tofu stir-fry with broccoli",
+          "focus": "Lean protein and B vitamins"
+        },
+        "snack": {
+          "name": "Carrot sticks with hummus",
+          "focus": "Fibre and steady energy"
+        }
+      },
+      "ovulation": {
+        "breakfast": {
+          "name": "Spinach, banana and flaxseed smoothie",
+          "focus": "Antioxidants and fibre around ovulation"
+        },
+        "lunch": {
+          "name": "Grilled fish with a rainbow salad",
+          "focus": "Zinc and omega-3s"
+        },
+        "dinner": {
+          "name": "Wholegrain pasta with vegetables and beans",
+          "focus": "Complex carbs for steady energy"
+        },
+        "snack": {
+          "name": "Pumpkin seeds and an orange",
+          "focus": "Zinc and vitamin C"
+        }
+      },
+      "luteal": {
+        "breakfast": {
+          "name": "Porridge with banana and peanut butter",
+          "focus": "Slow-release carbs to steady cravings"
+        },
+        "lunch": {
+          "name": "Brown rice bowl with beans and avocado",
+          "focus": "Fibre and healthy fats that keep you full"
+        },
+        "dinner": {
+          "name": "Baked chicken or tofu with roasted root vegetables",
+          "focus": "Vitamin B6 and magnesium for PMS symptoms"
+        },
+        "snack": {
+          "name": "Dates with a handful of walnuts",
+          "focus": "Meets sweet cravings with fibre"
+        }
       }
+    },
+    "cycle_subtitle": "Meal ideas matched to each phase of your cycle",
+    "cycle_disclaimer": "General guidance only. Talk to a clinician about your own nutrition needs.",
+    "current_phase": "Your current phase",
+    "phases": {
+      "menstrual": "Period",
+      "follicular": "Follicular",
+      "ovulation": "Ovulation",
+      "luteal": "Luteal"
     }
   },
   "medical_disclaimer": {

@@ -4,6 +4,10 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
+    "check-deps": "node ../../scripts/check-deps.js",
+    "prestart": "pnpm run check-deps",
+    "preandroid": "pnpm run check-deps",
+    "preios": "pnpm run check-deps",
     "start": "cross-env EXPO_NO_DOTENV=1 expo start",
     "prebuild": "cross-env EXPO_NO_DOTENV=1 pnpm expo prebuild",
     "android": "cross-env EXPO_NO_DOTENV=1 expo run:android",
@@ -63,6 +67,7 @@
     "expo-linear-gradient": "~15.0.8",
     "expo-linking": "~8.0.12",
     "expo-localization": "~17.0.9",
+    "expo-notifications": "~0.32.17",
     "expo-router": "~6.0.24",
     "expo-secure-store": "~15.0.8",
     "expo-sharing": "~14.0.8",

@@ -2,11 +2,13 @@ import React from 'react';
 
 import { cleanup, screen, setup } from '@/lib/test-utils';
 import { useTodayLog } from '@/lib/tracking';
+import { useHealthStore } from '@/store/useHealthStore';
 
 import Tracking from './tracking';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ back: jest.fn(), canGoBack: () => false }),
+  useLocalSearchParams: () => ({}),
 }));
 
 jest.mock('react-native-edge-to-edge', () => ({
@@ -67,6 +69,7 @@ const mockLog = (overrides: Partial<ReturnType<typeof useTodayLog>> = {}) => {
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
+  useHealthStore.setState({ mode: 'cycle' });
 });
 
 describe('Tracking', () => {
@@ -119,10 +122,18 @@ describe('Tracking', () => {
     ).toBeOnTheScreen();
   });
 
-  it('shows the on-device kick count', () => {
+  it('shows the on-device kick count in pregnancy mode', () => {
+    useHealthStore.setState({ mode: 'pregnancy' });
     mockLog();
     setup(<Tracking />);
     expect(screen.getByTestId('kick-count')).toHaveTextContent('3');
+  });
+
+  it('hides the kick counter in cycle mode', () => {
+    useHealthStore.setState({ mode: 'cycle' });
+    mockLog();
+    setup(<Tracking />);
+    expect(screen.queryByTestId('kick-counter')).toBeNull();
   });
 
   it('selects sexual health pills and toggles protection tags', async () => {

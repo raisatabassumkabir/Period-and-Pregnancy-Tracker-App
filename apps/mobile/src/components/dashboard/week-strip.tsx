@@ -53,14 +53,14 @@ export function WeekStrip({ today, selectedDate, onSelect }: Props) {
           >
             <Text
               className={`font-body-semibold text-[11px] ${
-                selected ? 'text-accent-100' : 'text-tone-600'
+                selected ? 'text-white' : 'text-tone-600'
               }`}
             >
               {WEEKDAY_INITIALS[index]}
             </Text>
             <Text
               className={`mt-1 font-body-bold text-[16px] ${
-                selected ? 'text-accent-100' : 'text-ink'
+                selected ? 'text-white' : 'text-ink'
               }`}
             >
               {Number(date.slice(-2))}

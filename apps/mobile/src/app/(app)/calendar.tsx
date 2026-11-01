@@ -20,12 +20,14 @@ import {
   deriveCycleInsights,
   formatCalendarDate,
   todayDateString,
+  useDemoSeedAllowed,
   withDemoFallback,
 } from '@/lib/health';
-import { usePaletteColors } from '@/lib/theme';
 
 const TRACKING_ROUTE = '/(app)/tracking';
 const FAB_ICON_SIZE = 18;
+/** Accent fills are mid-tone in every palette and mode, so white reads on all. */
+const ON_ACCENT_COLOR = '#FFFFFF';
 /** Room under the grid so the floating button never covers the last week. */
 const FAB_CLEARANCE_CLASS = 'pb-28';
 
@@ -35,7 +37,6 @@ function shiftMonth(date: Date, deltaMonths: number): Date {
 
 function AddSymptomButton({ date }: { date: string }) {
   const router = useRouter();
-  const palette = usePaletteColors();
 
   return (
     <Pressable
@@ -46,14 +47,8 @@ function AddSymptomButton({ date }: { date: string }) {
       }
       className="absolute bottom-6 right-4 h-14 flex-row items-center gap-2 rounded-pill bg-accent px-6 active:opacity-90"
     >
-      <Plus
-        size={FAB_ICON_SIZE}
-        color={palette.accentScale[100]}
-        strokeWidth={3}
-      />
-      <Text className="font-body-bold text-[15px] text-accent-100">
-        Add Symptom
-      </Text>
+      <Plus size={FAB_ICON_SIZE} color={ON_ACCENT_COLOR} strokeWidth={3} />
+      <Text className="font-body-bold text-[15px] text-white">Add Symptom</Text>
     </Pressable>
   );
 }
@@ -65,14 +60,17 @@ export default function Calendar() {
 
   const { data: cyclesPage, isError: cyclesFailed } = useCycles();
   const { data: dailyLogsPage, isError: dailyLogsFailed } = useDailyLogs();
+  const allowSeed = useDemoSeedAllowed();
 
   const { rows: cycles } = withDemoFallback(
     { data: cyclesPage, isError: cyclesFailed },
-    DEMO_CYCLES
+    DEMO_CYCLES,
+    allowSeed
   );
   const { rows: logs } = withDemoFallback(
     { data: dailyLogsPage, isError: dailyLogsFailed },
-    DEMO_DAILY_LOGS
+    DEMO_DAILY_LOGS,
+    allowSeed
   );
   const cycleLengthDays = deriveCycleInsights(cycles)?.cycleLengthDays;
 
@@ -120,16 +118,7 @@ export default function Calendar() {
           <Text className="mb-4 font-heading text-lg text-ink">
             {formatCalendarDate(activeDate)}
           </Text>
-          <View
-            className="rounded-3xl bg-white p-5"
-            style={{
-              shadowColor: '#F0E5E1',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.8,
-              shadowRadius: 15,
-              elevation: 3,
-            }}
-          >
+          <View className="rounded-card border border-divider bg-surface p-5">
             {activeLog ? (
               <View className="gap-3">
                 <Text className="font-body-semibold text-[15px] text-ink">

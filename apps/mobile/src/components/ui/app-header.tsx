@@ -5,8 +5,10 @@ import React from 'react';
 import { useMe } from '@/api/auth';
 import { usePaymentSubscriptionStatus } from '@/api/billing/use-subscription-status';
 import { PremiumBadge } from '@/components/billing';
+import { RemindersSheet } from '@/components/reminders';
 import { Pressable, Text, View } from '@/components/ui';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { useReminderSettings } from '@/lib/reminders';
 import { usePaletteColors } from '@/lib/theme';
 
 const AVATAR_ICON_SIZE = 20;
@@ -42,7 +44,6 @@ export function AppHeader({ title }: { title?: string }) {
   const { data: subscription } = usePaymentSubscriptionStatus({
     refetchOnWindowFocus: true,
   });
-  const palette = usePaletteColors();
 
   const isPremium = subscription?.is_premium ?? false;
   const displayName = profile.fullName || user?.full_name || 'there';
@@ -64,13 +65,37 @@ export function AppHeader({ title }: { title?: string }) {
           </View>
         </View>
       </View>
+      <ReminderBell />
+    </View>
+  );
+}
+
+/** Opens period reminders; a dot on the bell means reminders are on. */
+function ReminderBell() {
+  const palette = usePaletteColors();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const enabled = useReminderSettings((state) => state.settings.enabled);
+
+  return (
+    <>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          enabled ? 'Period reminders, on' : 'Period reminders, off'
+        }
+        onPress={() => setIsOpen(true)}
         className="size-[42px] items-center justify-center rounded-full bg-surface shadow-sm active:opacity-80"
         testID="notifications-bell"
-        accessibilityLabel="Notifications"
       >
         <Bell size={BELL_ICON_SIZE} color={palette.ink} strokeWidth={1.5} />
+        {enabled ? (
+          <View
+            className="absolute right-2.5 top-2.5 size-2.5 rounded-full border-2 border-surface bg-accent"
+            testID="notifications-bell-dot"
+          />
+        ) : null}
       </Pressable>
-    </View>
+      <RemindersSheet visible={isOpen} onClose={() => setIsOpen(false)} />
+    </>
   );
 }

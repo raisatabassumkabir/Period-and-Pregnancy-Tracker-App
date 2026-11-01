@@ -37,6 +37,12 @@ jest.mock('@/lib/health/use-personalization-profile', () => ({
   }),
 }));
 
+let mockIsSeededDemoSession = false;
+
+jest.mock('@/lib/health/use-demo-seed-allowed', () => ({
+  useDemoSeedAllowed: () => mockIsSeededDemoSession,
+}));
+
 jest.mock('@/api/auth', () => ({
   useMe: jest.fn(),
 }));
@@ -102,6 +108,7 @@ const startedDaysAgo = (days: number) => {
 afterEach(() => {
   cleanup();
   mockProfileGoals = [];
+  mockIsSeededDemoSession = false;
   mockPush.mockReset();
   mockUpdateProfile.mockReset();
   mockedUseMe.mockReset();
@@ -276,8 +283,9 @@ describe('Home', () => {
     expect(screen.queryByTestId('cycle-transition-banner')).toBeNull();
   });
 
-  it('falls back to labelled demo data when the backend is unreachable', () => {
+  it('falls back to labelled demo data for a demo account when the backend is unreachable', () => {
     mockProfileGoals = ['track_period', 'track_pregnancy'];
+    mockIsSeededDemoSession = true;
     mockUser();
     const failed = { data: undefined, isError: true };
     mockedUseCycles.mockReturnValue(failed as never);
@@ -287,6 +295,43 @@ describe('Home', () => {
     expect(screen.getByTestId('pregnancy-demo-pill')).toBeOnTheScreen();
     expect(screen.getByTestId('pregnancy-ring')).toBeOnTheScreen();
     expect(screen.getByTestId('pregnancy-ring-week')).toHaveTextContent('18');
+  });
+
+  it('never shows demo cycles to a new account when the backend is unreachable', () => {
+    mockProfileGoals = ['track_period'];
+    mockUser();
+    mockedUseCycles.mockReturnValue({
+      data: undefined,
+      isError: true,
+    } as never);
+    mockedUsePregnancies.mockReturnValue(page([]) as never);
+    setup(<Home />);
+    expect(screen.queryByTestId('cycle-demo-pill')).toBeNull();
+    expect(screen.queryByTestId('cycle-ring')).toBeNull();
+    expect(screen.getByTestId('cycle-empty-state-card')).toBeOnTheScreen();
+    expect(
+      screen.getByText('When did your last period start?')
+    ).toBeOnTheScreen();
+  });
+
+  it('asks a new user for her last period without any tap', () => {
+    mockProfileGoals = ['track_period'];
+    mockUser();
+    mockHealthData();
+    setup(<Home />);
+    expect(screen.getByTestId('initialize-cycle-modal')).toBeOnTheScreen();
+    expect(
+      screen.getByText('When did your last period start?')
+    ).toBeOnTheScreen();
+  });
+
+  it('does not prompt for a last period once a cycle exists', () => {
+    mockUser();
+    mockHealthData({
+      cycles: [{ id: 'c1', start_date: startedDaysAgo(9), end_date: null }],
+    });
+    setup(<Home />);
+    expect(screen.queryByText('When did your last period start?')).toBeNull();
   });
 
   it('never fakes data over a real empty response', () => {

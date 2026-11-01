@@ -1,20 +1,18 @@
 import { useIsFocused } from '@react-navigation/native';
-import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Platform } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 
+import { useIsDarkMode } from '@/lib/hooks/use-selected-theme';
+
 type Props = { hidden?: boolean };
 export const FocusAwareStatusBar = ({ hidden = false }: Props) => {
   const isFocused = useIsFocused();
-  const { colorScheme } = useColorScheme();
+  const isDark = useIsDarkMode();
 
   if (Platform.OS === 'web') return null;
 
   return isFocused ? (
-    <SystemBars
-      style={colorScheme === 'dark' ? 'light' : 'dark'}
-      hidden={hidden}
-    />
+    <SystemBars style={isDark ? 'light' : 'dark'} hidden={hidden} />
   ) : null;
 };

@@ -36,10 +36,10 @@ export function StepMedical({
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 24 }}
     >
-      <Text className="font-heading text-[26px] leading-8 text-[#4A4A4A]">
+      <Text className="font-heading text-[26px] leading-8 text-ink">
         Do you have any of these health conditions?
       </Text>
-      <Text className="mt-2 font-body text-[15px] leading-6 text-[#8C8C8C]">
+      <Text className="mt-2 font-body text-[15px] leading-6 text-tone-600">
         Choose all that apply. Your information remains completely private,
         secure, and encrypted.
       </Text>
@@ -55,20 +55,13 @@ export function StepMedical({
               onPress={() => onToggleCondition(item.id)}
               className={`flex-row items-center justify-between rounded-[20px] border p-4 active:opacity-85 ${
                 isSelected
-                  ? 'border-[#FF9FA8] bg-white'
-                  : 'border-[#F0E5E1] bg-white/95'
+                  ? 'border-accent bg-surface'
+                  : 'border-divider bg-surface'
               }`}
-              style={{
-                shadowColor: isSelected ? '#FF9FA8' : '#F0E5E1',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: isSelected ? 0.25 : 0.5,
-                shadowRadius: 8,
-                elevation: 2,
-              }}
             >
               <Text
                 className={`font-body-bold text-[15px] ${
-                  isSelected ? 'text-[#FF7575]' : 'text-[#4A4A4A]'
+                  isSelected ? 'text-accent' : 'text-ink'
                 }`}
               >
                 {item.label}
@@ -77,8 +70,8 @@ export function StepMedical({
               <View
                 className={`size-6 items-center justify-center rounded-full border-2 ${
                   isSelected
-                    ? 'border-[#FF9FA8] bg-[#FF9FA8]'
-                    : 'border-[#F0E5E1] bg-[#FCF8F5]'
+                    ? 'border-accent bg-accent'
+                    : 'border-divider bg-canvas'
                 }`}
               >
                 {isSelected && (

@@ -22,6 +22,7 @@
  */
 
 export const PALETTE_IDS = [
+  'blossom',
   'happy',
   'organic',
   'teal',
@@ -47,9 +48,90 @@ export interface Palette {
   dark: PaletteTokens;
 }
 
-export const DEFAULT_PALETTE_ID: PaletteId = 'rose';
+export const DEFAULT_PALETTE_ID: PaletteId = 'blossom';
 
 export const PALETTES: Record<PaletteId, Palette> = {
+  /**
+   * The default: soft and feminine. Blush-white canvas, petal-pink cards,
+   * plum ink instead of black, a dusty rosewood accent and a lavender
+   * secondary. Every ramp sits in the rose-mauve-lilac family, so no screen
+   * mixes unrelated hues. White button labels clear ~5:1 on the accent in
+   * both modes.
+   */
+  blossom: {
+    label: 'Blossom',
+    swatch: { accent: '#B24C74', accent2: '#8A6CC4', bg: '#FFF8F9' },
+    light: {
+      '--color-bg': '255 248 249',
+      '--color-surface': '252 238 242',
+      '--color-text': '45 27 40',
+      '--color-divider': '236 220 228',
+      '--color-accent': '178 76 116',
+      '--color-accent-2': '138 108 196',
+      '--color-neutral-100': '250 244 246',
+      '--color-neutral-200': '240 231 235',
+      '--color-neutral-300': '224 212 218',
+      '--color-neutral-400': '196 182 190',
+      '--color-neutral-500': '164 150 158',
+      '--color-neutral-600': '133 120 128',
+      '--color-neutral-700': '102 90 98',
+      '--color-neutral-800': '74 64 71',
+      '--color-neutral-900': '48 40 46',
+      '--color-accent-100': '255 242 246',
+      '--color-accent-200': '252 226 235',
+      '--color-accent-300': '246 199 216',
+      '--color-accent-400': '235 160 190',
+      '--color-accent-500': '214 121 157',
+      '--color-accent-600': '189 92 129',
+      '--color-accent-700': '156 66 101',
+      '--color-accent-800': '116 46 74',
+      '--color-accent-900': '74 30 48',
+      '--color-accent-2-100': '246 242 255',
+      '--color-accent-2-200': '234 226 252',
+      '--color-accent-2-300': '214 199 247',
+      '--color-accent-2-400': '186 163 236',
+      '--color-accent-2-500': '157 128 219',
+      '--color-accent-2-600': '131 101 196',
+      '--color-accent-2-700': '104 76 166',
+      '--color-accent-2-800': '76 54 125',
+      '--color-accent-2-900': '50 35 84',
+    },
+    dark: {
+      '--color-bg': '26 17 23',
+      '--color-surface': '38 26 34',
+      '--color-text': '250 236 243',
+      '--color-divider': '62 48 57',
+      '--color-accent': '186 72 120',
+      '--color-accent-2': '140 110 210',
+      '--color-neutral-100': '28 22 26',
+      '--color-neutral-200': '41 33 38',
+      '--color-neutral-300': '56 46 52',
+      '--color-neutral-400': '79 67 74',
+      '--color-neutral-500': '107 94 102',
+      '--color-neutral-600': '138 125 133',
+      '--color-neutral-700': '170 158 165',
+      '--color-neutral-800': '204 194 200',
+      '--color-neutral-900': '238 232 236',
+      '--color-accent-100': '33 20 27',
+      '--color-accent-200': '54 26 40',
+      '--color-accent-300': '84 32 58',
+      '--color-accent-400': '122 44 82',
+      '--color-accent-500': '158 66 108',
+      '--color-accent-600': '192 98 138',
+      '--color-accent-700': '222 136 170',
+      '--color-accent-800': '245 180 206',
+      '--color-accent-900': '255 226 238',
+      '--color-accent-2-100': '25 20 36',
+      '--color-accent-2-200': '38 30 58',
+      '--color-accent-2-300': '54 42 86',
+      '--color-accent-2-400': '76 58 122',
+      '--color-accent-2-500': '104 82 160',
+      '--color-accent-2-600': '136 112 196',
+      '--color-accent-2-700': '168 146 224',
+      '--color-accent-2-800': '199 182 240',
+      '--color-accent-2-900': '230 222 252',
+    },
+  },
   /**
    * Happy Women brand palette. Authored dark-first: charcoal ground, coral
    * accent, lavender secondary. The light ramp exists so the theme toggle

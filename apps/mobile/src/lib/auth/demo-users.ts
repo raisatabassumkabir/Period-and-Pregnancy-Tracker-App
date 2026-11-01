@@ -161,7 +161,22 @@ export async function clearUserStateForCleanTest(): Promise<void> {
   useHealthStore.getState().setMode('cycle');
 }
 
+const SEEDED_DEMO_TOKEN_PREFIX = 'demo-';
+const CLEAN_TEST_TOKEN_PREFIX = 'clean-test-';
+
 export function isDemoToken(token: string | undefined | null): boolean {
   if (!token) return false;
-  return token.startsWith('demo-') || token.startsWith('clean-test-');
+  return (
+    token.startsWith(SEEDED_DEMO_TOKEN_PREFIX) ||
+    token.startsWith(CLEAN_TEST_TOKEN_PREFIX)
+  );
+}
+
+/**
+ * Only the pre-seeded demo accounts get the 3-cycle offline seed. Clean test
+ * accounts are offline too but stand in for brand-new users, so they must see
+ * the empty state and the "last period" prompt like a real new account.
+ */
+export function isSeededDemoToken(token: string | undefined | null): boolean {
+  return token?.startsWith(SEEDED_DEMO_TOKEN_PREFIX) ?? false;
 }

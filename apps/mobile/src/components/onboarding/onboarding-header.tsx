@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import React from 'react';
 
 import { Pressable, Text, View } from '@/components/ui';
+import { usePaletteColors } from '@/lib/theme';
 
 interface OnboardingHeaderProps {
   currentStep: number;
@@ -18,6 +19,7 @@ export function OnboardingHeader({
   onSkip,
   testID = 'onboarding-header',
 }: OnboardingHeaderProps) {
+  const palette = usePaletteColors();
   const progressPercent = Math.round((currentStep / totalSteps) * 100);
 
   return (
@@ -29,22 +31,15 @@ export function OnboardingHeader({
             accessibilityLabel="Go back"
             testID="onboarding-back"
             onPress={onBack}
-            className="size-10 items-center justify-center rounded-full border border-[#F0E5E1] bg-white active:opacity-75"
-            style={{
-              shadowColor: '#F0E5E1',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.6,
-              shadowRadius: 6,
-              elevation: 2,
-            }}
+            className="size-10 items-center justify-center rounded-full border border-divider bg-surface active:opacity-75"
           >
-            <ArrowLeft size={18} color="#4A4A4A" />
+            <ArrowLeft size={18} color={palette.ink} />
           </Pressable>
         ) : (
           <View className="size-10" />
         )}
 
-        <Text className="font-body-semibold text-[13px] text-[#8C8C8C]">
+        <Text className="font-body-semibold text-[13px] text-tone-600">
           Step {currentStep} of {totalSteps}
         </Text>
 
@@ -54,18 +49,16 @@ export function OnboardingHeader({
           testID="onboarding-skip"
           onPress={onSkip}
           hitSlop={{ top: 16, bottom: 16, left: 24, right: 24 }}
-          className="rounded-full border border-[#F0E5E1] bg-white/80 px-4 py-2 active:opacity-60"
+          className="rounded-full border border-divider bg-surface px-4 py-2 active:opacity-60"
         >
-          <Text className="font-body-bold text-[13px] text-[#FF9FA8]">
-            Skip
-          </Text>
+          <Text className="font-body-bold text-[13px] text-accent">Skip</Text>
         </Pressable>
       </View>
 
       {/* Soft rounded progress bar */}
-      <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#F0E5E1]">
+      <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-tone-200">
         <View
-          className="h-full rounded-full bg-[#FF9FA8]"
+          className="h-full rounded-full bg-accent"
           style={{ width: `${progressPercent}%` }}
         />
       </View>

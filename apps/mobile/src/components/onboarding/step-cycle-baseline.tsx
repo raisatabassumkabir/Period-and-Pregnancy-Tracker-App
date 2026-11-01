@@ -3,6 +3,7 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/components/ui';
+import { usePaletteColors } from '@/lib/theme';
 
 interface StepCycleBaselineProps {
   cycleLength: number;
@@ -22,6 +23,7 @@ export function StepCycleBaseline({
   onChangeCycleLength,
   onChangePeriodDuration,
 }: StepCycleBaselineProps) {
+  const palette = usePaletteColors();
   const handleDecCycle = () => {
     if (cycleLength > MIN_CYCLE_LENGTH) {
       onChangeCycleLength(cycleLength - 1);
@@ -48,66 +50,50 @@ export function StepCycleBaseline({
 
   return (
     <View className="flex-1 px-6 pt-4" testID="step-cycle-baseline">
-      <Text className="font-heading text-2xl leading-8 text-[#4A4A4A]">
+      <Text className="font-heading text-2xl leading-8 text-ink">
         Tell us about your cycle
       </Text>
-      <Text className="mt-2 font-body text-sm leading-5 text-[#8C8C8C]">
+      <Text className="mt-2 font-body text-sm leading-5 text-tone-600">
         This helps us predict your fertile window, ovulation days, and next
         period.
       </Text>
 
       <View className="mt-8 gap-5">
         {/* Average Cycle Length Card */}
-        <View
-          className="rounded-[24px] bg-white p-5"
-          style={{
-            shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.8,
-            shadowRadius: 15,
-            elevation: 3,
-          }}
-        >
+        <View className="rounded-[24px] bg-surface p-5">
           <View className="flex-row items-center gap-3">
-            <View className="size-11 items-center justify-center rounded-full bg-[#FFE5E8]">
-              <Calendar size={22} color="#FF9FA8" strokeWidth={2.2} />
+            <View className="size-11 items-center justify-center rounded-full bg-accent-200">
+              <Calendar size={22} color={palette.accent} strokeWidth={2.2} />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">
+              <Text className="font-heading text-base text-ink">
                 Average Cycle Length
               </Text>
-              <Text className="font-body text-xs text-[#8C8C8C]">
+              <Text className="font-body text-xs text-tone-600">
                 First day of one period to the next
               </Text>
             </View>
           </View>
 
-          <View className="mt-5 flex-row items-center justify-between rounded-full bg-[#FCF8F5] p-2">
+          <View className="mt-5 flex-row items-center justify-between rounded-full bg-canvas p-2">
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Decrease cycle length"
               testID="cycle-length-dec"
               onPress={handleDecCycle}
-              className="size-11 items-center justify-center rounded-full bg-white active:scale-95"
-              style={{
-                shadowColor: '#F0E5E1',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.6,
-                shadowRadius: 4,
-                elevation: 1,
-              }}
+              className="size-11 items-center justify-center rounded-full bg-canvas active:scale-95"
             >
-              <Minus size={20} color="#4A4A4A" strokeWidth={2.5} />
+              <Minus size={20} color={palette.ink} strokeWidth={2.5} />
             </Pressable>
 
             <View
               className="flex-row items-baseline gap-1"
               testID="cycle-length-value"
             >
-              <Text className="font-heading text-3xl text-[#4A4A4A]">
+              <Text className="font-heading text-3xl text-ink">
                 {cycleLength}
               </Text>
-              <Text className="font-body text-sm text-[#8C8C8C]">days</Text>
+              <Text className="font-body text-sm text-tone-600">days</Text>
             </View>
 
             <Pressable
@@ -115,71 +101,52 @@ export function StepCycleBaseline({
               accessibilityLabel="Increase cycle length"
               testID="cycle-length-inc"
               onPress={handleIncCycle}
-              className="size-11 items-center justify-center rounded-full bg-white active:scale-95"
-              style={{
-                shadowColor: '#F0E5E1',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.6,
-                shadowRadius: 4,
-                elevation: 1,
-              }}
+              className="size-11 items-center justify-center rounded-full bg-canvas active:scale-95"
             >
-              <Plus size={20} color="#4A4A4A" strokeWidth={2.5} />
+              <Plus size={20} color={palette.ink} strokeWidth={2.5} />
             </Pressable>
           </View>
         </View>
 
         {/* Average Period Duration Card */}
-        <View
-          className="rounded-[24px] bg-white p-5"
-          style={{
-            shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.8,
-            shadowRadius: 15,
-            elevation: 3,
-          }}
-        >
+        <View className="rounded-[24px] bg-surface p-5">
           <View className="flex-row items-center gap-3">
-            <View className="size-11 items-center justify-center rounded-full bg-[#E5F7ED]">
-              <Droplet size={22} color="#5CC98B" strokeWidth={2.2} />
+            <View className="size-11 items-center justify-center rounded-full bg-accent2-200">
+              <Droplet
+                size={22}
+                color={palette.accent2Scale[700]}
+                strokeWidth={2.2}
+              />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">
+              <Text className="font-heading text-base text-ink">
                 Average Period Duration
               </Text>
-              <Text className="font-body text-xs text-[#8C8C8C]">
+              <Text className="font-body text-xs text-tone-600">
                 How many days bleeding usually lasts
               </Text>
             </View>
           </View>
 
-          <View className="mt-5 flex-row items-center justify-between rounded-full bg-[#FCF8F5] p-2">
+          <View className="mt-5 flex-row items-center justify-between rounded-full bg-canvas p-2">
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Decrease period duration"
               testID="period-duration-dec"
               onPress={handleDecPeriod}
-              className="size-11 items-center justify-center rounded-full bg-white active:scale-95"
-              style={{
-                shadowColor: '#F0E5E1',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.6,
-                shadowRadius: 4,
-                elevation: 1,
-              }}
+              className="size-11 items-center justify-center rounded-full bg-canvas active:scale-95"
             >
-              <Minus size={20} color="#4A4A4A" strokeWidth={2.5} />
+              <Minus size={20} color={palette.ink} strokeWidth={2.5} />
             </Pressable>
 
             <View
               className="flex-row items-baseline gap-1"
               testID="period-duration-value"
             >
-              <Text className="font-heading text-3xl text-[#4A4A4A]">
+              <Text className="font-heading text-3xl text-ink">
                 {periodDuration}
               </Text>
-              <Text className="font-body text-sm text-[#8C8C8C]">days</Text>
+              <Text className="font-body text-sm text-tone-600">days</Text>
             </View>
 
             <Pressable
@@ -187,16 +154,9 @@ export function StepCycleBaseline({
               accessibilityLabel="Increase period duration"
               testID="period-duration-inc"
               onPress={handleIncPeriod}
-              className="size-11 items-center justify-center rounded-full bg-white active:scale-95"
-              style={{
-                shadowColor: '#F0E5E1',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.6,
-                shadowRadius: 4,
-                elevation: 1,
-              }}
+              className="size-11 items-center justify-center rounded-full bg-canvas active:scale-95"
             >
-              <Plus size={20} color="#4A4A4A" strokeWidth={2.5} />
+              <Plus size={20} color={palette.ink} strokeWidth={2.5} />
             </Pressable>
           </View>
         </View>

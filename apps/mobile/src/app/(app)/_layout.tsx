@@ -8,12 +8,32 @@ import {
 } from 'lucide-react-native';
 import React from 'react';
 
+import { useCycles, useDailyLogs } from '@/api/cycles';
+import { CalendarEmojiWarmup } from '@/components/calendar/calendar-emoji-warmup';
 import { MedicalDisclaimerGate } from '@/components/legal';
 import { AppErrorBoundary } from '@/components/ui';
 import { useAuth, usePaletteColors } from '@/lib';
 import { FEATURES } from '@/lib/features';
+import { usePeriodReminderSync } from '@/lib/reminders';
 
 const TAB_ICON_SIZE = 23;
+
+/**
+ * Starts the cycle and daily-log queries the moment the signed-in shell
+ * mounts. Tabs mount lazily, so without this the Calendar only began fetching
+ * when opened and its period / fertile / ovulation markings arrived late.
+ */
+function WarmHealthCache() {
+  useCycles();
+  useDailyLogs();
+  return null;
+}
+
+/** Re-plans period reminders whenever the prediction or the settings change. */
+function PeriodReminderSync() {
+  usePeriodReminderSync();
+  return null;
+}
 
 export default function TabLayout() {
   const status = useAuth.use.status();
@@ -23,6 +43,9 @@ export default function TabLayout() {
   return (
     <AppErrorBoundary name="TabLayout">
       <MedicalDisclaimerGate>
+        <WarmHealthCache />
+        <PeriodReminderSync />
+        <CalendarEmojiWarmup />
         <Tabs
           screenOptions={{
             tabBarActiveTintColor: palette.accent,
@@ -49,6 +72,9 @@ export default function TabLayout() {
             name="calendar"
             options={{
               title: 'Calendar',
+              // Mounted at startup, not on first tap: its month grid is the
+              // heaviest render in the app, so the first open was visibly slow.
+              lazy: false,
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <CalendarDays color={color} size={TAB_ICON_SIZE} />

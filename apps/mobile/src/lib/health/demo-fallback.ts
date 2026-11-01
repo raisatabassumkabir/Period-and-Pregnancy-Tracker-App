@@ -12,15 +12,18 @@ export interface DemoFallbackResult<T> {
 }
 
 /**
- * Substitutes seed rows only when the request failed — an empty success is the
- * user's real (empty) data and must render the normal empty state, and a
- * pending query stays pending so real data replaces the seed on retry.
+ * Substitutes seed rows only when the request failed AND the session is a
+ * pre-seeded demo account (`allowSeed`). A real or fresh account with a failed
+ * request gets an empty list, so it sees the first-cycle prompt instead of
+ * someone else's fake history. An empty success is the user's real (empty)
+ * data, and a pending query stays pending so real data replaces the seed.
  */
 export function withDemoFallback<T>(
   source: DemoFallbackSource<T>,
-  seed: readonly T[]
+  seed: readonly T[],
+  allowSeed: boolean
 ): DemoFallbackResult<T> {
   if (source.data) return { rows: source.data.results, isDemo: false };
-  if (source.isError) return { rows: seed, isDemo: true };
+  if (source.isError && allowSeed) return { rows: seed, isDemo: true };
   return { rows: [], isDemo: false };
 }

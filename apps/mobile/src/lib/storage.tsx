@@ -41,6 +41,8 @@ export const STORAGE_KEYS = {
   PERSONALIZATION_PROFILE: '@app/personalization_profile',
   /** Set once this install has accepted the first-run medical disclaimer. */
   MEDICAL_DISCLAIMER_ACK: '@app/medical_disclaimer_ack',
+  /** Period-reminder preferences: on/off, days ahead, time of day. */
+  REMINDER_SETTINGS: '@app/reminder_settings',
 } as const;
 
 let storePromise: Promise<MMKV> | null = null;

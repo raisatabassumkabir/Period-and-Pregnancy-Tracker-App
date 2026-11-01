@@ -151,7 +151,7 @@ const DEFAULT_MEALS: MealEntry[] = [
 ];
 
 export const useHealthStore = create<HealthState>((set, get) => ({
-  mode: 'pregnancy',
+  mode: 'cycle',
   currentWeek: 24,
   currentDay: 3,
   babySizeLabel: 'Cantaloupe 🍈',

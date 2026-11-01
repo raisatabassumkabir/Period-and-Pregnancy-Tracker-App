@@ -73,6 +73,9 @@ export function usePersonalizationProfile() {
         if (stored) {
           const computedAge = calculateAge(stored.dateOfBirth);
           setProfile({ ...stored, age: computedAge });
+          // The health store is in-memory; the saved profile is what survives
+          // a restart, so it re-seeds the mode every screen gates on.
+          setHealthMode(stored.mode === 'pregnancy' ? 'pregnancy' : 'cycle');
         }
         setIsLoading(false);
       }
@@ -80,7 +83,7 @@ export function usePersonalizationProfile() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [setHealthMode]);
 
   const updateProfile = React.useCallback(
     async (

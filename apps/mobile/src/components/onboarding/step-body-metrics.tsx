@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
 import { Text } from '@/components/ui';
+import { usePaletteColors } from '@/lib/theme';
 
 interface StepBodyMetricsProps {
   heightCm: string; // e.g. "165"
@@ -19,6 +20,7 @@ export function StepBodyMetrics({
   onChangeHeight,
   onChangeWeight,
 }: StepBodyMetricsProps) {
+  const palette = usePaletteColors();
   const [unit, setUnit] = useState<UnitSystem>('metric');
 
   // Imperial local state
@@ -93,36 +95,27 @@ export function StepBodyMetrics({
 
   return (
     <View className="flex-1 px-6 pt-4" testID="step-body-metrics">
-      <Text className="font-heading text-2xl leading-8 text-[#4A4A4A]">
+      <Text className="font-heading text-2xl leading-8 text-ink">
         Help us personalize your nutrition
       </Text>
-      <Text className="mt-2 font-body text-sm leading-5 text-[#8C8C8C]">
+      <Text className="mt-2 font-body text-sm leading-5 text-tone-600">
         Our diet engine tailors meal plans, calorie targets, and cycle nutrition
         based on your body metrics.
       </Text>
 
       {/* Unit Selector Toggle */}
-      <View
-        className="mt-6 flex-row self-center rounded-full bg-white p-1"
-        style={{
-          shadowColor: '#F0E5E1',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.6,
-          shadowRadius: 10,
-          elevation: 2,
-        }}
-      >
+      <View className="mt-6 flex-row self-center rounded-full bg-surface p-1">
         <Pressable
           accessibilityRole="button"
           testID="unit-metric"
           onPress={() => handleUnitToggle('metric')}
           className={`rounded-full px-5 py-2 ${
-            unit === 'metric' ? 'bg-[#FF9FA8]' : 'bg-transparent'
+            unit === 'metric' ? 'bg-accent' : 'bg-transparent'
           }`}
         >
           <Text
             className={`font-heading text-xs ${
-              unit === 'metric' ? 'text-white' : 'text-[#8C8C8C]'
+              unit === 'metric' ? 'text-white' : 'text-tone-600'
             }`}
           >
             Metric (cm / kg)
@@ -134,12 +127,12 @@ export function StepBodyMetrics({
           testID="unit-imperial"
           onPress={() => handleUnitToggle('imperial')}
           className={`rounded-full px-5 py-2 ${
-            unit === 'imperial' ? 'bg-[#FF9FA8]' : 'bg-transparent'
+            unit === 'imperial' ? 'bg-accent' : 'bg-transparent'
           }`}
         >
           <Text
             className={`font-heading text-xs ${
-              unit === 'imperial' ? 'text-white' : 'text-[#8C8C8C]'
+              unit === 'imperial' ? 'text-white' : 'text-tone-600'
             }`}
           >
             Imperial (ft / lbs)
@@ -149,25 +142,18 @@ export function StepBodyMetrics({
 
       <View className="mt-6 gap-5">
         {/* Height Input Card */}
-        <View
-          className="rounded-[24px] bg-white p-5"
-          style={{
-            shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.8,
-            shadowRadius: 15,
-            elevation: 3,
-          }}
-        >
+        <View className="rounded-[24px] bg-surface p-5">
           <View className="flex-row items-center gap-3">
-            <View className="size-11 items-center justify-center rounded-full bg-[#E8F1FC]">
-              <Ruler size={22} color="#6BA4E8" strokeWidth={2.2} />
+            <View className="size-11 items-center justify-center rounded-full bg-accent2-200">
+              <Ruler
+                size={22}
+                color={palette.accent2Scale[700]}
+                strokeWidth={2.2}
+              />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">
-                Height
-              </Text>
-              <Text className="font-body text-xs text-[#8C8C8C]">
+              <Text className="font-heading text-base text-ink">Height</Text>
+              <Text className="font-body text-xs text-tone-600">
                 {unit === 'metric'
                   ? 'Enter height in centimeters'
                   : 'Enter feet and inches'}
@@ -177,7 +163,7 @@ export function StepBodyMetrics({
 
           <View className="mt-4">
             {unit === 'metric' ? (
-              <View className="flex-row items-center rounded-[18px] bg-[#FCF8F5] px-4 py-3">
+              <View className="flex-row items-center rounded-[18px] bg-canvas px-4 py-3">
                 <TextInput
                   testID="height-input-metric"
                   accessibilityLabel="Height in centimeters"
@@ -185,14 +171,14 @@ export function StepBodyMetrics({
                   value={heightCm}
                   onChangeText={onChangeHeight}
                   placeholder="e.g. 165"
-                  placeholderTextColor="#B0A8A4"
-                  className="flex-1 font-heading text-xl text-[#4A4A4A]"
+                  placeholderTextColor={palette.tone[500]}
+                  className="flex-1 font-heading text-xl text-ink"
                 />
-                <Text className="font-body text-sm text-[#8C8C8C]">cm</Text>
+                <Text className="font-body text-sm text-tone-600">cm</Text>
               </View>
             ) : (
               <View className="flex-row items-center gap-3">
-                <View className="flex-1 flex-row items-center rounded-[18px] bg-[#FCF8F5] px-4 py-3">
+                <View className="flex-1 flex-row items-center rounded-[18px] bg-canvas px-4 py-3">
                   <TextInput
                     testID="height-input-ft"
                     accessibilityLabel="Height in feet"
@@ -200,12 +186,12 @@ export function StepBodyMetrics({
                     value={feet}
                     onChangeText={handleFeetChange}
                     placeholder="5"
-                    placeholderTextColor="#B0A8A4"
-                    className="flex-1 font-heading text-xl text-[#4A4A4A]"
+                    placeholderTextColor={palette.tone[500]}
+                    className="flex-1 font-heading text-xl text-ink"
                   />
-                  <Text className="font-body text-sm text-[#8C8C8C]">ft</Text>
+                  <Text className="font-body text-sm text-tone-600">ft</Text>
                 </View>
-                <View className="flex-1 flex-row items-center rounded-[18px] bg-[#FCF8F5] px-4 py-3">
+                <View className="flex-1 flex-row items-center rounded-[18px] bg-canvas px-4 py-3">
                   <TextInput
                     testID="height-input-in"
                     accessibilityLabel="Height in inches"
@@ -213,10 +199,10 @@ export function StepBodyMetrics({
                     value={inches}
                     onChangeText={handleInchesChange}
                     placeholder="5"
-                    placeholderTextColor="#B0A8A4"
-                    className="flex-1 font-heading text-xl text-[#4A4A4A]"
+                    placeholderTextColor={palette.tone[500]}
+                    className="flex-1 font-heading text-xl text-ink"
                   />
-                  <Text className="font-body text-sm text-[#8C8C8C]">in</Text>
+                  <Text className="font-body text-sm text-tone-600">in</Text>
                 </View>
               </View>
             )}
@@ -224,25 +210,14 @@ export function StepBodyMetrics({
         </View>
 
         {/* Weight Input Card */}
-        <View
-          className="rounded-[24px] bg-white p-5"
-          style={{
-            shadowColor: '#F0E5E1',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.8,
-            shadowRadius: 15,
-            elevation: 3,
-          }}
-        >
+        <View className="rounded-[24px] bg-surface p-5">
           <View className="flex-row items-center gap-3">
-            <View className="size-11 items-center justify-center rounded-full bg-[#FCF4DE]">
-              <Scale size={22} color="#D9A838" strokeWidth={2.2} />
+            <View className="size-11 items-center justify-center rounded-full bg-accent-200">
+              <Scale size={22} color={palette.accent} strokeWidth={2.2} />
             </View>
             <View className="flex-1">
-              <Text className="font-heading text-base text-[#4A4A4A]">
-                Weight
-              </Text>
-              <Text className="font-body text-xs text-[#8C8C8C]">
+              <Text className="font-heading text-base text-ink">Weight</Text>
+              <Text className="font-body text-xs text-tone-600">
                 {unit === 'metric'
                   ? 'Enter weight in kilograms'
                   : 'Enter weight in pounds'}
@@ -252,7 +227,7 @@ export function StepBodyMetrics({
 
           <View className="mt-4">
             {unit === 'metric' ? (
-              <View className="flex-row items-center rounded-[18px] bg-[#FCF8F5] px-4 py-3">
+              <View className="flex-row items-center rounded-[18px] bg-canvas px-4 py-3">
                 <TextInput
                   testID="weight-input-metric"
                   accessibilityLabel="Weight in kilograms"
@@ -260,13 +235,13 @@ export function StepBodyMetrics({
                   value={weightKg}
                   onChangeText={onChangeWeight}
                   placeholder="e.g. 60"
-                  placeholderTextColor="#B0A8A4"
-                  className="flex-1 font-heading text-xl text-[#4A4A4A]"
+                  placeholderTextColor={palette.tone[500]}
+                  className="flex-1 font-heading text-xl text-ink"
                 />
-                <Text className="font-body text-sm text-[#8C8C8C]">kg</Text>
+                <Text className="font-body text-sm text-tone-600">kg</Text>
               </View>
             ) : (
-              <View className="flex-row items-center rounded-[18px] bg-[#FCF8F5] px-4 py-3">
+              <View className="flex-row items-center rounded-[18px] bg-canvas px-4 py-3">
                 <TextInput
                   testID="weight-input-imperial"
                   accessibilityLabel="Weight in pounds"
@@ -274,10 +249,10 @@ export function StepBodyMetrics({
                   value={lbs}
                   onChangeText={handleLbsChange}
                   placeholder="e.g. 132"
-                  placeholderTextColor="#B0A8A4"
-                  className="flex-1 font-heading text-xl text-[#4A4A4A]"
+                  placeholderTextColor={palette.tone[500]}
+                  className="flex-1 font-heading text-xl text-ink"
                 />
-                <Text className="font-body text-sm text-[#8C8C8C]">lbs</Text>
+                <Text className="font-body text-sm text-tone-600">lbs</Text>
               </View>
             )}
           </View>

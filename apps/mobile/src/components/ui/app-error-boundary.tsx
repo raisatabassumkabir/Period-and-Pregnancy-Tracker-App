@@ -2,14 +2,19 @@ import { AlertTriangle, RotateCcw } from 'lucide-react-native';
 import React from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import RNRestart from 'react-native-restart';
 
 import { captureException } from '@/lib/monitoring';
+import { usePaletteColors } from '@/lib/theme';
 
 import { Text } from './text';
 
+/** Accent fills are mid-tone in every palette and mode, so white reads on all. */
+const ON_ACCENT_COLOR = '#FFFFFF';
+
 export function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
+  const palette = usePaletteColors();
   const handleReload = () => {
     try {
       if (RNRestart && typeof RNRestart.restart === 'function') {
@@ -27,14 +32,17 @@ export function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
   };
 
   return (
-    <View style={styles.container} testID="error-boundary-fallback">
-      <View style={styles.iconCircle}>
-        <AlertTriangle size={32} color="#B83253" strokeWidth={2.2} />
+    <View
+      className="flex-1 items-center justify-center bg-canvas px-6"
+      testID="error-boundary-fallback"
+    >
+      <View className="size-16 items-center justify-center rounded-full bg-accent-200">
+        <AlertTriangle size={32} color={palette.accent} strokeWidth={2.2} />
       </View>
-      <Text className="mt-4 text-center font-heading text-2xl text-[#2D2D2D]">
+      <Text className="mt-4 text-center font-heading text-2xl text-ink">
         Something went wrong
       </Text>
-      <Text className="mt-2 max-w-[280px] text-center font-body text-sm leading-5 text-[#7A7A7A]">
+      <Text className="mt-2 max-w-[280px] text-center font-body text-sm leading-5 text-tone-600">
         We encountered an unexpected issue. Your health data remains safely
         stored. Tap below to reload the app.
       </Text>
@@ -42,10 +50,9 @@ export function ErrorFallback({ resetErrorBoundary }: FallbackProps) {
         accessibilityRole="button"
         testID="reload-app-button"
         onPress={handleReload}
-        className="mt-7 h-12 flex-row items-center justify-center gap-2 rounded-pill bg-[#B83253] px-8 active:opacity-90"
-        style={styles.buttonShadow}
+        className="mt-7 h-12 flex-row items-center justify-center gap-2 rounded-pill bg-accent px-8 active:opacity-90"
       >
-        <RotateCcw size={18} color="#FFFFFF" strokeWidth={2.5} />
+        <RotateCcw size={18} color={ON_ACCENT_COLOR} strokeWidth={2.5} />
         <Text className="font-body-bold text-[16px] text-white">
           Reload App
         </Text>
@@ -77,28 +84,3 @@ export function AppErrorBoundary({
     </ReactErrorBoundary>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FCF8F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FFE5E8',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonShadow: {
-    shadowColor: '#B83253',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-});

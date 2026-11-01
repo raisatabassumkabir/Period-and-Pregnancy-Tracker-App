@@ -131,7 +131,7 @@ describe('Calendar', () => {
         end_date: null,
       },
     ]);
-    mockDailyLogs([{ id: 'l1', date: second, mood: 'great' }]);
+    mockDailyLogs([{ id: 'l1', date: second, mood: 'great', symptoms: [] }]);
     setup(<Calendar />);
 
     // 😄 is `great`; 😣 is the period phase's stock face.

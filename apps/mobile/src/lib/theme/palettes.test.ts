@@ -50,9 +50,9 @@ function eachPalette(fn: (tokens: PaletteTokens, label: string) => void) {
 }
 
 describe('palette structure', () => {
-  it('exposes exactly seven palettes and has a valid default palette', () => {
-    expect(PALETTE_IDS).toHaveLength(7);
-    expect(DEFAULT_PALETTE_ID).toBe('rose');
+  it('exposes exactly eight palettes and has a valid default palette', () => {
+    expect(PALETTE_IDS).toHaveLength(8);
+    expect(DEFAULT_PALETTE_ID).toBe('blossom');
     expect(PALETTES[DEFAULT_PALETTE_ID]).toBeDefined();
   });
 
