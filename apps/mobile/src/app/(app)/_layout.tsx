@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import {
   Apple,
   CalendarDays,
+  HeartHandshake,
   HeartPulse,
   House,
   Sparkles,
@@ -14,6 +15,8 @@ import { MedicalDisclaimerGate } from '@/components/legal';
 import { AppErrorBoundary } from '@/components/ui';
 import { useAuth, usePaletteColors } from '@/lib';
 import { FEATURES } from '@/lib/features';
+import { translate } from '@/lib/i18n';
+import { usePartnerNudgeSync, usePartnerSide } from '@/lib/partner';
 import { usePeriodReminderSync } from '@/lib/reminders';
 
 const TAB_ICON_SIZE = 23;
@@ -35,9 +38,18 @@ function PeriodReminderSync() {
   return null;
 }
 
+/** A linked partner's nudges, planned on this phone from her shared status. */
+function PartnerNudgeSync() {
+  usePartnerNudgeSync();
+  return null;
+}
+
 export default function TabLayout() {
   const status = useAuth.use.status();
   const palette = usePaletteColors();
+  // A partner only sees Home (her status); her tracking tabs are hidden.
+  const { isPartner } = usePartnerSide();
+  const herTab = isPartner ? null : undefined;
 
   if (!status) return null;
   return (
@@ -45,6 +57,7 @@ export default function TabLayout() {
       <MedicalDisclaimerGate>
         <WarmHealthCache />
         <PeriodReminderSync />
+        <PartnerNudgeSync />
         <CalendarEmojiWarmup />
         <Tabs
           screenOptions={{
@@ -71,6 +84,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="calendar"
             options={{
+              href: herTab,
               title: 'Calendar',
               // Mounted at startup, not on first tap: its month grid is the
               // heaviest render in the app, so the first open was visibly slow.
@@ -85,6 +99,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="tracking"
             options={{
+              href: herTab,
               title: 'Track',
               headerShown: false,
               tabBarIcon: ({ color }) => (
@@ -96,12 +111,24 @@ export default function TabLayout() {
           <Tabs.Screen
             name="diet"
             options={{
+              href: herTab,
               title: 'Diet',
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <Apple color={color} size={TAB_ICON_SIZE} />
               ),
               tabBarButtonTestID: 'diet-tab',
+            }}
+          />
+          <Tabs.Screen
+            name="partner"
+            options={{
+              title: translate('partner.settings_item'),
+              headerShown: false,
+              tabBarIcon: ({ color }) => (
+                <HeartHandshake color={color} size={TAB_ICON_SIZE} />
+              ),
+              tabBarButtonTestID: 'partner-tab',
             }}
           />
           <Tabs.Screen

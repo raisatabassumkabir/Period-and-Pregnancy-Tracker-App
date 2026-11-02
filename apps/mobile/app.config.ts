@@ -35,6 +35,37 @@ const appIconBadgeConfig: AppIconBadgeConfig = {
   ],
 };
 
+/** Path prefix of partner invite links; matches the API's `/p/<code>` page. */
+const INVITE_LINK_PATH_PREFIX = '/p/';
+
+type AndroidIntentFilters = NonNullable<
+  NonNullable<ExpoConfig['android']>['intentFilters']
+>;
+
+/**
+ * App Link for invite URLs on the API's own host. Only over https: Android
+ * cannot verify an http host, and a dev LAN address never needs it (the
+ * `scheme` deep link covers development).
+ */
+function inviteLinkFilters(): AndroidIntentFilters {
+  const api = new URL(Env.API_URL);
+  if (api.protocol !== 'https:') return [];
+  return [
+    {
+      action: 'VIEW',
+      autoVerify: true,
+      data: [
+        {
+          scheme: 'https',
+          host: api.host,
+          pathPrefix: INVITE_LINK_PATH_PREFIX,
+        },
+      ],
+      category: ['BROWSABLE', 'DEFAULT'],
+    },
+  ];
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: Env.NAME,
@@ -90,6 +121,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Production must talk HTTPS only.
     // @ts-expect-error: 'usesCleartextTraffic' is valid in runtime but missing from the type definition
     usesCleartextTraffic: Env.APP_ENV !== 'production',
+    // Partner invite links (https://<api host>/p/<code>) open the app directly.
+    // Verified through /.well-known/assetlinks.json served by the API, which
+    // must list the Play App Signing SHA-256. Custom schemes aren't tappable
+    // in WhatsApp, so https is the link people actually share.
+    intentFilters: inviteLinkFilters(),
   },
   web: {
     favicon: './assets/favicon.png',

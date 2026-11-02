@@ -22,11 +22,34 @@ import {
 } from '@/components/ui';
 import { useAuth, useIsFirstTime } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
+import { readPendingPartnerCode, savePendingPartnerCode } from '@/lib/partner';
 import { useHealthStore } from '@/store/useHealthStore';
 
 const TOTAL_STEPS = 6;
 const DEFAULT_CYCLE_LENGTH = 28;
 const DEFAULT_PERIOD_DURATION = 5;
+
+/** Someone who arrived through a partner invite link starts on "I have a code". */
+function usePrefillFromInviteLink(
+  setIntent: (intent: AppIntent) => void,
+  setPartnerCode: (code: string) => void
+) {
+  React.useEffect(() => {
+    let active = true;
+    readPendingPartnerCode()
+      .then((code) => {
+        if (!active || !code) return;
+        setIntent('partner');
+        setPartnerCode(code);
+      })
+      .catch(() => {
+        // No stored code: onboarding starts blank, as usual.
+      });
+    return () => {
+      active = false;
+    };
+  }, [setIntent, setPartnerCode]);
+}
 
 export default function Onboarding() {
   const router = useRouter();
@@ -45,6 +68,7 @@ export default function Onboarding() {
   // Form selections
   const [intent, setIntent] = useState<AppIntent | null>(null);
   const [partnerCode, setPartnerCode] = useState<string>('');
+  usePrefillFromInviteLink(setIntent, setPartnerCode);
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedSource, setSelectedSource] = useState<string>('');
@@ -129,6 +153,11 @@ export default function Onboarding() {
       );
     } catch (err) {
       console.warn('Failed to update local profile:', err);
+    }
+
+    // Redeemed from Home once signed in (the code needs an account).
+    if (intent === 'partner' && partnerCode.trim()) {
+      await savePendingPartnerCode(partnerCode);
     }
 
     setHealthMode(isPregnancyGoal ? 'pregnancy' : 'cycle');

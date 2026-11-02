@@ -1,0 +1,11 @@
+{% extends "legal/base.html" %}
+{% block title %}Join your partner{% endblock %}
+{% block heading %}Your partner invited you{% endblock %}
+{% block content %}
+<p>Happy Women helps you support your partner through her cycle: a heads-up before her period, how she may be feeling, and small ideas to help.</p>
+<h2>1. Install the app</h2>
+<p><a href="{{ play_store_url }}" rel="noopener">Get Happy Women on Google Play</a></p>
+<h2>2. Enter this code</h2>
+<p style="font-size:1.6rem;letter-spacing:2px;font-weight:700">{{ code }}</p>
+<p>Open the app, choose <strong>"I have a partner code"</strong> and enter it. The code works for 7 days.</p>
+{% endblock %}

@@ -3,5 +3,6 @@ export * from './billing';
 export * from './common';
 export * from './cycles';
 export * from './pregnancy';
+export * from './sharing';
 export * from './types';
 export * from './users';

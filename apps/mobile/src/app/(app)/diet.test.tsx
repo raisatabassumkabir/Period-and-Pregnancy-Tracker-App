@@ -2,6 +2,8 @@ import React from 'react';
 
 import { useCycles } from '@/api/cycles';
 import { usePregnancies } from '@/api/pregnancy';
+import { useMealDay } from '@/lib/diet';
+import { todayDateString } from '@/lib/health/dates';
 import { cleanup, screen, setup } from '@/lib/test-utils';
 import { useHealthStore } from '@/store/useHealthStore';
 
@@ -45,9 +47,14 @@ const startedDaysAgo = (days: number) => {
   return `${date.getFullYear()}-${month}-${day}`;
 };
 
+const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
+
 beforeEach(() => {
   mockCycles();
   mockPregnancies();
+  useMealDay.setState({
+    day: { date: todayDateString(), swaps: {}, eaten: [] },
+  });
 });
 
 afterEach(() => {
@@ -57,55 +64,44 @@ afterEach(() => {
   useHealthStore.setState({ mode: 'cycle' });
 });
 
-describe('Diet — pregnancy mode', () => {
-  beforeEach(() => useHealthStore.setState({ mode: 'pregnancy' }));
-
-  it('renders one card per meal slot', () => {
+describe('Diet', () => {
+  it('renders today\u2019s plan with one card per meal slot', () => {
     setup(<Diet />);
-    expect(screen.getByTestId('meal-card-breakfast')).toBeOnTheScreen();
-    expect(screen.getByTestId('meal-card-lunch')).toBeOnTheScreen();
-    expect(screen.getByTestId('meal-card-dinner')).toBeOnTheScreen();
-    expect(screen.getByTestId('meal-card-snack')).toBeOnTheScreen();
+    expect(screen.getByTestId('meal-targets-card')).toBeOnTheScreen();
+    SLOTS.forEach((slot) =>
+      expect(screen.getByTestId(`daily-meal-${slot}`)).toBeOnTheScreen()
+    );
   });
 
-  it('defaults to the trimester of the active pregnancy', () => {
+  it('explains the luteal focus on a luteal day', () => {
+    // Day 22 of a default 28-day cycle is past ovulation (day 14): luteal.
+    mockCycles([{ id: 'c1', start_date: startedDaysAgo(21), end_date: null }]);
+    setup(<Diet />);
+    expect(screen.getByTestId('meal-plan-focus')).toHaveTextContent(/Luteal/);
+  });
+
+  it('uses the pregnancy focus in pregnancy mode', () => {
+    useHealthStore.setState({ mode: 'pregnancy' });
     mockPregnancies([
       { id: 'p1', status: 'active', current_week: 30, due_date: '2026-12-01' },
     ]);
     setup(<Diet />);
-    // Third-trimester breakfast copy, chosen without the user touching the tabs.
-    expect(screen.getByText(/Oats with chia/)).toBeOnTheScreen();
-  });
-
-  it('lets the user switch trimester by hand', async () => {
-    const { user } = setup(<Diet />);
-
-    await user.press(screen.getByTestId('trimester-selector-2'));
-
-    expect(screen.getByText(/Chickpea and quinoa/)).toBeOnTheScreen();
-  });
-});
-
-describe('Diet — cycle mode', () => {
-  it('shows cycle phases instead of trimesters', () => {
-    setup(<Diet />);
-    expect(screen.getByTestId('phase-selector')).toBeOnTheScreen();
-    expect(screen.queryByTestId('trimester-selector')).toBeNull();
-  });
-
-  it('opens on the phase of the current cycle day', () => {
-    // Day 22 of a default 28-day cycle is past ovulation (day 14): luteal.
-    mockCycles([{ id: 'c1', start_date: startedDaysAgo(21), end_date: null }]);
-    setup(<Diet />);
-    expect(screen.getByTestId('diet-current-phase')).toHaveTextContent(
-      /Luteal/
+    expect(screen.getByTestId('meal-plan-focus')).toHaveTextContent(
+      /Trimester 3/
     );
-    expect(screen.getByText(/Porridge with banana/)).toBeOnTheScreen();
   });
 
-  it('lets the user browse another phase', async () => {
+  it('swaps a meal and marks one eaten', async () => {
     const { user } = setup(<Diet />);
-    await user.press(screen.getByTestId('phase-selector-ovulation'));
-    expect(screen.getByText(/Pumpkin seeds/)).toBeOnTheScreen();
+    await user.press(screen.getByTestId('daily-meal-lunch-swap'));
+    expect(useMealDay.getState().day.swaps.lunch).toBe(1);
+
+    await user.press(screen.getByTestId('daily-meal-snack-eaten'));
+    expect(useMealDay.getState().day.eaten).toHaveLength(1);
+  });
+
+  it('asks for height and weight when they are missing', () => {
+    setup(<Diet />);
+    expect(screen.getByTestId('meal-add-metrics')).toBeOnTheScreen();
   });
 });

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.cycles",
     "apps.pregnancy",
     "apps.payments",
+    "apps.sharing",
 ]
 
 MIDDLEWARE = [
@@ -96,10 +97,10 @@ DATABASES = {
     )
 }
 
-if 'test' in sys.argv:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+if "test" in sys.argv:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
     }
 
 AUTH_USER_MODEL = "users.User"
@@ -153,6 +154,8 @@ REST_FRAMEWORK = {
         "auth-token": "10/min",
         "auth-register": "5/hour",
         "password-reset": "5/hour",
+        # Guessing partner codes: 10 tries an hour per user is plenty for typos.
+        "partner-redeem": "10/hour",
     },
     # Traefik appends the client IP to X-Forwarded-For. Without this DRF keys
     # every throttle on the proxy's address and one client throttles everyone.
@@ -198,18 +201,13 @@ CSRF_TRUSTED_ORIGINS = [
 # RevenueCat subscription management & webhook integration
 REVENUECAT_SECRET_API_KEY = os.environ.get("REVENUECAT_SECRET_API_KEY", "")
 # Canonical authorization secret, with fallback to legacy REVENUECAT_WEBHOOK_SECRET
-REVENUECAT_WEBHOOK_AUTHORIZATION = (
-    os.environ.get("REVENUECAT_WEBHOOK_AUTHORIZATION")
-    or os.environ.get("REVENUECAT_WEBHOOK_SECRET", "")
-)
-REVENUECAT_API_BASE_URL = os.environ.get(
-    "REVENUECAT_API_BASE_URL", "https://api.revenuecat.com/v1"
-)
+REVENUECAT_WEBHOOK_AUTHORIZATION = os.environ.get(
+    "REVENUECAT_WEBHOOK_AUTHORIZATION"
+) or os.environ.get("REVENUECAT_WEBHOOK_SECRET", "")
+REVENUECAT_API_BASE_URL = os.environ.get("REVENUECAT_API_BASE_URL", "https://api.revenuecat.com/v1")
 # Keep below the mobile client's 15s request timeout so a slow upstream fails
 # here first and the app gets a real response instead of its own timeout.
-REVENUECAT_REQUEST_TIMEOUT_SECONDS = int(
-    os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "5")
-)
+REVENUECAT_REQUEST_TIMEOUT_SECONDS = int(os.environ.get("REVENUECAT_REQUEST_TIMEOUT_SECONDS", "5"))
 
 # Transactional email (password resets). Console locally; prod.py swaps in
 # Resend through django-anymail.
@@ -217,6 +215,18 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Happy Women <no-reply@localhost>")
 # Absolute origin for links inside emails. prod.py derives it from DOMAIN.
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
+
+# Android App Links for partner invites (/p/<code>). The fingerprint must be the
+# Play App Signing key (Play Console > App integrity), not the upload key.
+ANDROID_APP_PACKAGE = os.environ.get("ANDROID_APP_PACKAGE", "com.happywomen.app")
+ANDROID_APP_SHA256_FINGERPRINTS = [
+    fp.strip()
+    for fp in os.environ.get("ANDROID_APP_SHA256_FINGERPRINTS", "").split(",")
+    if fp.strip()
+]
+PLAY_STORE_URL = os.environ.get(
+    "PLAY_STORE_URL", f"https://play.google.com/store/apps/details?id={ANDROID_APP_PACKAGE}"
+)
 # Reset links expire after an hour, and die on first use because the token
 # hashes the current password.
 PASSWORD_RESET_TIMEOUT = 60 * 60

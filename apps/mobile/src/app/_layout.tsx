@@ -52,6 +52,9 @@ loadSelectedPalette();
 SplashScreen.preventAutoHideAsync();
 
 /** Top-level routes that are valid for both signed-in and signed-out users. */
+/** `/p/<code>`: the path inside partner invite links (see app/p/[code].tsx). */
+const INVITE_LINK_ROUTE = 'p';
+
 const AUTH_ROUTES = new Set([
   'login',
   'register',
@@ -102,6 +105,9 @@ export default function RootLayout() {
         router.dismissAll();
       }
       requestAnimationFrame(() => router.replace(target));
+    } else if (token && root === INVITE_LINK_ROUTE) {
+      // An invite link (/p/<code>) has stored its code; the Partner screen redeems it.
+      requestAnimationFrame(() => router.replace('/partner'));
     } else if (token && onAuthScreen) {
       // Allow onboarding to stay mounted until completed
       if (root !== 'onboarding') {
@@ -127,6 +133,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
         <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+        <Stack.Screen name="p/[code]" options={{ headerShown: false }} />
       </Stack>
     </Providers>
   );

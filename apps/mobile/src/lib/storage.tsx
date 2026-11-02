@@ -43,6 +43,12 @@ export const STORAGE_KEYS = {
   MEDICAL_DISCLAIMER_ACK: '@app/medical_disclaimer_ack',
   /** Period-reminder preferences: on/off, days ahead, time of day. */
   REMINDER_SETTINGS: '@app/reminder_settings',
+  /** Today's meal swaps and eaten meals; reset when the date changes. */
+  MEAL_DAY: '@app/meal_day',
+  /** Partner phone only: whether to schedule support nudges, and when. */
+  PARTNER_NUDGES: '@app/partner_nudges',
+  /** A partner code from an invite link, kept until the partner signs in and redeems it. */
+  PENDING_PARTNER_CODE: '@app/pending_partner_code',
 } as const;
 
 let storePromise: Promise<MMKV> | null = null;

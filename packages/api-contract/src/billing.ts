@@ -85,9 +85,10 @@ export interface SubscriptionStatusResponse {
 /**
  * Feature keys the backend may send in a 402 body. Add one entry per gated
  * feature; the mobile app maps each to an upgrade-sheet title.
- * `premium` is the generic fallback and must stay.
+ * `premium` is the generic fallback and must stay. `partner_sync` is reserved:
+ * partner sharing ships free, so nothing sends it yet.
  */
-export type PremiumFeature = 'premium';
+export type PremiumFeature = 'premium' | 'partner_sync';
 
 /**
  * Body of every `402 Payment Required` response: a Problem Details object

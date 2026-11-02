@@ -1,9 +1,16 @@
 import { useRouter } from 'expo-router';
-import { Baby, Calendar, HeartPulse, Plus } from 'lucide-react-native';
+import {
+  Baby,
+  Calendar,
+  HeartHandshake,
+  HeartPulse,
+  Plus,
+} from 'lucide-react-native';
 import React from 'react';
 
 import { useCycles } from '@/api/cycles';
 import { usePregnancies } from '@/api/pregnancy';
+import { PhaseGuideCard } from '@/components/cycle-education';
 import {
   CycleRing,
   CycleStatusCards,
@@ -14,6 +21,7 @@ import {
 } from '@/components/dashboard';
 import { InitializeCycleModal } from '@/components/dashboard/initialize-cycle-modal';
 import { PromptCard } from '@/components/dashboard/prompt-card';
+import { PartnerHome } from '@/components/partner';
 import {
   FocusAwareStatusBar,
   Kicker,
@@ -25,6 +33,7 @@ import {
   View,
 } from '@/components/ui';
 import { AppHeader } from '@/components/ui/app-header';
+import { cycleDietPhaseFor } from '@/lib/diet';
 import {
   DEMO_CYCLES,
   DEMO_PREGNANCY,
@@ -39,6 +48,8 @@ import {
   useTrackingMode,
   withDemoFallback,
 } from '@/lib/health';
+import { translate } from '@/lib/i18n';
+import { usePartnerSide, usePendingPartnerCode } from '@/lib/partner';
 
 const ACTION_ICON_SIZE = 18;
 /** Accent fills are mid-tone in every palette and mode, so white reads on all of them. */
@@ -303,6 +314,15 @@ function CycleSection({
           today={today}
         />
       </View>
+      <View className="mt-5">
+        <PhaseGuideCard
+          phase={cycleDietPhaseFor(
+            insights.currentDay,
+            insights.cycleLengthDays
+          )}
+          audience="self"
+        />
+      </View>
     </>
   );
 }
@@ -352,7 +372,8 @@ function CycleTransitionBanner({
   );
 }
 
-export default function Home() {
+/** Her own home: cycle and/or pregnancy, depending on her goals. */
+function HerHome() {
   const [mode, setTrackingMode] = useTrackingMode();
   const { profile, updateProfile } = usePersonalizationProfile();
   const today = todayDateString();
@@ -427,6 +448,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="px-4 pb-8 pt-5"
       >
+        <PendingInvitePrompt />
         <WeekStrip
           today={today}
           selectedDate={selectedDate}
@@ -461,4 +483,60 @@ export default function Home() {
       </ScrollView>
     </View>
   );
+}
+
+/**
+ * Someone opened an invite link (or entered a code in onboarding) before they
+ * had an account. Offer to finish linking; the Partner screen redeems it.
+ */
+function PendingInvitePrompt() {
+  const router = useRouter();
+  const code = usePendingPartnerCode((state) => state.code);
+  const hydrate = usePendingPartnerCode((state) => state.hydrate);
+  const { link } = usePartnerSide();
+  React.useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
+  if (!code || link) return null;
+  return (
+    <View className="mb-5">
+      <PromptCard
+        icon={HeartHandshake}
+        title={translate('partner.join.title')}
+        subtitle={code}
+        cta={{
+          label: translate('partner.join.submit'),
+          onPress: () => router.push('/partner'),
+          testID: 'pending-invite-cta',
+        }}
+        testID="pending-invite-prompt"
+      />
+    </View>
+  );
+}
+
+/** A linked partner's home: her shared status and ways to support her. */
+function PartnerHomeScreen() {
+  return (
+    <View className="flex-1 bg-canvas" testID="home-screen">
+      <FocusAwareStatusBar />
+      <SafeAreaView edges={['top']}>
+        <View className="px-4 pt-2">
+          <AppHeader />
+        </View>
+      </SafeAreaView>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="px-4 pb-8 pt-5"
+      >
+        <PartnerHome />
+      </ScrollView>
+    </View>
+  );
+}
+
+export default function Home() {
+  const { isPartner } = usePartnerSide();
+  return isPartner ? <PartnerHomeScreen /> : <HerHome />;
 }

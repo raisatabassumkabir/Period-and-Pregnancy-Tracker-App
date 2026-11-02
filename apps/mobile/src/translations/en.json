@@ -201,5 +201,309 @@
     "dating": "Due dates and pregnancy weeks are estimated from your last period. Your clinician may adjust them after an ultrasound.",
     "care": "Talk to a qualified health professional about any symptoms or concerns. In an emergency, or if your baby is moving less than usual, get medical care right away.",
     "accept": "I understand"
+  },
+  "cycle_guide": {
+    "title": "How you may feel",
+    "partner_title": "How she may feel",
+    "learn_more": "Learn about every phase",
+    "sheet_kicker": "Your cycle, explained",
+    "today": "Today",
+    "hormones": "Hormones",
+    "mood": "Mood",
+    "energy": "Energy",
+    "self_care": "What helps",
+    "partner_tip": "How a partner can help",
+    "disclaimer": "Everyone is different. These are common patterns, not rules. If mood changes feel severe or stop you from living normally, talk to a doctor.",
+    "source": "Based on NHS and ACOG patient guidance.",
+    "phases": {
+      "menstrual": {
+        "days": "About days 1–5",
+        "hormones": "Oestrogen and progesterone are at their lowest, which starts the bleed.",
+        "mood": "Tiredness, low mood or wanting quiet time is common, especially on the first two days. Many people feel relief once bleeding starts.",
+        "energy": "Low. Cramps and blood loss can be draining.",
+        "self_care": "Warmth on your tummy, rest, gentle walks, iron-rich food and plenty of water.",
+        "partner": "Take over a chore, bring a warm drink or her favourite chocolate, and offer a heating pad. Ask what she needs instead of guessing."
+      },
+      "follicular": {
+        "days": "About days 6–12",
+        "hormones": "Oestrogen rises steadily as an egg matures.",
+        "mood": "Often brighter, more optimistic and more social. Many people feel most like themselves.",
+        "energy": "Rising. A good time for new plans and harder workouts.",
+        "self_care": "Try something new, plan ahead and enjoy the extra energy.",
+        "partner": "Plan a date or something fun together. Encourage her ideas and plans."
+      },
+      "ovulation": {
+        "days": "About days 13–15",
+        "hormones": "Oestrogen peaks and a surge of LH releases the egg.",
+        "mood": "Confident, outgoing and affectionate. Some people feel a brief dip or mild one-sided pain.",
+        "energy": "At its highest for most people.",
+        "self_care": "Social plans, exercise and time outdoors suit this phase well.",
+        "partner": "Compliment her, spend quality time together and be affectionate."
+      },
+      "luteal": {
+        "days": "About days 16–28",
+        "hormones": "Progesterone rises, then both hormones fall in the last week before the period.",
+        "mood": "Calm at first. In the last week, irritability, sadness, anxiety or feeling overwhelmed (PMS) are common.",
+        "energy": "Slowly falling. Cravings and bloating are normal.",
+        "self_care": "Regular meals, less caffeine and salt, magnesium-rich foods, gentle exercise and early nights.",
+        "partner": "Be patient and kind. Send a positive message, bring flowers or a comfort snack, and don't take short tempers personally."
+      }
+    },
+    "pregnancy": {
+      "1": "Weeks 1–13: rising hormones can bring nausea, tiredness and mood swings. Rest and small, frequent meals help.",
+      "2": "Weeks 14–27: energy often returns and mood steadies. A good time for gentle exercise and planning.",
+      "3": "Weeks 28–40: discomfort, poor sleep and worry about birth are common. Support, rest and preparation help."
+    }
+  },
+  "meal_library": {
+    "today_title": "Today's meals",
+    "targets": "Your daily targets",
+    "kcal": "kcal",
+    "protein_g": "g protein",
+    "plan_total": "This plan",
+    "swap": "Swap",
+    "new_tomorrow": "A new plan is ready every day.",
+    "add_metrics": "Add your height and weight for calorie and protein targets made for you.",
+    "teen_note": "For under-18s we show balanced meals without calorie counting. Growing bodies need enough food.",
+    "protein_boost": "Add a protein boost: an extra egg, a glass of milk or a bowl of lentils.",
+    "pregnancy_safe": "Pregnancy-safe picks only.",
+    "portion": "Portion ×{{scale}}",
+    "meals": {
+      "b01": "Oats with banana and peanut butter",
+      "b02": "Spinach and cheese omelette with wholegrain toast",
+      "b03": "Greek yogurt with berries and chia seeds",
+      "b04": "Ful medames with an egg and wholemeal pita",
+      "b05": "Shakshuka with wholemeal bread",
+      "b06": "Tofu scramble with peppers on toast",
+      "b07": "Overnight oats with dates and walnuts",
+      "b08": "Moong dal pancakes with mint yogurt",
+      "b09": "Wholewheat paratha with spiced scrambled eggs",
+      "b10": "Smoked salmon and avocado on rye",
+      "b11": "Chickpea flour pancake with spinach",
+      "b12": "Wholegrain toast with labneh, olive oil and tomato",
+      "b13": "Quinoa porridge with almond milk and berries",
+      "b14": "Boiled eggs, wholemeal toast and an orange",
+      "b15": "Peanut butter, banana and oat smoothie with soy milk",
+      "b16": "Cottage cheese with pineapple and pumpkin seeds",
+      "b17": "Moong dal and rice khichuri with an egg",
+      "b18": "Muesli with milk, kiwi and flaxseed",
+      "b19": "Sweet potato hash with eggs",
+      "b20": "Hummus, vegetables and wholemeal pita",
+      "l01": "Lentil soup with wholemeal bread",
+      "l02": "Grilled chicken and quinoa salad",
+      "l03": "Chickpea and spinach curry with brown rice",
+      "l04": "Tuna and sweetcorn wholemeal wrap",
+      "l05": "Beef and vegetable stir-fry with noodles",
+      "l06": "Kidney bean curry (rajma) with rice",
+      "l07": "Salmon poke bowl with brown rice",
+      "l08": "Falafel bowl with tabbouleh and hummus",
+      "l09": "Chicken shawarma plate with salad and yogurt sauce",
+      "l10": "Paneer and pea curry with roti",
+      "l11": "Egg fried brown rice with vegetables",
+      "l12": "Tofu and vegetable stir-fry with rice",
+      "l13": "Mujaddara with yogurt salad",
+      "l14": "Turkey and avocado wholegrain sandwich",
+      "l15": "Rohu fish curry with rice and spinach",
+      "l16": "Quinoa, black bean and corn salad",
+      "l17": "Chicken, vegetable and barley soup",
+      "l18": "Dal with brown rice and sautéed greens",
+      "l19": "Sardines on wholegrain toast with salad",
+      "l20": "Halloumi and roasted vegetable couscous",
+      "d01": "Baked salmon with sweet potato and broccoli",
+      "d02": "Chicken and vegetable curry with brown rice",
+      "d03": "Beef and lentil stew",
+      "d04": "Tofu and broccoli stir-fry with brown rice",
+      "d05": "Grilled fish with lemon, quinoa and greens",
+      "d06": "Spinach and ricotta wholewheat pasta bake",
+      "d07": "Chickpea and sweet potato stew",
+      "d08": "Lamb kofta with bulgur and salad",
+      "d09": "Egg curry with roti and cucumber raita",
+      "d10": "Prawn and vegetable stir-fry with noodles",
+      "d11": "Black bean chilli with rice",
+      "d12": "Roast chicken with potatoes and green beans",
+      "d13": "Stuffed peppers with turkey mince and rice",
+      "d14": "Lentil and vegetable shepherd's pie",
+      "d15": "Mackerel with brown rice and spinach",
+      "d16": "Paneer tikka with vegetables and roti",
+      "d17": "Chicken liver with onions and mash",
+      "d18": "Aubergine and lentil moussaka",
+      "d19": "Beef and broccoli with brown rice",
+      "d20": "Tempeh and peanut noodle bowl",
+      "s01": "Dates with walnuts",
+      "s02": "Greek yogurt with honey",
+      "s03": "Apple slices with peanut butter",
+      "s04": "Two boiled eggs",
+      "s05": "Roasted chickpeas",
+      "s06": "Dark chocolate and almonds",
+      "s07": "Hummus with carrot and cucumber sticks",
+      "s08": "Cottage cheese with cucumber",
+      "s09": "Steamed edamame",
+      "s10": "A banana and a glass of milk",
+      "s11": "An orange and pumpkin seeds",
+      "s12": "Nuts and raisins",
+      "s13": "Wholegrain crackers with cheese",
+      "s14": "Lassi (yogurt drink)",
+      "s15": "Berry smoothie with soy milk",
+      "s16": "Tuna on rice cakes",
+      "s17": "Chana chaat (spiced chickpea salad)",
+      "s18": "A kiwi and a handful of cashews",
+      "s19": "Yogurt parfait with granola",
+      "s20": "Peanut butter on wholegrain toast"
+    },
+    "nutrients": {
+      "iron": "Iron",
+      "folate": "Folate",
+      "omega3": "Omega-3",
+      "magnesium": "Magnesium",
+      "calcium": "Calcium",
+      "fibre": "Fibre",
+      "protein": "Protein",
+      "vitamin_c": "Vitamin C",
+      "b6": "Vitamin B6",
+      "complex_carbs": "Slow carbs"
+    },
+    "focus": {
+      "menstrual": "Period: iron and vitamin C to replace what you lose, omega-3 for cramps.",
+      "follicular": "Follicular: protein, fibre and folate to match your rising energy.",
+      "ovulation": "Ovulation: fibre and antioxidants (vitamin C, omega-3).",
+      "luteal": "Luteal: magnesium, vitamin B6 and slow carbs to ease PMS and cravings.",
+      "t1": "Trimester 1: folate for baby's development, small meals for nausea.",
+      "t2": "Trimester 2: iron, calcium and protein as baby grows fast.",
+      "t3": "Trimester 3: fibre, omega-3, calcium and protein for the final stretch."
+    },
+    "eaten": "Eaten"
+  },
+  "partner": {
+    "settings_item": "Partner",
+    "invite": {
+      "title": "Share with your partner",
+      "body": "Your partner gets a heads-up before your period, a guide to how you may feel, and small ideas to support you. They never see your symptoms, moods or notes.",
+      "your_name": "Your name (what your partner sees)",
+      "create": "Create invite",
+      "code_label": "Your partner code",
+      "expires": "Valid for 7 days, single use.",
+      "whatsapp": "Send on WhatsApp",
+      "share": "Share link",
+      "message": "I use Happy Women to track my cycle. Join me so you know how I'm doing: {{url}} (or enter code {{code}} in the app).",
+      "share_failed": "Couldn't open that app. Try another way to share."
+    },
+    "linked": {
+      "title": "Linked with {{name}}",
+      "title_unnamed": "Linked with your partner",
+      "share_fertile": "Share my fertile window",
+      "share_fertile_hint": "For couples trying to conceive.",
+      "share_pregnancy": "Share my pregnancy",
+      "unlink": "Unlink partner",
+      "unlink_confirm": "Your partner will stop seeing your updates straight away.",
+      "sees": "They can see: period dates, cycle phase and, if you allow, your fertile window or pregnancy due date."
+    },
+    "join": {
+      "title": "Join your partner",
+      "body": "Enter the code she shared with you.",
+      "code_placeholder": "HW-XXXX-XXXX",
+      "your_name": "Your name (what she sees)",
+      "submit": "Link up",
+      "invalid": "That code is invalid or has expired. Ask her for a new one.",
+      "conflict": "One of you is already linked to a partner.",
+      "own_code": "That's your own code. Send it to your partner instead.",
+      "too_many": "Too many tries. Please wait an hour and try again.",
+      "success": "You're linked! You'll see her updates here."
+    },
+    "home": {
+      "kicker": "Your partner",
+      "her_name_fallback": "Your partner",
+      "period_in": "Period in {{count}} days",
+      "period_in_one": "Period tomorrow",
+      "period_today": "Period may start today",
+      "period_late": "Period is {{count}} days late",
+      "on_period": "On her period · day {{day}}",
+      "cycle_day": "Cycle day {{day}} · {{phase}}",
+      "pregnant": "Pregnant · week {{week}}",
+      "private": "She is keeping her current status private.",
+      "no_data": "She hasn't logged a period yet. You'll see her cycle here once she does.",
+      "not_linked": "You're not linked yet",
+      "not_linked_body": "Ask her to create an invite in Happy Women, then enter the code.",
+      "today_idea": "Today's idea to support her",
+      "send_kind_message": "Send her a kind message",
+      "another_idea": "Another idea"
+    },
+    "ttc": {
+      "title": "Trying to conceive",
+      "window": "Fertile window: {{start}} – {{end}}",
+      "best_days": "Best days to try: {{days}}",
+      "relax": "Keep it relaxed: a slow evening, a back or shoulder massage, and no pressure. Stress doesn't help either of you.",
+      "doctor": "These are estimates. If you've been trying for 12 months (6 months if she is over 35), see a doctor together."
+    },
+    "nudges": {
+      "title": "Reminders on this phone",
+      "body": "A nudge before her period, on day one, and on tougher days.",
+      "period_soon_title": "{{name}}'s period is due in 2 days",
+      "period_soon_body": "Stock up on her favourite snacks and plan a calm evening.",
+      "period_start_title": "{{name}}'s period may start today",
+      "period_start_body": "A warm drink, chocolate or flowers would be lovely today.",
+      "check_in_title": "Check in on {{name}}",
+      "check_in_body": "Ask how she's feeling and take a chore off her plate.",
+      "pms_title": "{{name}} may feel low this week",
+      "pms_body": "Be extra patient. A kind message goes a long way.",
+      "fertile_title": "The fertile window is opening",
+      "fertile_body": "The next few days are the best chance to conceive. Keep it relaxed.",
+      "best_day_title": "A peak fertility day",
+      "best_day_body": "Today and tomorrow are the most likely days. No pressure, just time together."
+    },
+    "ideas": {
+      "menstrual": {
+        "0": "Bring her a hot water bottle or heating pad.",
+        "1": "Surprise her with her favourite chocolate.",
+        "2": "Make her a warm ginger or mint tea.",
+        "3": "Take over dinner or the dishes tonight."
+      },
+      "follicular": {
+        "0": "Plan a walk or a small outing together.",
+        "1": "Ask about her plans and cheer her on.",
+        "2": "Cook a fresh, colourful meal together.",
+        "3": "Book something fun for the weekend."
+      },
+      "ovulation": {
+        "0": "Tell her something you love about her.",
+        "1": "Plan a date night.",
+        "2": "Bring her flowers, just because.",
+        "3": "Take a photo together and send it to her."
+      },
+      "luteal": {
+        "0": "Be extra patient. Short tempers aren't about you.",
+        "1": "Bring her a comfort snack she loves.",
+        "2": "Offer a gentle shoulder or back massage.",
+        "3": "Give her quiet time without asking why."
+      },
+      "pregnancy": {
+        "0": "Rub her feet or back tonight.",
+        "1": "Take on an extra chore so she can rest.",
+        "2": "Go to the next check-up with her.",
+        "3": "Ask what she's worried about, and just listen."
+      }
+    },
+    "messages": {
+      "menstrual": {
+        "0": "Thinking of you today. Rest up, I've got dinner covered ❤️",
+        "1": "Sending you a big hug. Need anything on my way home?"
+      },
+      "follicular": {
+        "0": "You've got this today. So proud of you 🌸",
+        "1": "Free this weekend? I'd love to take you out."
+      },
+      "ovulation": {
+        "0": "Just a reminder that you're amazing 💕",
+        "1": "Can't stop thinking about you today."
+      },
+      "luteal": {
+        "0": "However you feel today is okay. I'm here for you 🤍",
+        "1": "You don't have to do it all. Let me help tonight."
+      },
+      "pregnancy": {
+        "0": "You and our little one mean everything to me 💛",
+        "1": "You're doing an incredible job. Rest, I'll handle things."
+      }
+    },
+    "support_tab": "Support"
   }
 }

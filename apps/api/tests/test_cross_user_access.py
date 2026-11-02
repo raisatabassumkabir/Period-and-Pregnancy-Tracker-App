@@ -15,7 +15,14 @@ from django.urls import reverse
 from apps.core.rls import rls_user
 from config.api_router import router
 from conftest import create_owned
-from tests.factories import CycleFactory, DailyLogFactory, PregnancyFactory, ProfileFactory
+from tests.factories import (
+    CycleFactory,
+    DailyLogFactory,
+    PartnerInviteFactory,
+    PartnerLinkFactory,
+    PregnancyFactory,
+    ProfileFactory,
+)
 
 # (router basename, factory producing an object owned by the given user)
 CROSS_USER_ROUTES = [
@@ -23,6 +30,8 @@ CROSS_USER_ROUTES = [
     ("cycle", CycleFactory),
     ("dailylog", DailyLogFactory),
     ("pregnancy", PregnancyFactory),
+    ("partnerinvite", PartnerInviteFactory),
+    ("partnerlink", PartnerLinkFactory),
 ]
 
 pytestmark = pytest.mark.django_db

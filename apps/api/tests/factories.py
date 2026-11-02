@@ -6,6 +6,8 @@ from apps.cycles.models import Cycle, DailyLog
 from apps.payments.constants import ENTITLEMENT_PREMIUM, PRODUCT_PREMIUM_MONTHLY
 from apps.payments.models import Subscription, WebhookEvent
 from apps.pregnancy.models import Pregnancy
+from apps.sharing.models import PartnerInvite, PartnerLink
+from apps.sharing.services import hash_code
 from apps.users.models import Profile, User
 
 
@@ -84,3 +86,26 @@ class WebhookEventFactory(factory.django.DjangoModelFactory):
     status = WebhookEvent.Status.PENDING
     summary = factory.LazyFunction(dict)
 
+
+class PartnerInviteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PartnerInvite
+
+    user = factory.SubFactory(UserFactory)
+    code_hash = factory.Sequence(lambda n: hash_code(f"HW-TEST-{n:04d}"))
+    expires_at = factory.LazyFunction(
+        lambda: datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=7)
+    )
+
+
+class PartnerLinkFactory(factory.django.DjangoModelFactory):
+    """`user` is the owner (her), so create_owned(PartnerLinkFactory, user) works."""
+
+    class Meta:
+        model = PartnerLink
+
+    class Params:
+        user = factory.SubFactory(UserFactory)
+
+    owner = factory.SelfAttribute("user")
+    partner = factory.SubFactory(UserFactory)

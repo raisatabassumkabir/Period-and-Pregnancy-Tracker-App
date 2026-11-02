@@ -29,6 +29,7 @@ import { useTodayLog } from '@/lib/tracking';
 
 /** Keeps the last section clear of the pinned Apply bar. */
 const APPLY_BAR_CLEARANCE_CLASS = 'pb-32';
+const CALENDAR_ROUTE = '/(app)/calendar';
 
 function Section({
   title,
@@ -101,7 +102,10 @@ export default function Tracking() {
   // The calendar's "Add Symptom" pushes this screen with a `date` param; from
   // the tab bar there is nothing to go back to, so no arrow.
   const { date } = useLocalSearchParams<{ date?: string }>();
-  const openedFromCalendar = Boolean(date) && router.canGoBack();
+  // Opened from a calendar day: return there explicitly. Tab history is not a
+  // stack, so router.back() can have nothing to go back to (GO_BACK unhandled).
+  const openedFromCalendar = Boolean(date);
+  const returnToCalendar = () => router.navigate(CALENDAR_ROUTE);
   const {
     draft,
     setFlow,
@@ -120,21 +124,17 @@ export default function Tracking() {
     try {
       await save();
       showMessage({ message: 'Today’s log saved!', type: 'success' });
-      if (router.canGoBack?.()) {
-        router.back();
-      }
+      if (openedFromCalendar) returnToCalendar();
     } catch {
       showMessage({ message: 'Today’s log saved!', type: 'success' });
-      if (router.canGoBack?.()) {
-        router.back();
-      }
+      if (openedFromCalendar) returnToCalendar();
     }
   };
 
   return (
     <View className="flex-1 bg-canvas" testID="tracking-screen">
       <FocusAwareStatusBar />
-      <TrackHeader onBack={openedFromCalendar ? router.back : undefined} />
+      <TrackHeader onBack={openedFromCalendar ? returnToCalendar : undefined} />
 
       <ScrollView
         className="flex-1"

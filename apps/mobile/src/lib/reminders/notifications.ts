@@ -75,13 +75,24 @@ export async function requestReminderPermission(): Promise<boolean> {
   return asked.granted;
 }
 
-/** Removes every period reminder this app scheduled, and nothing else. */
-export async function cancelPeriodReminders(): Promise<void> {
+/** A notification to schedule; `kind` says which one within its group. */
+export interface TaggedReminder {
+  kind: string;
+  fireAt: Date;
+  title: string;
+  body: string;
+}
+
+/**
+ * Removes every notification this app scheduled under `tag`, and nothing
+ * else. Each feature (her period reminders, a partner's nudges) owns a tag.
+ */
+export async function cancelTaggedReminders(tag: string): Promise<void> {
   if (!Notifications) return;
   const api = Notifications;
   const scheduled = await api.getAllScheduledNotificationsAsync();
   const ours = scheduled.filter(
-    (request) => request.content.data?.kind === REMINDER_DATA_KIND
+    (request) => request.content.data?.kind === tag
   );
   await Promise.all(
     ours.map((request) =>
@@ -90,14 +101,27 @@ export async function cancelPeriodReminders(): Promise<void> {
   );
 }
 
+/** Removes every period reminder this app scheduled, and nothing else. */
+export function cancelPeriodReminders(): Promise<void> {
+  return cancelTaggedReminders(REMINDER_DATA_KIND);
+}
+
 /** Replaces any existing period reminders with `plan`. */
-export async function replacePeriodReminders(
+export function replacePeriodReminders(
   plan: readonly PlannedReminder[]
+): Promise<void> {
+  return replaceTaggedReminders(REMINDER_DATA_KIND, plan);
+}
+
+/** Replaces everything scheduled under `tag` with `plan`. */
+export async function replaceTaggedReminders(
+  tag: string,
+  plan: readonly TaggedReminder[]
 ): Promise<void> {
   if (!Notifications) return;
   const api = Notifications;
   await ensureChannel(api);
-  await cancelPeriodReminders();
+  await cancelTaggedReminders(tag);
   await Promise.all(
     plan.map((reminder) =>
       api.scheduleNotificationAsync({
@@ -106,7 +130,7 @@ export async function replacePeriodReminders(
           body: reminder.body,
           sound: 'default',
           priority: api.AndroidNotificationPriority.MAX,
-          data: { kind: REMINDER_DATA_KIND, reminder: reminder.kind },
+          data: { kind: tag, reminder: reminder.kind },
         },
         trigger: {
           type: api.SchedulableTriggerInputTypes.DATE,

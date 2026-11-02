@@ -11,6 +11,7 @@ from apps.payments.views import (
     SubscriptionStatusView,
     SubscriptionSyncView,
 )
+from apps.sharing.web_views import InviteLandingView, asset_links
 from apps.users.views import (
     MeView,
     PasswordResetRequestView,
@@ -59,6 +60,9 @@ api_patterns = [
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("health/", health),
+    # Partner invite links: App Link verification + a page for phones without the app.
+    path(".well-known/assetlinks.json", asset_links, name="asset-links"),
+    path("p/<str:code>", InviteLandingView.as_view(), name="partner-invite-landing"),
     # Public legal pages linked from the Play listing and the app (HTML).
     path(
         "legal/privacy/",
@@ -95,4 +99,3 @@ if settings.API_DOCS_ENABLED:
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
         path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
     ]
-

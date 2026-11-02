@@ -10,6 +10,7 @@ from rest_framework.routers import DefaultRouter
 
 from apps.cycles.views import CycleViewSet, DailyLogViewSet
 from apps.pregnancy.views import PregnancyViewSet
+from apps.sharing.views import PartnerInviteViewSet, PartnerLinkViewSet, SharedStatusViewSet
 from apps.users.views import ProfileViewSet
 
 router = DefaultRouter()
@@ -17,3 +18,6 @@ router.register("profiles", ProfileViewSet, basename="profile")
 router.register("cycles", CycleViewSet, basename="cycle")
 router.register("daily-logs", DailyLogViewSet, basename="dailylog")
 router.register("pregnancies", PregnancyViewSet, basename="pregnancy")
+router.register("partner-invites", PartnerInviteViewSet, basename="partnerinvite")
+router.register("partner-links", PartnerLinkViewSet, basename="partnerlink")
+router.register("shared-statuses", SharedStatusViewSet, basename="sharedstatus")

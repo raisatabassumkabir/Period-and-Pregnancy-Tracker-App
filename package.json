@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
+    "postinstall": "node scripts/warn-running-metro.js",
     "init-app": "node scripts/init-app.js",
     "mobile": "pnpm --filter mobile",
     "contract": "pnpm --filter @repo/api-contract",

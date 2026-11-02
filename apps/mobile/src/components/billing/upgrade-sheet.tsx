@@ -43,6 +43,7 @@ const FEATURE_HIGHLIGHTS: { icon: string; label: string }[] = [
 
 const FEATURE_TITLES: Record<string, string> = {
   premium: 'Upgrade to Premium',
+  partner_sync: 'Share with your partner',
 };
 
 function getTitle(detail: UpgradeRequiredDetail | null): string {
