@@ -8,10 +8,11 @@ import type { ProblemDetail } from '@/api/types';
 import { Button, Input, Text } from '@/components/ui';
 import type { TxKeyPath } from '@/lib/i18n';
 import { translate } from '@/lib/i18n';
-import { usePendingPartnerCode } from '@/lib/partner';
+import { extractPartnerCode, usePendingPartnerCode } from '@/lib/partner';
 
 const NAME_MAX_LENGTH = 40;
-const CODE_MAX_LENGTH = 14;
+/** Room for a pasted link or her whole message; only the code is sent. */
+const INPUT_MAX_LENGTH = 500;
 
 const ERROR_BY_STATUS: Readonly<Record<number, TxKeyPath>> = {
   404: 'partner.join.invalid',
@@ -22,17 +23,30 @@ const ERROR_BY_STATUS: Readonly<Record<number, TxKeyPath>> = {
 
 /** Branch on the status (CONTRACT.md), never on the server's wording. */
 function errorKey(error: AxiosError<ProblemDetail> | null): TxKeyPath | null {
-  const status = error?.response?.status;
-  if (status === undefined) return error ? 'partner.join.invalid' : null;
-  return ERROR_BY_STATUS[status] ?? 'partner.join.invalid';
+  if (!error) return null;
+  // No response: offline, or the server is down. Say so instead of "invalid".
+  if (!error.response) return 'partner.network_error';
+  return ERROR_BY_STATUS[error.response.status] ?? 'partner.generic_error';
 }
 
-/** Partner side: enter her code (pre-filled from an invite link) and link up. */
-export function JoinCard() {
+/** Her link, the code, or the code pre-filled from an invite link the partner tapped. */
+function useLinkOrCodeInput() {
   const pending = usePendingPartnerCode((state) => state.code);
   const hydrate = usePendingPartnerCode((state) => state.hydrate);
+  const [text, setText] = React.useState('');
+  React.useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
+  React.useEffect(() => {
+    if (pending) setText(pending);
+  }, [pending]);
+  return { text, setText, code: extractPartnerCode(text) };
+}
+
+/** Partner side: paste her link (or type her code) and link up. */
+export function JoinCard() {
   const clearPending = usePendingPartnerCode((state) => state.clear);
-  const [code, setCode] = React.useState('');
+  const { text, setText, code } = useLinkOrCodeInput();
   const [name, setName] = React.useState('');
   const redeem = useRedeemPartnerCode({
     onSuccess: () => {
@@ -44,14 +58,10 @@ export function JoinCard() {
     },
   });
 
-  React.useEffect(() => {
-    void hydrate();
-  }, [hydrate]);
-  React.useEffect(() => {
-    if (pending) setCode(pending);
-  }, [pending]);
+  const typedSomething = text.trim().length > 0;
+  const failure: TxKeyPath | null =
+    typedSomething && !code ? 'partner.join.no_code' : errorKey(redeem.error);
 
-  const failure = errorKey(redeem.error);
   return (
     <View className="rounded-card bg-surface p-5" testID="partner-join-card">
       <Text className="font-heading text-[20px] text-ink">
@@ -62,15 +72,23 @@ export function JoinCard() {
       </Text>
       <View className="mt-4">
         <Input
-          placeholder={translate('partner.join.code_placeholder')}
-          value={code}
-          onChangeText={setCode}
-          autoCapitalize="characters"
+          label={translate('partner.join.code_or_link')}
+          value={text}
+          onChangeText={setText}
+          autoCapitalize="none"
           autoCorrect={false}
-          maxLength={CODE_MAX_LENGTH}
+          maxLength={INPUT_MAX_LENGTH}
           error={failure ? translate(failure) : undefined}
           testID="partner-join-code"
         />
+        {code && code !== text.trim().toUpperCase() ? (
+          <Text
+            className="mb-3 text-[13px] text-tone-700"
+            testID="partner-join-found"
+          >
+            {translate('partner.invite.code_label')}: {code}
+          </Text>
+        ) : null}
         <Input
           label={translate('partner.join.your_name')}
           value={name}
@@ -82,9 +100,9 @@ export function JoinCard() {
       <Button
         label={translate('partner.join.submit')}
         loading={redeem.isPending}
-        disabled={code.trim().length === 0}
+        disabled={!code}
         onPress={() =>
-          redeem.mutate({ code: code.trim(), display_name: name.trim() })
+          code && redeem.mutate({ code, display_name: name.trim() })
         }
         testID="partner-join-submit"
         className="mt-2 rounded-pill"

@@ -15,6 +15,7 @@ import { MedicalDisclaimerGate } from '@/components/legal';
 import { AppErrorBoundary } from '@/components/ui';
 import { useAuth, usePaletteColors } from '@/lib';
 import { FEATURES } from '@/lib/features';
+import { usePersonalizationProfile } from '@/lib/health';
 import { translate } from '@/lib/i18n';
 import { usePartnerNudgeSync, usePartnerSide } from '@/lib/partner';
 import { usePeriodReminderSync } from '@/lib/reminders';
@@ -47,9 +48,12 @@ function PartnerNudgeSync() {
 export default function TabLayout() {
   const status = useAuth.use.status();
   const palette = usePaletteColors();
-  // A partner only sees Home (her status); her tracking tabs are hidden.
+  // A partner account only sees Home (her status) and Partner; her tracking
+  // tabs are hidden, linked or not (same rule as Home).
   const { isPartner } = usePartnerSide();
-  const herTab = isPartner ? null : undefined;
+  const { profile } = usePersonalizationProfile();
+  const herTab =
+    isPartner || profile.appIntent === 'partner' ? null : undefined;
 
   if (!status) return null;
   return (

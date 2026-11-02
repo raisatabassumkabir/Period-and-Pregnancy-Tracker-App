@@ -46,6 +46,12 @@ if [ "$1" = "web" ]; then
   echo "Running database migrations..."
   uv run manage.py migrate --noinput
 
+  # Dev only: the mobile app's demo logins as real accounts (seed refuses DEBUG=False).
+  if [ "$DJANGO_SETTINGS_MODULE" = "config.settings.dev" ]; then
+    echo "Seeding demo accounts..."
+    uv run manage.py seed_demo_accounts
+  fi
+
   echo "Collecting static files..."
   uv run manage.py collectstatic --noinput
 

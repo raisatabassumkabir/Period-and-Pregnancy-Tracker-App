@@ -219,6 +219,9 @@ PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
 # Android App Links for partner invites (/p/<code>). The fingerprint must be the
 # Play App Signing key (Play Console > App integrity), not the upload key.
 ANDROID_APP_PACKAGE = os.environ.get("ANDROID_APP_PACKAGE", "com.happywomen.app")
+# The app's deep-link scheme (apps/mobile/env.js SCHEME): the invite page's
+# "Open in the app" button uses it when the App Link is not verified yet.
+ANDROID_APP_SCHEME = os.environ.get("ANDROID_APP_SCHEME", "happywomen")
 ANDROID_APP_SHA256_FINGERPRINTS = [
     fp.strip()
     for fp in os.environ.get("ANDROID_APP_SHA256_FINGERPRINTS", "").split(",")

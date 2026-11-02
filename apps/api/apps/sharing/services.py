@@ -49,19 +49,36 @@ def hash_code(code: str) -> str:
     return hashlib.sha256(normalise_code(code).encode()).hexdigest()
 
 
-def invite_url(code: str) -> str:
+def invite_url(code: str, request=None) -> str:
+    """
+    The link she shares. In development PUBLIC_BASE_URL is localhost, which a
+    phone can't reach, so the link uses the host the app called instead
+    (e.g. 10.0.2.2:8000 from the emulator).
+    """
+    if settings.DEBUG and request is not None:
+        return request.build_absolute_uri(f"/p/{code}")
     return f"{settings.PUBLIC_BASE_URL.rstrip('/')}/p/{code}"
+
+
+def active_invites(user):
+    """Her open invite (at most one): unredeemed and not yet expired."""
+    return PartnerInvite.objects.for_user(user).filter(
+        redeemed_at__isnull=True, expires_at__gt=timezone.now()
+    )
 
 
 @transaction.atomic
 def create_invite(user, display_name: str = "") -> tuple[PartnerInvite, str]:
-    """Replaces her open invites with a fresh one; returns it and the plain code once."""
+    """Replaces her open invites with a fresh one. One partner at a time."""
+    if PartnerLink.objects.for_user(user).exists():
+        raise Conflict({"code": ["You are already linked to a partner. Unlink first."]})
     PartnerInvite.objects.for_user(user).filter(redeemed_at__isnull=True).delete()
     refresh_shared_status(user)
     code = _generate_code()
     invite = PartnerInvite.objects.create(
         user=user,
         code_hash=hash_code(code),
+        code=code,
         display_name=display_name,
         expires_at=timezone.now() + INVITE_TTL,
     )
@@ -96,8 +113,10 @@ def redeem_invite(partner, code: str, display_name: str = "") -> PartnerLink:
             )
     except IntegrityError as exc:
         raise Conflict({"code": ["One of you is already linked to a partner."]}) from exc
+    # A used code is worthless; don't keep it around.
     invite.redeemed_at = timezone.now()
-    invite.save(update_fields=["redeemed_at", "updated_at"])
+    invite.code = ""
+    invite.save(update_fields=["redeemed_at", "code", "updated_at"])
     return link
 
 

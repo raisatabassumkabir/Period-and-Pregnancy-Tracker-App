@@ -21,12 +21,15 @@ const _usePartnerLinks = createQuery<
 /** Only the options callers need; spreading the full generic type erases the data type. */
 interface Options {
   enabled?: boolean;
+  /** Poll while an invite is waiting, so her screen flips to "linked" by itself. */
+  refetchInterval?: number | false;
 }
 
 export function usePartnerLinks(options: Options = {}) {
   const token = useAuth((state) => state.token);
   return _usePartnerLinks({
     enabled: !!token && (options.enabled ?? true),
+    refetchInterval: options.refetchInterval ?? false,
   });
 }
 

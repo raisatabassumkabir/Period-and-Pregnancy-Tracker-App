@@ -1,7 +1,7 @@
 """
 Partner sharing endpoints.
 
-- /api/partner-invites/   her: create (returns the code once), read, rename, delete
+- /api/partner-invites/   her: create, list her open invite (code + link), read, rename, delete
 - /api/partner-links/     either side: redeem a code (POST), list, unlink (DELETE);
                           her only: change share switches (PATCH)
 - /api/shared-statuses/   the partner: her narrow status (0 or 1 rows)
@@ -26,6 +26,7 @@ NO_STORE = {"Cache-Control": "private, no-store"}
 
 class PartnerInviteViewSet(
     mixins.CreateModelMixin,
+    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
@@ -33,21 +34,25 @@ class PartnerInviteViewSet(
 ):
     serializer_class = PartnerInviteSerializer
     queryset = PartnerInvite.objects.none()  # schema generation only
+    pagination_class = None  # at most one open invite
 
     def get_queryset(self):
+        if self.action == "list":
+            return services.active_invites(self.request.user)
         return PartnerInvite.objects.for_user(self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response["Cache-Control"] = NO_STORE["Cache-Control"]
+        return response
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        invite, code = services.create_invite(
+        invite, _code = services.create_invite(
             request.user, serializer.validated_data.get("display_name", "")
         )
-        body = {
-            **PartnerInviteSerializer(invite).data,
-            "code": code,
-            "url": services.invite_url(code),
-        }
+        body = self.get_serializer(invite).data
         return Response(body, status=status.HTTP_201_CREATED, headers=NO_STORE)
 
 

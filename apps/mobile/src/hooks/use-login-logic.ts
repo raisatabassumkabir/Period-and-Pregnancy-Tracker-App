@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 
 import { useLogin } from '@/api/auth';
@@ -7,6 +8,7 @@ import {
   clearUserStateForCleanTest,
   findDemoAccount,
   isCleanTestAccount,
+  offlineTokensFor,
   seedDemoUserState,
 } from '@/lib/auth/demo-users';
 
@@ -15,6 +17,21 @@ import type { LoginFormValues } from './auth-schemas';
 import { loginSchema } from './auth-schemas';
 
 const LOGIN_FIELDS = ['email', 'password'] as const;
+
+/** No response at all: offline, or the server is down. A 401 is a real answer. */
+function isUnreachable(error: unknown): boolean {
+  return isAxiosError(error) && !error.response;
+}
+
+/** Demo accounts get their on-phone profile; clean-test ones start blank. */
+async function prepareLocalState(email: string): Promise<void> {
+  if (isCleanTestAccount(email)) {
+    await clearUserStateForCleanTest();
+    return;
+  }
+  const demo = findDemoAccount(email);
+  if (demo) await seedDemoUserState(demo);
+}
 
 export const useLoginLogic = () => {
   const signIn = useAuth.use.signIn();
@@ -26,44 +43,30 @@ export const useLoginLogic = () => {
     mode: 'onTouched',
   });
 
+  /**
+   * Every account, demo ones included, logs in through the real API: demo
+   * accounts exist on the server (`manage.py seed_demo_accounts`), so testing
+   * them tests the real backend. Only when the server can't be reached at all
+   * does a demo login fall back to an offline, on-phone session.
+   */
   const handleLogin = async (values: LoginFormValues) => {
-    const trimmedEmail = values.email.trim();
-
-    if (isCleanTestAccount(trimmedEmail)) {
-      await clearUserStateForCleanTest();
-      try {
-        const tokens = await loginMutation.mutateAsync({
-          email: trimmedEmail,
-          password: values.password,
-        });
-        signIn({ access: tokens.access, refresh: tokens.refresh });
-      } catch {
-        // Allows testing clean-slate flow even when local Django backend is offline
-        signIn({
-          access: `clean-test-access-token`,
-          refresh: `clean-test-refresh-token`,
-        });
-      }
-      return;
-    }
-
-    const demo = findDemoAccount(trimmedEmail);
-    if (demo) {
-      await seedDemoUserState(demo);
-      signIn({
-        access: `demo-access-token-${demo.mode}`,
-        refresh: `demo-refresh-token-${demo.mode}`,
-      });
-      return;
-    }
-
+    const email = values.email.trim();
     try {
       const tokens = await loginMutation.mutateAsync({
-        email: values.email.trim(),
+        email,
         password: values.password,
       });
+      await prepareLocalState(email);
       signIn({ access: tokens.access, refresh: tokens.refresh });
     } catch (error: unknown) {
+      const offline = isUnreachable(error)
+        ? offlineTokensFor(email, values.password)
+        : null;
+      if (offline) {
+        await prepareLocalState(email);
+        signIn(offline);
+        return;
+      }
       applyProblemToForm({
         form,
         error,

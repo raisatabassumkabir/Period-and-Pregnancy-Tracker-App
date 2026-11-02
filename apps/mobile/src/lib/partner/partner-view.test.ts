@@ -2,7 +2,7 @@ import type { SharedStatus } from '@/api/types';
 
 import { planPartnerNudges } from './partner-nudges';
 import { derivePartnerView } from './partner-view';
-import { isPartnerCode } from './share-invite';
+import { extractPartnerCode, isPartnerCode } from './share-invite';
 import { kindMessageKey, supportIdeaKey } from './support-ideas';
 
 const TODAY = new Date(2026, 10, 2); // 2 Nov 2026, local
@@ -148,5 +148,25 @@ describe('isPartnerCode', () => {
     expect(isPartnerCode('hw7k3mq9xa')).toBe(true);
     expect(isPartnerCode('https://evil.example')).toBe(false);
     expect(isPartnerCode('HW-0000-1111')).toBe(false);
+  });
+});
+
+describe('extractPartnerCode', () => {
+  it('finds the code in a code, a link or her whole message', () => {
+    expect(extractPartnerCode('hw-7k3m-q9xa')).toBe('HW-7K3M-Q9XA');
+    expect(extractPartnerCode('http://10.0.2.2:8000/p/HW-7K3M-Q9XA')).toBe(
+      'HW-7K3M-Q9XA'
+    );
+    expect(
+      extractPartnerCode(
+        'Join me: https://x.app/p/HW-7K3M-Q9XA (or enter code HW-7K3M-Q9XA)'
+      )
+    ).toBe('HW-7K3M-Q9XA');
+    expect(extractPartnerCode('HW 7K3M Q9XA')).toBe('HW-7K3M-Q9XA');
+  });
+
+  it('returns null when there is no code', () => {
+    expect(extractPartnerCode('https://evil.example/p/nothing')).toBeNull();
+    expect(extractPartnerCode('')).toBeNull();
   });
 });

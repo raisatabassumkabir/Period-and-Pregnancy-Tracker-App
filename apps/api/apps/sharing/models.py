@@ -10,6 +10,8 @@ are about to add such a field here, stop and raise it first.
 RLS (migration 0001):
 - PartnerInvite: owner policy, plus a `redeem` policy that exposes one row
   only to a transaction that already knows its code (`app.invite_code_hash`).
+  The plain `code` is readable by her alone (owner policy), so she can see
+  and re-share her link; redeeming still looks invites up by hash only.
 - PartnerLink: visible to both people in it.
 - SharedStatus: owner policy, plus read-only access for her linked partner.
 """
@@ -26,8 +28,11 @@ from apps.core.models import OwnedModel, OwnedQuerySet, TimestampedModel
 class PartnerInvite(OwnedModel):
     """A one-time code she shares with her partner. `user` is her."""
 
-    # SHA-256 of the normalised code; the code itself is never stored.
+    # Redeem lookups match the SHA-256 of the normalised code, never `code`.
     code_hash = models.CharField(max_length=64, unique=True)
+    # Kept so she can copy or re-send her link later. Short-lived (7 days),
+    # single-use, and visible only to her.
+    code = models.CharField(max_length=20, blank=True, default="")
     display_name = models.CharField(max_length=40, blank=True, default="")
     expires_at = models.DateTimeField()
     redeemed_at = models.DateTimeField(null=True, blank=True)

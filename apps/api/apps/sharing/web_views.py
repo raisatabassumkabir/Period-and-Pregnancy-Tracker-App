@@ -45,5 +45,6 @@ class InviteLandingView(TemplateView):
             code=code.upper(),
             operator_name=settings.LEGAL_OPERATOR_NAME,
             play_store_url=settings.PLAY_STORE_URL,
+            app_url=f"{settings.ANDROID_APP_SCHEME}://p/{code.upper()}",
         )
         return context

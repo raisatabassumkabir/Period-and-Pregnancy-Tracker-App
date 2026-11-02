@@ -10,13 +10,15 @@ import type { SupportTopic } from '@/lib/partner';
 import { usePartnerSide } from '@/lib/partner';
 
 import { ConceiveCard } from './conceive-card';
+import { NotLinkedCard } from './not-linked-card';
 import { NudgeToggle } from './nudge-toggle';
 import { PartnerStatusCard } from './partner-status-card';
 import { SupportIdeaCard } from './support-idea-card';
 
 /** Home for a linked partner: her status, how she may feel, and how to help. */
 export function PartnerHome() {
-  const { link, view } = usePartnerSide();
+  const { link, view, isPartner } = usePartnerSide();
+  if (!isPartner) return <NotLinkedCard />;
   const name = link?.other_name || translate('partner.home.her_name_fallback');
   const topic: SupportTopic | null =
     view.kind === 'pregnancy' ? 'pregnancy' : view.phase;

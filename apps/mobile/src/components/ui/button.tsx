@@ -150,6 +150,7 @@ export const Button = React.forwardRef<View, Props>(
             ) : (
               <Text
                 testID={testID ? `${testID}-label` : undefined}
+                numberOfLines={1}
                 className={styles.label({ className: textClassName })}
               >
                 {text}

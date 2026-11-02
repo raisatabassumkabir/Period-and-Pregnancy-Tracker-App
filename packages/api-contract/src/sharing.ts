@@ -12,22 +12,25 @@ export interface PartnerInviteCreate {
   display_name?: string;
 }
 
-/** `GET /api/partner-invites/{id}/`. The code itself is never readable again. */
+/**
+ * Her invite: `GET /api/partner-invites/` (her open one, 0 or 1, unpaginated),
+ * `GET /api/partner-invites/{id}/`, and the 201 from `POST`. Readable by her only.
+ * `POST` is 409 while she is already linked.
+ */
 export interface PartnerInvite {
   id: string;
+  /** e.g. `HW-7K3M-Q9XA`; empty once redeemed. Case, spaces and dashes don't matter. */
+  code: string;
+  /** `https://<host>/p/<code>`: opens the app (App Link) or a page with an "Open in app" button. */
+  url: string;
   display_name: string;
   /** RFC 3339 UTC. Invites last 7 days. */
   expires_at: string;
   redeemed_at: string | null;
 }
 
-/** `201` from `POST /api/partner-invites/`: the only time the code is returned. */
-export interface PartnerInviteCreated extends PartnerInvite {
-  /** e.g. `HW-7K3M-Q9XA`. Case, spaces and dashes don't matter when redeeming. */
-  code: string;
-  /** `https://<host>/p/<code>`: opens the app (Android App Link) or a fallback page. */
-  url: string;
-}
+/** The create response is a plain `PartnerInvite`; kept for existing imports. */
+export type PartnerInviteCreated = PartnerInvite;
 
 /**
  * `POST /api/partner-links/` body (partner side).

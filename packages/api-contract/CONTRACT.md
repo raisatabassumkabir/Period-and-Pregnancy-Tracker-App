@@ -119,17 +119,19 @@ enforces it); the only thing they can read is `SharedStatus`: date anchors
 (cycle and period length, last period start, next period, ovulation, due date).
 Never symptoms, mood, notes, intercourse logs or screening results.
 
-| Method + path                                 | Who     | Success                                                   | Errors                                                                        |
-| --------------------------------------------- | ------- | --------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `POST /api/partner-invites/`                  | her     | 201 `PartnerInviteCreated` (the code, returned only here) | 422                                                                           |
-| `GET/PATCH/DELETE /api/partner-invites/{id}/` | her     | 200 / 200 / 204                                           | 404                                                                           |
-| `POST /api/partner-links/` with `{code}`      | partner | 201 `PartnerLink`                                         | 404 unknown **or** expired (same body), 409 already linked, 422 own code, 429 |
-| `GET /api/partner-links/`                     | either  | 200 `PartnerLink[]` (0 or 1, unpaginated)                 |                                                                               |
-| `PATCH /api/partner-links/{id}/`              | her     | 200                                                       | 403 for the partner, 404                                                      |
-| `DELETE /api/partner-links/{id}/`             | either  | 204, access ends immediately                              | 404                                                                           |
-| `GET /api/shared-statuses/`                   | partner | 200 `SharedStatus[]` (0 or 1, unpaginated)                |                                                                               |
+| Method + path                                 | Who     | Success                                                      | Errors                                                                        |
+| --------------------------------------------- | ------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `POST /api/partner-invites/`                  | her     | 201 `PartnerInvite` (code + link)                            | 409 already linked, 422                                                       |
+| `GET /api/partner-invites/`                   | her     | 200 `PartnerInvite[]`: her open invite (0 or 1, unpaginated) |                                                                               |
+| `GET/PATCH/DELETE /api/partner-invites/{id}/` | her     | 200 / 200 / 204                                              | 404                                                                           |
+| `POST /api/partner-links/` with `{code}`      | partner | 201 `PartnerLink`                                            | 404 unknown **or** expired (same body), 409 already linked, 422 own code, 429 |
+| `GET /api/partner-links/`                     | either  | 200 `PartnerLink[]` (0 or 1, unpaginated)                    |                                                                               |
+| `PATCH /api/partner-links/{id}/`              | her     | 200                                                          | 403 for the partner, 404                                                      |
+| `DELETE /api/partner-links/{id}/`             | either  | 204, access ends immediately                                 | 404                                                                           |
+| `GET /api/shared-statuses/`                   | partner | 200 `SharedStatus[]` (0 or 1, unpaginated)                   |                                                                               |
 
-- A new invite replaces her unredeemed one. Invites expire after 7 days and are single use.
+- A new invite replaces her unredeemed one. Invites expire after 7 days and are single use;
+  redeeming clears the stored code. Only she can read her code (database RLS).
 - Share switches apply on every read: `share_fertile_window: false` nulls
   `ovulation_date`; `share_pregnancy: false` nulls `pregnancy_due_date` and
   reports a pregnancy or postpartum `mode` as `private`.

@@ -3,6 +3,8 @@ import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import * as React from 'react';
 
+import { onSignOut } from '@/lib/auth';
+
 import { networkInformation } from './network-information';
 import { queryPersister } from './query-persister';
 
@@ -23,6 +25,18 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+/**
+ * Cached responses belong to whoever was signed in. Without this, the next
+ * person to sign in on the same phone sees the previous account's data
+ * (cycles, her pairing code) until each query refetches.
+ */
+export function clearUserCache(): void {
+  queryClient.clear();
+  queryPersister.removeClient();
+}
+
+onSignOut(clearUserCache);
 
 export function APIProvider({ children }: { children: React.ReactNode }) {
   useReactQueryDevTools(queryClient);

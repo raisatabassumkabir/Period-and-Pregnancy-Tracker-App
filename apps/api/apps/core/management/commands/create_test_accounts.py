@@ -15,9 +15,9 @@ from apps.pregnancy.models import Pregnancy
 from apps.users.models import Profile, User
 
 TEST_ACCOUNTS = [
-    {"email": "test1@happywomen.com", "password": "TestUser2026!"},
-    {"email": "test2@happywomen.com", "password": "TestUser2026!"},
-    {"email": "test3@happywomen.com", "password": "TestUser2026!"},
+    {"email": "test1@happywomen.com", "password": "HappyWomen2026!"},
+    {"email": "test2@happywomen.com", "password": "HappyWomen2026!"},
+    {"email": "test3@happywomen.com", "password": "HappyWomen2026!"},
 ]
 
 

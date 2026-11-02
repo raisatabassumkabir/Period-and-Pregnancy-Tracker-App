@@ -379,13 +379,25 @@
       "title": "Share with your partner",
       "body": "Your partner gets a heads-up before your period, a guide to how you may feel, and small ideas to support you. They never see your symptoms, moods or notes.",
       "your_name": "Your name (what your partner sees)",
-      "create": "Create invite",
       "code_label": "Your partner code",
       "expires": "Valid for 7 days, single use.",
-      "whatsapp": "Send on WhatsApp",
       "share": "Share link",
       "message": "I use Happy Women to track my cycle. Join me so you know how I'm doing: {{url}} (or enter code {{code}} in the app).",
-      "share_failed": "Couldn't open that app. Try another way to share."
+      "share_failed": "Couldn't open that app. Try another way to share.",
+      "create_code": "Create pairing code",
+      "share_title": "Share the pairing code",
+      "share_body": "Send this code or link to your partner. They install Happy Women and enter it to pair with you.",
+      "valid_until": "Valid until {{date}}",
+      "send_code": "Send on WhatsApp",
+      "copy_link": "Copy link",
+      "copied": "Link copied",
+      "lost_code": "Lost the code? Create a new one",
+      "cancel": "Cancel invite",
+      "cancel_confirm": "This code will stop working straight away.",
+      "pull_to_refresh": "Waiting for your partner to join. Pull down to refresh.",
+      "tap_to_copy": "Tap the code to copy the link",
+      "link_label": "Your partner link",
+      "copy_shared": "Choose \"Copy\" in the menu to copy your link."
     },
     "linked": {
       "title": "Linked with {{name}}",
@@ -399,7 +411,7 @@
     },
     "join": {
       "title": "Join your partner",
-      "body": "Enter the code she shared with you.",
+      "body": "Paste the link she sent you, or type her code.",
       "code_placeholder": "HW-XXXX-XXXX",
       "your_name": "Your name (what she sees)",
       "submit": "Link up",
@@ -407,7 +419,11 @@
       "conflict": "One of you is already linked to a partner.",
       "own_code": "That's your own code. Send it to your partner instead.",
       "too_many": "Too many tries. Please wait an hour and try again.",
-      "success": "You're linked! You'll see her updates here."
+      "success": "You're linked! You'll see her updates here.",
+      "code_or_link": "Her link or code",
+      "paste": "Paste",
+      "no_code": "There is no partner code in that text. Paste the link she sent, or type the code (HW-XXXX-XXXX).",
+      "choose_title": "I received a link or code"
     },
     "home": {
       "kicker": "Your partner",
@@ -504,6 +520,12 @@
         "1": "You're doing an incredible job. Rest, I'll handle things."
       }
     },
-    "support_tab": "Support"
+    "support_tab": "Support",
+    "network_error": "Can't reach Happy Women right now. Check your connection and try again.",
+    "generic_error": "Something went wrong. Please try again.",
+    "offline": {
+      "title": "Couldn't reach the server",
+      "body": "Happy Women could not reach the server when you signed in, so you are using an offline session on this phone. Pairing needs the server: start it, then sign out and log in again."
+    }
   }
 }

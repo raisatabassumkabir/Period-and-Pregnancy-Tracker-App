@@ -27,3 +27,18 @@ export function isPartnerCode(
 ): value is string {
   return !!value && CODE_PATTERN.test(value.trim());
 }
+
+/** Same shape, found anywhere inside a longer text (a link or her whole message). */
+const CODE_IN_TEXT = /HW[-\s]?([A-Z2-9]{4})[-\s]?([A-Z2-9]{4})(?![A-Z0-9])/i;
+
+/**
+ * The partner may paste her code, her link (`https://…/p/HW-7K3M-Q9XA`) or the
+ * whole WhatsApp message. Returns the normalised code `HW-7K3M-Q9XA`, or null.
+ */
+export function extractPartnerCode(
+  text: string | undefined | null
+): string | null {
+  const match = text?.match(CODE_IN_TEXT);
+  if (!match) return null;
+  return `HW-${match[1]}-${match[2]}`.toUpperCase();
+}

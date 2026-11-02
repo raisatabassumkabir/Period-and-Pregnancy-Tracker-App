@@ -6,7 +6,7 @@ from django.utils import timezone
 from apps.core.rls import rls_bypass, rls_user
 from apps.sharing.models import PartnerInvite, PartnerLink, SharedStatus
 from apps.sharing.serializers import SharedStatusSerializer
-from apps.sharing.services import normalise_code
+from apps.sharing.services import hash_code, normalise_code
 from apps.users.models import Profile
 from conftest import create_owned
 from tests.factories import CycleFactory, ProfileFactory, UserFactory
@@ -58,15 +58,43 @@ def assert_problem(response, status):
 
 
 class TestInvites:
-    def test_create_returns_code_once_and_never_stores_it(self, as_user, her):
+    def test_create_returns_the_code_and_link(self, as_user, her):
         body = invite(as_user(her))
         assert body["code"].startswith("HW-")
         assert body["url"].endswith(f"/p/{body['code']}")
         with rls_user(str(her.pk)):
             stored = PartnerInvite.objects.for_user(her).get()
-        assert body["code"] not in stored.code_hash
-        detail = as_user(her).get(f"{INVITES}{body['id']}/").json()
-        assert "code" not in detail
+        assert stored.code_hash == hash_code(body["code"])
+
+    def test_no_new_invite_while_linked(self, as_user, her, user_b):
+        code = invite(as_user(her))["code"]
+        as_user(user_b).post(LINKS, {"code": code}, format="json")
+        response = as_user(her).post(INVITES, {}, format="json")
+        assert_problem(response, 409)
+
+    def test_she_can_read_her_open_invite_again(self, as_user, her):
+        created = invite(as_user(her))
+        response = as_user(her).get(INVITES)
+        assert response.status_code == 200
+        assert response["Cache-Control"] == "private, no-store"
+        [current] = response.json()
+        assert current["code"] == created["code"]
+        assert current["url"] == created["url"]
+
+    def test_open_invite_list_hides_redeemed_and_expired(self, as_user, her, user_b):
+        code = invite(as_user(her))["code"]
+        as_user(user_b).post(LINKS, {"code": code}, format="json")
+        assert as_user(her).get(INVITES).json() == []
+        with rls_user(str(her.pk)):
+            assert PartnerInvite.objects.for_user(her).get().code == ""
+
+    def test_nobody_else_sees_her_invite(self, as_user, her, user_b):
+        invite(as_user(her))
+        assert as_user(user_b).get(INVITES).json() == []
+
+    def test_landing_page_offers_to_open_the_app(self, client, as_user, her):
+        code = invite(as_user(her))["code"]
+        assert f"happywomen://p/{code}".encode() in client.get(f"/p/{code}").content
 
     def test_new_invite_replaces_the_open_one(self, as_user, her):
         invite(as_user(her))

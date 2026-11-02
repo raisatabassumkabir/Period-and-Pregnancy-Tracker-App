@@ -12,6 +12,8 @@ export interface DemoUserAccount {
   description: string;
   mode: AppMode;
   profile: PersonalizationProfile;
+  /** Partner POV: no health data of his own, so no offline cycle seed. */
+  isPartner?: boolean;
 }
 
 export const DEMO_PASSWORD = 'Password123!';
@@ -92,6 +94,33 @@ export const DEMO_ACCOUNTS: readonly DemoUserAccount[] = [
       hasCompletedOnboarding: true,
     },
   },
+  {
+    email: 'daniel.partner@gmail.com',
+    password: DEMO_PASSWORD,
+    name: 'Daniel Bennett',
+    title: 'Partner POV',
+    badge: 'Partner',
+    description:
+      'Pairs with Claire using her link or code, then sees her phase, period countdown and ideas to support her.',
+    mode: 'cycle',
+    isPartner: true,
+    profile: {
+      fullName: 'Daniel Bennett',
+      dateOfBirth: '1997-02-03',
+      age: 29,
+      height: '178',
+      weight: '76',
+      averageCycleLength: 28,
+      averagePeriodDuration: 5,
+      mode: 'cycle_tracking',
+      diet: 'unspecified',
+      medicalConditions: [],
+      goals: [],
+      source: 'Friends or Family',
+      hasCompletedOnboarding: true,
+      appIntent: 'partner',
+    },
+  },
 ];
 
 export const CLEAN_TEST_PASSWORD = 'HappyWomen2026!';
@@ -162,7 +191,41 @@ export async function clearUserStateForCleanTest(): Promise<void> {
 }
 
 const SEEDED_DEMO_TOKEN_PREFIX = 'demo-';
+const PARTNER_DEMO_TOKEN_PREFIX = 'demo-partner-';
 const CLEAN_TEST_TOKEN_PREFIX = 'clean-test-';
+
+export interface OfflineTokens {
+  access: string;
+  refresh: string;
+}
+
+/**
+ * Fallback ONLY for when the server can't be reached: a demo or clean-test
+ * login with the right password still opens the app, offline. These tokens
+ * are fake, so nothing that needs the server (e.g. partner pairing) works.
+ * Every demo account is also a real server account
+ * (apps/api: `manage.py seed_demo_accounts`), which is the normal path.
+ */
+export function offlineTokensFor(
+  email: string,
+  password: string
+): OfflineTokens | null {
+  if (isCleanTestAccount(email) && password === CLEAN_TEST_PASSWORD) {
+    return {
+      access: `${CLEAN_TEST_TOKEN_PREFIX}access-token`,
+      refresh: `${CLEAN_TEST_TOKEN_PREFIX}refresh-token`,
+    };
+  }
+  const demo = findDemoAccount(email);
+  if (!demo || password !== demo.password) return null;
+  const prefix = demo.isPartner
+    ? PARTNER_DEMO_TOKEN_PREFIX
+    : SEEDED_DEMO_TOKEN_PREFIX;
+  return {
+    access: `${prefix}access-token-${demo.mode}`,
+    refresh: `${prefix}refresh-token-${demo.mode}`,
+  };
+}
 
 export function isDemoToken(token: string | undefined | null): boolean {
   if (!token) return false;
@@ -178,5 +241,6 @@ export function isDemoToken(token: string | undefined | null): boolean {
  * the empty state and the "last period" prompt like a real new account.
  */
 export function isSeededDemoToken(token: string | undefined | null): boolean {
-  return token?.startsWith(SEEDED_DEMO_TOKEN_PREFIX) ?? false;
+  if (!token || token.startsWith(PARTNER_DEMO_TOKEN_PREFIX)) return false;
+  return token.startsWith(SEEDED_DEMO_TOKEN_PREFIX);
 }

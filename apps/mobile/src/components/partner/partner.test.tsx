@@ -1,7 +1,9 @@
 import React from 'react';
 
 import {
+  useCancelPartnerInvite,
   useCreatePartnerInvite,
+  useOpenInvite,
   usePartnerLink,
   usePartnerLinks,
   useRedeemPartnerCode,
@@ -18,6 +20,8 @@ import { PartnerHome } from './partner-home';
 
 jest.mock('@/api/sharing', () => ({
   useCreatePartnerInvite: jest.fn(),
+  useCancelPartnerInvite: jest.fn(),
+  useOpenInvite: jest.fn(),
   useRedeemPartnerCode: jest.fn(),
   usePartnerLinks: jest.fn(),
   usePartnerLink: jest.fn(),
@@ -70,26 +74,54 @@ afterEach(() => {
   usePendingPartnerCode.setState({ code: null, hydrated: true });
 });
 
+const OPEN_INVITE = {
+  id: 'i1',
+  code: 'HW-7K3M-Q9XA',
+  url: 'http://10.0.2.2:8000/p/HW-7K3M-Q9XA',
+  display_name: 'Raisa',
+  expires_at: '2026-11-09T00:00:00Z',
+  redeemed_at: null,
+};
+
+function givenInvite(invite: typeof OPEN_INVITE | null) {
+  const idle = { mutate: jest.fn(), isPending: false, error: null };
+  mocked(useCreatePartnerInvite).mockReturnValue(idle);
+  mocked(useCancelPartnerInvite).mockReturnValue(idle);
+  mocked(useOpenInvite).mockReturnValue({ invite });
+  return idle;
+}
+
 describe('InviteCard', () => {
-  it('shows the code and share buttons once the invite exists', () => {
-    mocked(useCreatePartnerInvite).mockReturnValue({
-      mutate: jest.fn(),
-      isPending: false,
-      data: {
-        id: 'i1',
-        code: 'HW-7K3M-Q9XA',
-        url: 'https://api.example/p/HW-7K3M-Q9XA',
-        display_name: 'Raisa',
-        expires_at: '2026-11-09T00:00:00Z',
-        redeemed_at: null,
-      },
-    });
+  it('asks for her name and creates a code when she has none', async () => {
+    const { mutate } = givenInvite(null);
+    const { user } = setup(<InviteCard />);
+    await user.type(screen.getByTestId('partner-invite-name'), 'Raisa');
+    await user.press(screen.getByTestId('partner-invite-create'));
+    expect(mutate).toHaveBeenCalledWith({ display_name: 'Raisa' });
+  });
+
+  it('keeps showing her open code and link with copy and share buttons', () => {
+    givenInvite(OPEN_INVITE);
     setup(<InviteCard />);
     expect(screen.getByTestId('partner-invite-code')).toHaveTextContent(
       'HW-7K3M-Q9XA'
     );
-    expect(screen.getByTestId('partner-invite-whatsapp')).toBeOnTheScreen();
-    expect(screen.getByTestId('partner-invite-share')).toBeOnTheScreen();
+    expect(screen.getByTestId('partner-invite-url')).toHaveTextContent(
+      OPEN_INVITE.url
+    );
+    ['whatsapp', 'copy', 'share', 'new-code', 'cancel'].forEach((id) =>
+      expect(screen.getByTestId(`partner-invite-${id}`)).toBeOnTheScreen()
+    );
+  });
+
+  it('says when the server cannot be reached', () => {
+    const idle = givenInvite(null);
+    mocked(useCreatePartnerInvite).mockReturnValue({
+      ...idle,
+      error: { message: 'Network Error' },
+    });
+    setup(<InviteCard />);
+    expect(screen.getByText(/Can't reach Happy Women/)).toBeOnTheScreen();
   });
 });
 
@@ -106,6 +138,39 @@ describe('JoinCard', () => {
       'value',
       'HW-7K3M-Q9XA'
     );
+  });
+
+  it('takes the code out of a pasted link and redeems only the code', async () => {
+    const mutate = jest.fn();
+    mocked(useRedeemPartnerCode).mockReturnValue({
+      mutate,
+      isPending: false,
+      error: null,
+    });
+    const { user } = setup(<JoinCard />);
+    await user.type(
+      screen.getByTestId('partner-join-code'),
+      'http://10.0.2.2:8000/p/HW-7K3M-Q9XA'
+    );
+    expect(screen.getByTestId('partner-join-found')).toHaveTextContent(
+      /HW-7K3M-Q9XA/
+    );
+    await user.press(screen.getByTestId('partner-join-submit'));
+    expect(mutate).toHaveBeenCalledWith({
+      code: 'HW-7K3M-Q9XA',
+      display_name: '',
+    });
+  });
+
+  it('explains when the pasted text has no code', async () => {
+    mocked(useRedeemPartnerCode).mockReturnValue({
+      mutate: jest.fn(),
+      isPending: false,
+      error: null,
+    });
+    const { user } = setup(<JoinCard />);
+    await user.type(screen.getByTestId('partner-join-code'), 'hello');
+    expect(screen.getByText(/no partner code in that text/)).toBeOnTheScreen();
   });
 
   it.each([
@@ -125,6 +190,15 @@ describe('JoinCard', () => {
 });
 
 describe('PartnerHome', () => {
+  it('asks a partner account that is not linked yet to link, not for a period', () => {
+    mocked(usePartnerLinks).mockReturnValue({ data: [] });
+    mocked(usePartnerLink).mockReturnValue(null);
+    mocked(useSharedStatuses).mockReturnValue({ data: [] });
+    setup(<PartnerHome />);
+    expect(screen.getByTestId('partner-not-linked')).toBeOnTheScreen();
+    expect(screen.queryByTestId('partner-status-card')).toBeNull();
+  });
+
   it('shows her name, period day, a support idea and the partner guide', () => {
     givenPartnerOf(status());
     setup(<PartnerHome />);

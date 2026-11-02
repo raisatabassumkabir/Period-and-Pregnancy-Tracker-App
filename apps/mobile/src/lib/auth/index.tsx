@@ -14,6 +14,18 @@ interface AuthState {
   hydrate: () => void;
 }
 
+type SignOutListener = () => void;
+const signOutListeners = new Set<SignOutListener>();
+
+/**
+ * Runs on every sign-out. The API layer registers its cache wipe here (it
+ * imports this module, so this module can't import it back).
+ */
+export function onSignOut(listener: SignOutListener): () => void {
+  signOutListeners.add(listener);
+  return () => signOutListeners.delete(listener);
+}
+
 const _useAuth = create<AuthState>((set, get) => ({
   status: 'idle',
   token: null,
@@ -31,6 +43,7 @@ const _useAuth = create<AuthState>((set, get) => ({
     getBillingClient()
       .resetUser()
       .catch(() => {});
+    signOutListeners.forEach((listener) => listener());
     set({ status: 'signOut', token: null });
   },
   hydrate: () => {

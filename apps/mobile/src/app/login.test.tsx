@@ -183,4 +183,60 @@ describe('Login', () => {
     ).toBeOnTheScreen();
     expect(screen.getByTestId('login-button')).toBeDisabled();
   });
+
+  describe('demo accounts', () => {
+    const CLAIRE = 'claire.cycle@gmail.com';
+    const DEMO_PASSWORD = 'Password123!';
+    /** An axios error with no response: the server could not be reached. */
+    const unreachable = () =>
+      Object.assign(new Error('Network Error'), { isAxiosError: true });
+
+    async function logIn(email: string, password: string) {
+      const { user } = setup(<Login />);
+      await user.type(screen.getByTestId('email-input'), email);
+      await user.type(screen.getByTestId('password-input'), password);
+      await user.press(screen.getByTestId('login-button'));
+    }
+
+    it('logs a demo account in through the real API', async () => {
+      mockLogin();
+      mutateAsync.mockResolvedValue(TOKENS);
+      await logIn(CLAIRE, DEMO_PASSWORD);
+      await waitFor(() => expect(useAuth.getState().token).toEqual(TOKENS));
+      expect(mutateAsync).toHaveBeenCalledWith({
+        email: CLAIRE,
+        password: DEMO_PASSWORD,
+      });
+    });
+
+    it('falls back to an offline session only when the server is unreachable', async () => {
+      mockLogin();
+      mutateAsync.mockRejectedValue(unreachable());
+      await logIn(CLAIRE, DEMO_PASSWORD);
+      await waitFor(() =>
+        expect(useAuth.getState().token?.access).toMatch(/^demo-/)
+      );
+    });
+
+    it('never goes offline on a wrong password', async () => {
+      mockLogin();
+      mutateAsync.mockRejectedValue(
+        problem(401, {
+          type: 'https://apiguide.dev/errors/unauthorized',
+          title: 'Unauthorized',
+          status: 401,
+          detail: 'No active account found with the given credentials.',
+        })
+      );
+      await logIn(CLAIRE, 'wrong-password');
+      await waitFor(() => expect(mutateAsync).toHaveBeenCalled());
+      expect(useAuth.getState().token).toBeNull();
+    });
+
+    it('lists the partner demo account', () => {
+      mockLogin();
+      setup(<Login />);
+      expect(screen.getByTestId('demo-account-partner')).toBeOnTheScreen();
+    });
+  });
 });

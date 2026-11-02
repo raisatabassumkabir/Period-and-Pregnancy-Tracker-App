@@ -536,7 +536,14 @@ function PartnerHomeScreen() {
   );
 }
 
+/**
+ * A linked partner, or an account set up as a partner (onboarding "I have a
+ * partner code") that hasn't linked yet, gets the partner home. Never her
+ * cycle tracker: that would ask HIM for his last period.
+ */
 export default function Home() {
   const { isPartner } = usePartnerSide();
-  return isPartner ? <PartnerHomeScreen /> : <HerHome />;
+  const { profile } = usePersonalizationProfile();
+  const partnerAccount = isPartner || profile.appIntent === 'partner';
+  return partnerAccount ? <PartnerHomeScreen /> : <HerHome />;
 }

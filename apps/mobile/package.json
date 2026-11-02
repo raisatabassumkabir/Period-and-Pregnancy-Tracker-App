@@ -58,6 +58,7 @@
     "app-icon-badge": "^0.1.2",
     "axios": "^1.13.2",
     "expo": "~54.0.37",
+    "expo-clipboard": "~8.0.8",
     "expo-constants": "~18.0.14",
     "expo-crypto": "~15.0.9",
     "expo-dev-client": "~6.0.21",

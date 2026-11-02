@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.sharing import services
 from apps.sharing.models import PartnerInvite, PartnerLink, SharedStatus
 from apps.users.models import Profile
 
@@ -10,12 +11,17 @@ PRIVATE_MODE = "private"
 
 
 class PartnerInviteSerializer(serializers.ModelSerializer):
-    """The plain code is only ever returned once, from create (see the view)."""
+    """Her invite, with the code and the link to share. Only she can read it."""
+
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = PartnerInvite
-        fields = ["id", "display_name", "expires_at", "redeemed_at"]
-        read_only_fields = ["id", "expires_at", "redeemed_at"]
+        fields = ["id", "code", "url", "display_name", "expires_at", "redeemed_at"]
+        read_only_fields = ["id", "code", "url", "expires_at", "redeemed_at"]
+
+    def get_url(self, invite: PartnerInvite) -> str:
+        return services.invite_url(invite.code, self.context.get("request"))
 
 
 class RedeemSerializer(serializers.Serializer):
