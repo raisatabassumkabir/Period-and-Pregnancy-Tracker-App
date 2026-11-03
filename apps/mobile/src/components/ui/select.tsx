@@ -3,18 +3,17 @@ import {
   type BottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
+import { Check as CheckIcon } from 'lucide-react-native';
 import * as React from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 import { Platform, View } from 'react-native';
 import { Pressable, type PressableProps } from 'react-native';
-import type { SvgProps } from 'react-native-svg';
-import Svg, { Path } from 'react-native-svg';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { tv } from 'tailwind-variants';
 
-import colors from '@/components/ui/colors';
 import { CaretDown } from '@/components/ui/icons';
-import { useIsDarkMode } from '@/lib/hooks/use-selected-theme';
+import { usePaletteColors } from '@/lib/theme';
 
 import type { InputControllerType } from './input';
 import { Modal, useModal } from './modal';
@@ -56,30 +55,53 @@ const selectTv = tv({
 
 const List = Platform.OS === 'web' ? FlashList : BottomSheetFlatList;
 
-export type OptionType = { label: string; value: string | number };
+type OptionIcon = React.ComponentType<{ size?: number; color?: string }>;
+
+export type OptionType = {
+  label: string;
+  value: string | number;
+  /** Optional leading icon, drawn in a soft accent circle. */
+  icon?: OptionIcon;
+  /** Optional one-line helper under the label. */
+  description?: string;
+};
 
 type OptionsProps = {
   options: OptionType[];
   onSelect: (option: OptionType) => void;
   value?: string | number;
+  /** Sheet heading, e.g. "Theme". */
+  title?: string;
   testID?: string;
 };
+
+/** Handle + header + list padding; rows are fixed height so the sheet fits them exactly. */
+const SHEET_CHROME_HEIGHT = 32;
+const SHEET_TITLE_HEIGHT = 44;
+const OPTION_ROW_HEIGHT = 72;
+const OPTION_ICON_SIZE = 20;
+const CHECK_ICON_SIZE = 14;
 
 function keyExtractor(item: OptionType) {
   return `select-item-${item.value}`;
 }
 
 export const Options = React.forwardRef<BottomSheetModal, OptionsProps>(
-  ({ options, onSelect, value, testID }, ref) => {
-    const height = options.length * 70 + 100;
+  ({ options, onSelect, value, title, testID }, ref) => {
+    const insets = React.useContext(SafeAreaInsetsContext);
+    const palette = usePaletteColors();
+    const height =
+      SHEET_CHROME_HEIGHT +
+      (title ? SHEET_TITLE_HEIGHT : 0) +
+      options.length * OPTION_ROW_HEIGHT +
+      (insets?.bottom ?? 0);
     const snapPoints = React.useMemo(() => [height], [height]);
-    const isDark = useIsDarkMode();
 
     const renderSelectItem = React.useCallback(
       ({ item }: { item: OptionType }) => (
         <Option
           key={`select-item-${item.value}`}
-          label={item.label}
+          option={item}
           selected={value === item.value}
           onPress={() => onSelect(item)}
           testID={testID ? `${testID}-item-${item.value}` : undefined}
@@ -94,37 +116,84 @@ export const Options = React.forwardRef<BottomSheetModal, OptionsProps>(
         index={0}
         snapPoints={snapPoints}
         backgroundStyle={{
-          backgroundColor: isDark ? colors.neutral[800] : colors.white,
+          backgroundColor: palette.surface,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
         }}
       >
+        {title ? (
+          <Text className="px-5 pb-3 font-heading text-[20px] text-ink">
+            {title}
+          </Text>
+        ) : null}
         <List
           data={options}
           keyExtractor={keyExtractor}
           renderItem={renderSelectItem}
           testID={testID ? `${testID}-modal` : undefined}
-          estimatedItemSize={52}
+          estimatedItemSize={OPTION_ROW_HEIGHT}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
         />
       </Modal>
     );
   }
 );
 
+interface OptionProps extends PressableProps {
+  option: OptionType;
+  selected?: boolean;
+}
+
+/**
+ * One choice. Colour-only toggle between states: a runtime-toggled shadow
+ * crashes css-interop (see CLAUDE.md gotchas).
+ */
 const Option = React.memo(
-  ({
-    label,
-    selected = false,
-    ...props
-  }: PressableProps & {
-    selected?: boolean;
-    label: string;
-  }) => {
+  ({ option, selected = false, ...props }: OptionProps) => {
+    const palette = usePaletteColors();
+    const Icon = option.icon;
     return (
       <Pressable
-        className="flex-row items-center border-b border-divider bg-surface px-3 py-2"
+        accessibilityRole="radio"
+        accessibilityState={{ selected }}
+        className={`mb-2 h-16 flex-row items-center gap-3 rounded-panel border px-4 active:opacity-80 ${
+          selected ? 'border-accent bg-accent-100' : 'border-divider bg-canvas'
+        }`}
         {...props}
       >
-        <Text className="flex-1 dark:text-neutral-100 ">{label}</Text>
-        {selected && <Check />}
+        {Icon ? (
+          <View
+            className={`size-10 items-center justify-center rounded-full ${
+              selected ? 'bg-accent' : 'bg-accent-200'
+            }`}
+          >
+            <Icon
+              size={OPTION_ICON_SIZE}
+              color={selected ? '#FFFFFF' : palette.accent}
+            />
+          </View>
+        ) : null}
+        <View className="flex-1">
+          <Text
+            className={`text-[16px] text-ink ${
+              selected ? 'font-body-bold' : 'font-body-semibold'
+            }`}
+          >
+            {option.label}
+          </Text>
+          {option.description ? (
+            <Text className="text-[12px] text-tone-600" numberOfLines={1}>
+              {option.description}
+            </Text>
+          ) : null}
+        </View>
+        {selected ? (
+          <View className="size-6 items-center justify-center rounded-full bg-accent">
+            <CheckIcon size={CHECK_ICON_SIZE} color="#FFFFFF" strokeWidth={3} />
+          </View>
+        ) : (
+          <View className="size-6 rounded-full border-2 border-tone-300" />
+        )}
       </Pressable>
     );
   }
@@ -245,21 +314,3 @@ export function ControlledSelect<T extends FieldValues>(
     />
   );
 }
-
-const Check = ({ ...props }: SvgProps) => (
-  <Svg
-    width={25}
-    height={24}
-    fill="none"
-    viewBox="0 0 25 24"
-    {...props}
-    className="stroke-black dark:stroke-white"
-  >
-    <Path
-      d="m20.256 6.75-10.5 10.5L4.506 12"
-      strokeWidth={2.438}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);

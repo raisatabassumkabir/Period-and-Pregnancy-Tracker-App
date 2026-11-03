@@ -1,49 +1,100 @@
 import { Link } from 'expo-router';
-import { Sparkles } from 'lucide-react-native';
 import React from 'react';
 import type { TextInput } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
 import {
   AuthFooter,
   AuthLayout,
+  DemoAccountsPanel,
   EmailInput,
+  GoogleButton,
+  GoogleConsentSheet,
   PasswordInput,
+  TermsNotice,
 } from '@/components/auth';
-import { Button, ErrorBanner, Pressable, Text, View } from '@/components/ui';
+import {
+  Button,
+  ErrorBanner,
+  Pressable,
+  Text,
+  useModal,
+  View,
+} from '@/components/ui';
 import { useLoginLogic } from '@/hooks/use-login-logic';
-import { usePaletteColors } from '@/lib';
-import { CLEAN_TEST_ACCOUNTS, DEMO_ACCOUNTS } from '@/lib/auth/demo-users';
+
+/** The API has no Google sign-in endpoint yet (CONTRACT.md), so say so instead of failing silently. */
+function useGoogleSignIn() {
+  const sheet = useModal();
+  const onContinue = () => {
+    sheet.dismiss();
+    showMessage({
+      message: 'Google sign-in is coming soon',
+      description: 'For now, sign in with your email and password.',
+      type: 'info',
+    });
+  };
+  return { sheet, onContinue };
+}
+
+function FieldLabel({ children }: { children: string }) {
+  return (
+    <Text className="mb-2 font-body-bold text-[13px] text-ink">{children}</Text>
+  );
+}
+
+function OrDivider() {
+  return (
+    <View className="my-6 flex-row items-center gap-3">
+      <View className="flex-1 border-t border-divider" />
+      <Text className="text-[13px] text-tone-500">or</Text>
+      <View className="flex-1 border-t border-divider" />
+    </View>
+  );
+}
+
+function ForgotPasswordLink() {
+  return (
+    <View className="mb-6 mt-1 items-end">
+      <Link href="/forgot-password" asChild>
+        <Pressable accessibilityRole="link" testID="forgot-password-link">
+          <Text className="font-body-semibold text-[14px] text-accent-700">
+            Forgot password?
+          </Text>
+        </Pressable>
+      </Link>
+    </View>
+  );
+}
 
 export default function Login() {
-  const palette = usePaletteColors();
   const { form, handleLogin, selectDemoAccount, isSubmitting, errors } =
     useLoginLogic();
+  const google = useGoogleSignIn();
   const passwordRef = React.useRef<TextInput | null>(null);
-
   const submit = form.handleSubmit(handleLogin);
 
   return (
     <AuthLayout
       testID="login-screen"
       kicker="Welcome back"
-      title="Sign in to your account"
+      title="Sign in"
       subtitle="Continue your personal health journey."
-      activeTab="login"
       footer={
-        <AuthFooter
-          question="New to Happy Women?"
-          linkLabel="Create an account"
-          href="/register"
-          testID="login-to-register"
-        />
+        <View className="gap-5">
+          <AuthFooter
+            question="Don't have an account?"
+            linkLabel="Sign up"
+            href="/register"
+            testID="login-to-register"
+          />
+          <TermsNotice />
+        </View>
       }
     >
       <ErrorBanner message={errors.root?.message} />
-
       <View className="mb-4">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">
-          Email address
-        </Text>
+        <FieldLabel>Email address</FieldLabel>
         <EmailInput
           control={form.control}
           label=""
@@ -51,115 +102,34 @@ export default function Login() {
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
       </View>
-
-      <View className="mb-2">
-        <Text className="mb-2 font-body-bold text-[13px] text-ink">
-          Password
-        </Text>
-        <PasswordInput
-          control={form.control}
-          name="password"
-          label=""
-          placeholder="Enter your password"
-          autoComplete="current-password"
-          inputRef={passwordRef}
-          onSubmitEditing={submit}
-        />
-      </View>
-
-      <View className="mb-6 items-end">
-        <Link href="/forgot-password" asChild>
-          <Pressable testID="forgot-password-link">
-            <Text className="font-body-semibold text-[13px] text-ink">
-              Forgot password?
-            </Text>
-          </Pressable>
-        </Link>
-      </View>
-
+      <FieldLabel>Password</FieldLabel>
+      <PasswordInput
+        control={form.control}
+        name="password"
+        label=""
+        placeholder="Enter your password"
+        autoComplete="current-password"
+        inputRef={passwordRef}
+        onSubmitEditing={submit}
+      />
+      <ForgotPasswordLink />
       <Button
-        label="→ Sign in"
+        label="Continue"
         size="lg"
-        className="my-0 h-14"
-        style={{
-          borderRadius: 16,
-        }}
+        className="my-0 h-14 rounded-pill"
         textClassName="font-body-semibold text-[16px] text-white"
         loading={isSubmitting}
         onPress={submit}
         testID="login-button"
       />
-
-      {__DEV__ && (
-        <View className="mt-6 border-t border-divider pt-5">
-          <View className="mb-3 flex-row items-center gap-1.5">
-            <Sparkles size={16} color={palette.accent} />
-            <Text className="font-body-bold text-[13px] text-ink">
-              Demo & Test Accounts (Tap to fill & test)
-            </Text>
-          </View>
-
-          <View className="gap-2.5">
-            <Text className="font-body-semibold text-[11px] uppercase tracking-wider text-tone-500">
-              Clean-Slate Test Accounts (Forces Onboarding Flow)
-            </Text>
-            {CLEAN_TEST_ACCOUNTS.map((acc) => (
-              <Pressable
-                key={acc.email}
-                onPress={() => selectDemoAccount(acc.email, acc.password)}
-                className="rounded-card border border-accent/20 bg-accent/5 p-3 active:opacity-80"
-                testID={`clean-account-${acc.email.split('@')[0]}`}
-              >
-                <View className="flex-row items-center justify-between">
-                  <Text className="font-body-bold text-[13px] text-ink">
-                    {acc.name}
-                  </Text>
-                  <View className="rounded-pill bg-accent px-2 py-0.5">
-                    <Text className="text-[10px] font-bold text-white">
-                      {acc.badge}
-                    </Text>
-                  </View>
-                </View>
-                <Text className="mt-0.5 font-mono text-[11px] text-tone-600">
-                  {acc.email} • {acc.password}
-                </Text>
-                <Text className="mt-1 text-[11px] leading-4 text-tone-700">
-                  {acc.description}
-                </Text>
-              </Pressable>
-            ))}
-
-            <Text className="mt-2 font-body-semibold text-[11px] uppercase tracking-wider text-tone-500">
-              Pre-Seeded Demo Accounts (Skips Onboarding)
-            </Text>
-            {DEMO_ACCOUNTS.map((acc) => (
-              <Pressable
-                key={acc.email}
-                onPress={() => selectDemoAccount(acc.email, acc.password)}
-                className="rounded-card border border-divider bg-surface/80 p-3 active:opacity-80"
-                testID={`demo-account-${acc.badge.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <View className="flex-row items-center justify-between">
-                  <Text className="font-body-bold text-[13px] text-ink">
-                    {acc.name}
-                  </Text>
-                  <View className="rounded-pill bg-accent/15 px-2 py-0.5">
-                    <Text className="text-[11px] font-bold text-accent">
-                      {acc.badge}
-                    </Text>
-                  </View>
-                </View>
-                <Text className="mt-0.5 text-[11px] text-tone-600">
-                  {acc.email} • {acc.password}
-                </Text>
-                <Text className="mt-1 text-[11px] leading-4 text-tone-700">
-                  {acc.description}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      )}
+      <OrDivider />
+      <GoogleButton onPress={google.sheet.present} />
+      {__DEV__ ? <DemoAccountsPanel onSelect={selectDemoAccount} /> : null}
+      <GoogleConsentSheet
+        ref={google.sheet.ref}
+        onContinue={google.onContinue}
+        onCancel={google.sheet.dismiss}
+      />
     </AuthLayout>
   );
 }

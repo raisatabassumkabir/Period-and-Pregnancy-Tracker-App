@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -25,7 +24,6 @@ interface Props {
   title: string;
   subtitle: string;
   onGoBack?: () => void;
-  activeTab?: 'login' | 'register';
   children: React.ReactNode;
   footer?: React.ReactNode;
   testID?: string;
@@ -36,13 +34,11 @@ export function AuthLayout({
   title,
   subtitle,
   onGoBack,
-  activeTab,
   children,
   footer,
   testID,
 }: Props) {
   const palette = usePaletteColors();
-  const router = useRouter();
 
   return (
     <View className="flex-1 bg-surface" testID={testID}>
@@ -97,42 +93,6 @@ export function AuthLayout({
                 {subtitle}
               </Text>
             </Animated.View>
-
-            {/* Segmented Control */}
-            {activeTab && (
-              <Animated.View
-                entering={FadeInDown.delay(150)
-                  .duration(800)
-                  .springify()
-                  .damping(16)}
-                className="bg-bg mb-6 flex-row rounded-[16px] p-1"
-              >
-                <Pressable
-                  onPress={() => router.replace('/login')}
-                  className={`flex-1 items-center justify-center rounded-[12px] py-3 ${
-                    activeTab === 'login' ? 'bg-surface shadow-sm' : ''
-                  }`}
-                >
-                  <Text
-                    className={`font-body-semibold text-[15px] ${activeTab === 'login' ? 'text-ink' : 'text-tone-600'}`}
-                  >
-                    Sign in
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => router.replace('/register')}
-                  className={`flex-1 items-center justify-center rounded-[12px] py-3 ${
-                    activeTab === 'register' ? 'bg-surface shadow-sm' : ''
-                  }`}
-                >
-                  <Text
-                    className={`font-body-semibold text-[15px] ${activeTab === 'register' ? 'text-ink' : 'text-tone-600'}`}
-                  >
-                    Register
-                  </Text>
-                </Pressable>
-              </Animated.View>
-            )}
 
             <Animated.View
               entering={FadeInUp.delay(200)

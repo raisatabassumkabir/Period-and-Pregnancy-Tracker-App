@@ -1,8 +1,11 @@
 export { AuthFooter } from './auth-footer';
 export { AuthLayout } from './auth-layout';
+export { DemoAccountsPanel } from './demo-accounts-panel';
 export { EmailInput } from './email-input';
 export { FeatureCarousel, FEATURES } from './feature-carousel';
-export { GoogleButton } from './google-button';
+export { GoogleButton, GoogleIcon } from './google-button';
+export { GoogleConsentSheet } from './google-consent-sheet';
 export { ModeStep } from './mode-step';
 export { PasswordHints } from './password-hints';
 export { PasswordInput } from './password-input';
+export { TermsNotice } from './terms-notice';

@@ -3,6 +3,7 @@ import { ActivityIndicator } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Pressable, Text, View } from '@/components/ui';
+import { usePaletteColors } from '@/lib/theme';
 
 interface GoogleButtonProps {
   onPress?: () => void;
@@ -12,8 +13,8 @@ interface GoogleButtonProps {
   testID?: string;
 }
 
-/** Official multi-colored Google 'G' Mark */
-function GoogleIcon({ size = 20 }: { size?: number }) {
+/** Official multi-coloured Google 'G' mark (brand colours are fixed by Google). */
+export function GoogleIcon({ size = 20 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path
@@ -43,6 +44,7 @@ export function GoogleButton({
   label = 'Continue with Google',
   testID = 'google-auth-button',
 }: GoogleButtonProps) {
+  const palette = usePaletteColors();
   return (
     <Pressable
       testID={testID}
@@ -50,14 +52,14 @@ export function GoogleButton({
       accessibilityLabel={label}
       onPress={onPress}
       disabled={disabled || loading}
-      className="bg-bg h-14 flex-row items-center justify-center rounded-[16px] active:opacity-70"
+      className="h-14 flex-row items-center justify-center rounded-pill border border-divider bg-canvas active:opacity-70"
     >
       {loading ? (
-        <ActivityIndicator size="small" color="#FF7A8A" />
+        <ActivityIndicator size="small" color={palette.accent} />
       ) : (
         <View className="flex-row items-center justify-center">
-          <GoogleIcon size={18} />
-          <Text className="ml-3 font-body-semibold text-[14px] text-ink">
+          <GoogleIcon size={20} />
+          <Text className="ml-3 font-body-semibold text-[15px] text-ink">
             {label}
           </Text>
         </View>

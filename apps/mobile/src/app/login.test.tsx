@@ -54,8 +54,22 @@ describe('Login', () => {
     expect(screen.getByText('Happy Women')).toBeOnTheScreen();
     expect(screen.getByText('Welcome back')).toBeOnTheScreen();
     expect(screen.getByTestId('login-button-label')).toHaveTextContent(
-      '→ Sign in'
+      'Continue'
     );
+  });
+
+  it('offers forgot password, sign up, Google and the terms', () => {
+    mockLogin();
+    setup(<Login />);
+
+    expect(screen.getByTestId('forgot-password-link')).toBeOnTheScreen();
+    expect(screen.getByTestId('login-to-register')).toBeOnTheScreen();
+    expect(screen.getByTestId('google-auth-button')).toBeOnTheScreen();
+    // Once under the form, once in the Google consent sheet.
+    expect(screen.getAllByTestId('terms-link')).toHaveLength(2);
+    expect(screen.getAllByTestId('privacy-link')).toHaveLength(2);
+    expect(screen.getByTestId('google-consent-continue')).toBeOnTheScreen();
+    expect(screen.getByTestId('google-consent-cancel')).toBeOnTheScreen();
   });
 
   it('rejects a malformed email without calling the API', async () => {
@@ -233,9 +247,10 @@ describe('Login', () => {
       expect(useAuth.getState().token).toBeNull();
     });
 
-    it('lists the partner demo account', () => {
+    it('lists the partner demo account', async () => {
       mockLogin();
-      setup(<Login />);
+      const { user } = setup(<Login />);
+      await user.press(screen.getByTestId('demo-accounts-toggle'));
       expect(screen.getByTestId('demo-account-partner')).toBeOnTheScreen();
     });
   });

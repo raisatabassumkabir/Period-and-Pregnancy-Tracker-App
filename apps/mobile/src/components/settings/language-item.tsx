@@ -24,8 +24,16 @@ export const LanguageItem = () => {
 
   const langs = React.useMemo(
     () => [
-      { label: translate('settings.english'), value: 'en' },
-      { label: translate('settings.arabic'), value: 'ar' },
+      {
+        label: translate('settings.english'),
+        description: 'English',
+        value: 'en',
+      },
+      {
+        label: translate('settings.arabic'),
+        description: 'العربية',
+        value: 'ar',
+      },
     ],
     []
   );
@@ -48,6 +56,8 @@ export const LanguageItem = () => {
         options={langs}
         onSelect={onSelect}
         value={selectedLanguage?.value}
+        title={translate('settings.language')}
+        testID="language-options"
       />
     </>
   );

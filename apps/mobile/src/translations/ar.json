@@ -22,7 +22,10 @@
       "dark": "مظلم",
       "light": "خفيفة",
       "system": "System",
-      "title": "سمة"
+      "title": "سمة",
+      "dark_hint": "مريح للعين ليلًا",
+      "light_hint": "ساطع وواضح في النهار",
+      "system_hint": "يتبع إعداد هاتفك"
     },
     "palette": {
       "title": "لوحة الألوان"

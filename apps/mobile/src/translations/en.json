@@ -22,7 +22,10 @@
       "dark": "Dark",
       "light": "Light",
       "system": "System",
-      "title": "Theme"
+      "title": "Theme",
+      "dark_hint": "Easy on the eyes at night",
+      "light_hint": "Bright and clear in daylight",
+      "system_hint": "Follows your phone setting"
     },
     "palette": {
       "title": "Colour palette"

@@ -1,4 +1,4 @@
-import { Palette } from 'lucide-react-native';
+import { Moon, Palette, SmartphoneIcon, Sun } from 'lucide-react-native';
 import React from 'react';
 
 import type { OptionType } from '@/components/ui';
@@ -25,9 +25,24 @@ export const ThemeItem = () => {
 
   const themes = React.useMemo(
     () => [
-      { label: `${translate('settings.theme.dark')} 🌙`, value: 'dark' },
-      { label: `${translate('settings.theme.light')} 🌞`, value: 'light' },
-      { label: `${translate('settings.theme.system')} ⚙️`, value: 'system' },
+      {
+        label: translate('settings.theme.light'),
+        description: translate('settings.theme.light_hint'),
+        value: 'light',
+        icon: Sun,
+      },
+      {
+        label: translate('settings.theme.dark'),
+        description: translate('settings.theme.dark_hint'),
+        value: 'dark',
+        icon: Moon,
+      },
+      {
+        label: translate('settings.theme.system'),
+        description: translate('settings.theme.system_hint'),
+        value: 'system',
+        icon: SmartphoneIcon,
+      },
     ],
     []
   );
@@ -50,6 +65,8 @@ export const ThemeItem = () => {
         options={themes}
         onSelect={onSelect}
         value={theme?.value}
+        title={translate('settings.theme.title')}
+        testID="theme-options"
       />
     </>
   );

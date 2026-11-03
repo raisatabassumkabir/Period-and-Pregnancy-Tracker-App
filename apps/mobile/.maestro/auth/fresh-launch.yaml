@@ -5,10 +5,11 @@ appId: ${APP_ID}
 - clearState
 - runFlow: ../utils/launch-app.yaml
 - extendedWaitUntil:
-    visible: 'Login with password'
+    visible: 'Welcome back'
     timeout: 60000
 - assertVisible: 'Email address'
 - assertVisible: 'Password'
 - assertVisible:
     id: 'login-button'
-- assertVisible: 'Register'
+- assertVisible: 'Sign up'
+- assertVisible: 'Continue with Google'

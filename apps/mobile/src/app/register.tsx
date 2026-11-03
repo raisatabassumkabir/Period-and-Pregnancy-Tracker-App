@@ -26,7 +26,6 @@ export default function Register() {
       kicker="Join Happy Women"
       title="Create your account"
       subtitle="Start your personal health journey in a few moments."
-      activeTab="register"
       footer={
         <AuthFooter
           question="Already have an account?"
