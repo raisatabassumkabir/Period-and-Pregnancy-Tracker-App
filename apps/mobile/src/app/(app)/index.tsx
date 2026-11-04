@@ -85,7 +85,7 @@ function LogActionButton({ label }: { label: string }) {
       accessibilityRole="button"
       testID="dashboard-log-action"
       onPress={() => router.push(TRACKING_ROUTE)}
-      className="mt-5 h-13 flex-row items-center justify-center gap-2 self-center rounded-pill bg-accent px-8 active:opacity-90"
+      className="mt-5 h-14 flex-row items-center justify-center gap-2 self-center rounded-pill border-b-4 border-accent-700 bg-accent px-8 active:opacity-90"
     >
       <Plus size={ACTION_ICON_SIZE} color={ON_ACCENT_COLOR} strokeWidth={3} />
       <Text className="font-body-bold text-[16px] text-white">{label}</Text>
@@ -104,15 +104,13 @@ function SectionHeading({ title, isDemo, pillId }: SectionHeadingProps) {
   return (
     <View className="flex-row items-center justify-between">
       <Kicker>{title}</Kicker>
-      {isDemo ? (
+      {isDemo && (
         <Pill
           label="Demo data"
           tone="accent2-soft"
           badge
           testID={`${pillId ?? title.toLowerCase()}-demo-pill`}
         />
-      ) : (
-        <Sparkle size={18} />
       )}
     </View>
   );
@@ -294,7 +292,10 @@ function CycleSection({
 
   return (
     <>
-      <View className="rounded-[32px] bg-accent-100 px-5 pb-7 pt-6 overflow-hidden">
+      <View className="rounded-[32px] bg-accent-100 px-5 pb-6 pt-5">
+        <View className="absolute right-5 top-5">
+          <Sparkle />
+        </View>
         <SectionHeading title="Your cycle" pillId="cycle" isDemo={isDemo} />
         <View className="mt-4">
           <CycleRing

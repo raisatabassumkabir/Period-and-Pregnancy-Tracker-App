@@ -53,10 +53,10 @@ function CodeBox({ invite }: { invite: PartnerInvite }) {
   return (
     <View
       testID="partner-invite-code-box"
-      className="mt-4 items-center overflow-hidden rounded-[30px] bg-accent-100 px-5 pb-5 pt-6"
+      className="mt-4 items-center rounded-[30px] bg-accent-100 px-5 pb-5 pt-6"
     >
-      <View className="absolute left-6 top-6">
-        <Sparkle size={20} />
+      <View className="absolute left-5 top-5">
+        <Sparkle size={22} />
       </View>
       <Text className="font-body-bold text-[14px] text-accent-700">
         {translate('partner.invite.code_label')}
@@ -70,12 +70,12 @@ function CodeBox({ invite }: { invite: PartnerInvite }) {
           {invite.code}
         </Text>
       </View>
-      <View className="mt-4 h-[52px] w-full flex-row items-center overflow-hidden gap-2 rounded-2xl bg-surface pl-3.5 pr-1.5">
+      <View className="mt-4 h-[52px] w-full flex-row items-center gap-2 rounded-2xl bg-surface pl-4 pr-1.5">
         {/* Android drops numberOfLines on selectable text; Copy covers it. */}
         <Text
           numberOfLines={1}
           ellipsizeMode="middle"
-          className="flex-1 font-body-bold text-[13px] text-tone-600"
+          className="flex-1 font-body-bold text-[14px] text-tone-600"
           testID="partner-invite-url"
         >
           {invite.url}
@@ -89,10 +89,10 @@ function CodeBox({ invite }: { invite: PartnerInvite }) {
             )
           }
           testID="partner-invite-copy"
-          className="h-9 flex-row items-center gap-1.5 rounded-xl bg-accent-100 px-3 active:opacity-80"
+          className="h-10 flex-row items-center gap-1.5 rounded-xl bg-accent-100 px-3.5 active:opacity-80"
         >
           <Copy size={ICON_SIZE} color={palette.accentScale[700]} />
-          <Text className="font-body-bold text-[13px] text-accent-700">
+          <Text className="font-body-bold text-[14px] text-accent-700">
             {translate('partner.invite.copy_link')}
           </Text>
         </Pressable>
@@ -107,16 +107,10 @@ function CodeBox({ invite }: { invite: PartnerInvite }) {
 function Chip({ label, shared }: { label: string; shared: boolean }) {
   return (
     <View
-      className={`h-8 justify-center rounded-pill px-3.5 ${
-        shared
-          ? 'bg-accent-100 border border-accent-300'
-          : 'bg-tone-200 border border-tone-300'
-      }`}
+      className={`h-8 justify-center rounded-pill px-3 ${shared ? 'bg-mint' : 'bg-tone-200'}`}
     >
       <Text
-        className={`font-body-bold text-[13px] ${
-          shared ? 'text-accent-700' : 'text-tone-700'
-        }`}
+        className={`font-body-bold text-[14px] ${shared ? 'text-mint-ink' : 'text-tone-600'}`}
       >
         {label}
       </Text>
@@ -130,7 +124,7 @@ function VisibilityCard() {
   const never = ['never_symptoms', 'never_moods', 'never_notes'] as const;
   return (
     <View
-      className="mt-4 gap-3.5 rounded-[24px] border border-accent-200/60 bg-surface p-5 shadow-sm overflow-hidden"
+      className="mt-4 gap-3 rounded-[26px] border-2 border-divider bg-surface p-[18px]"
       testID="partner-invite-visibility"
     >
       <Text className="font-display text-[19px] text-ink">
@@ -141,7 +135,7 @@ function VisibilityCard() {
           <Chip key={key} label={translate(`partner.invite.${key}`)} shared />
         ))}
       </View>
-      <Text className="mt-1 font-body-bold text-[14px] text-tone-600">
+      <Text className="font-body-bold text-[14px] text-tone-600">
         {translate('partner.invite.never_title')}
       </Text>
       <View className="flex-row flex-wrap gap-2">
