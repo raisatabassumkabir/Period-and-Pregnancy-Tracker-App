@@ -11,6 +11,7 @@ import {
   GoogleButton,
   GoogleConsentSheet,
   PasswordInput,
+  PrivacyPill,
   TermsNotice,
 } from '@/components/auth';
 import {
@@ -77,17 +78,17 @@ export default function Login() {
   return (
     <AuthLayout
       testID="login-screen"
-      kicker="Welcome back"
-      title="Sign in"
-      subtitle="Continue your personal health journey."
+      title="Welcome back"
+      subtitle="Your cycle, your data. Only yours."
       footer={
-        <View className="gap-5">
+        <View className="gap-4">
           <AuthFooter
-            question="Don't have an account?"
-            linkLabel="Sign up"
+            question="New here?"
+            linkLabel="Create an account"
             href="/register"
             testID="login-to-register"
           />
+          <PrivacyPill />
           <TermsNotice />
         </View>
       }
@@ -114,10 +115,10 @@ export default function Login() {
       />
       <ForgotPasswordLink />
       <Button
-        label="Continue"
+        label="Sign in"
         size="lg"
         className="my-0 h-14 rounded-pill"
-        textClassName="font-body-semibold text-[16px] text-white"
+        textClassName="font-body-bold text-[17px] text-white"
         loading={isSubmitting}
         onPress={submit}
         testID="login-button"

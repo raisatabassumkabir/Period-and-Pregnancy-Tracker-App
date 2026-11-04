@@ -20,7 +20,7 @@ export function NotLinkedCard() {
         <View className="size-11 items-center justify-center rounded-full bg-accent-200">
           <HeartHandshake size={ICON_SIZE} color={palette.accent} />
         </View>
-        <Text className="flex-1 font-heading text-[19px] text-ink">
+        <Text className="flex-1 font-display text-[19px] text-ink">
           {translate('partner.home.not_linked')}
         </Text>
       </View>

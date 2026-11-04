@@ -122,7 +122,7 @@ export const Options = React.forwardRef<BottomSheetModal, OptionsProps>(
         }}
       >
         {title ? (
-          <Text className="px-5 pb-3 font-heading text-[20px] text-ink">
+          <Text className="px-5 pb-3 font-display text-[20px] text-ink">
             {title}
           </Text>
         ) : null}

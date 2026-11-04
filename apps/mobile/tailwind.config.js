@@ -43,6 +43,19 @@ const palette = {
     800: 'rgb(var(--color-accent-2-800) / <alpha-value>)',
     900: 'rgb(var(--color-accent-2-900) / <alpha-value>)',
   },
+  /** Pastel card fills, each with an AA-safe `ink` for text on it (palettes.ts). */
+  peach: {
+    DEFAULT: 'rgb(var(--color-peach) / <alpha-value>)',
+    ink: 'rgb(var(--color-peach-ink) / <alpha-value>)',
+  },
+  mint: {
+    DEFAULT: 'rgb(var(--color-mint) / <alpha-value>)',
+    ink: 'rgb(var(--color-mint-ink) / <alpha-value>)',
+  },
+  butter: {
+    DEFAULT: 'rgb(var(--color-butter) / <alpha-value>)',
+    ink: 'rgb(var(--color-butter-ink) / <alpha-value>)',
+  },
   /** The palette's neutral ramp. `tone-100` is the base surface tier in BOTH themes. */
   tone: {
     100: 'rgb(var(--color-neutral-100) / <alpha-value>)',
@@ -72,6 +85,8 @@ module.exports = {
         // rounded family (Nunito) at four weights; the role names stay the
         // same so no screen needed a className change to adopt it.
         heading: ['Nunito-ExtraBold'],
+        // Soft serif for big titles and names; loaded at runtime (_layout.tsx).
+        display: ['Fraunces-SemiBold'],
         body: ['Nunito-Regular'],
         'body-semibold': ['Nunito-SemiBold'],
         'body-bold': ['Nunito-Bold'],

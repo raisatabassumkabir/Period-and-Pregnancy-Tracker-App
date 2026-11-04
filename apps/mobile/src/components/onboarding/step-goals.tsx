@@ -125,7 +125,7 @@ export function StepGoals({ selectedGoals, onToggleGoal }: StepGoalsProps) {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 24 }}
     >
-      <Text className="font-heading text-[26px] leading-8 text-ink">
+      <Text className="font-display text-[26px] leading-8 text-ink">
         What brings you to Happy Women?
       </Text>
       <Text className="mt-2 font-body text-[15px] leading-6 text-tone-600">

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useCycles } from '@/api/cycles';
 import { useAuth } from '@/lib';
+import { readPendingPartnerCode, usePendingPartnerCode } from '@/lib/partner';
 import { cleanup, screen, setup, waitFor } from '@/lib/test-utils';
 
 import Onboarding from './onboarding';
@@ -228,7 +229,29 @@ describe('Onboarding (6-Step Flow)', () => {
     await user.press(screen.getByTestId('intent-partner'));
     expect(screen.getByTestId('partner-code-input')).toBeOnTheScreen();
     await user.type(screen.getByTestId('partner-code-input'), 'HW-9988');
+    // Not a real code (HW-XXXX-XXXX), so there is nothing to link with yet.
+    expect(screen.getByTestId('onboarding-next')).toBeDisabled();
 
+    await user.clear(screen.getByTestId('partner-code-input'));
+    await user.type(screen.getByTestId('partner-code-input'), 'HW-7K3M-Q9XA');
     expect(screen.getByTestId('onboarding-next')).not.toBeDisabled();
+  });
+
+  it('keeps a partner code and sends them to make an account first', async () => {
+    // Pairing needs an account, so the "you're paired" welcome comes after
+    // sign-up, once the code is really redeemed, never before.
+    const { user } = setup(<Onboarding />);
+
+    await user.press(screen.getByTestId('intent-partner'));
+    await user.type(screen.getByTestId('partner-code-input'), 'HW-7K3M-Q9XA');
+    expect(screen.getByTestId('onboarding-next-label')).toHaveTextContent(
+      'Create account to link'
+    );
+    await user.press(screen.getByTestId('onboarding-next'));
+
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/register'));
+    expect(screen.queryByTestId('step-partner-paired')).toBeNull();
+    expect(await readPendingPartnerCode()).toBe('HW-7K3M-Q9XA');
+    await usePendingPartnerCode.getState().clear();
   });
 });

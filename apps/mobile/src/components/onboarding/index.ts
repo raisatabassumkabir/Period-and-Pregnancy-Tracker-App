@@ -1,3 +1,4 @@
+export { toggleChoice } from './choice-chips';
 export { OnboardingHeader } from './onboarding-header';
 export { StepAcquisition } from './step-acquisition';
 export { StepBodyMetrics } from './step-body-metrics';
@@ -5,3 +6,9 @@ export { StepCycleBaseline } from './step-cycle-baseline';
 export { StepGoals } from './step-goals';
 export { type AppIntent, StepIntent } from './step-intent';
 export { StepMedical } from './step-medical';
+export { StepPartnerFertile } from './step-partner-fertile';
+export { StepPartnerGoals } from './step-partner-goals';
+export { StepPartnerIntimacy } from './step-partner-intimacy';
+export { StepPartnerPaired } from './step-partner-paired';
+export { StepPartnerSetup } from './step-partner-setup';
+export { NO_SYMPTOMS, StepPartnerSymptoms } from './step-partner-symptoms';

@@ -13,7 +13,7 @@ import { ConceiveCard } from './conceive-card';
 import { NotLinkedCard } from './not-linked-card';
 import { NudgeToggle } from './nudge-toggle';
 import { PartnerStatusCard } from './partner-status-card';
-import { SupportIdeaCard } from './support-idea-card';
+import { KindNoteCard, SupportActionsCard } from './support-idea-card';
 
 /** Home for a linked partner: her status, how she may feel, and how to help. */
 export function PartnerHome() {
@@ -36,7 +36,8 @@ export function PartnerHome() {
           )}
         </Text>
       ) : null}
-      {topic ? <SupportIdeaCard topic={topic} /> : null}
+      {topic ? <SupportActionsCard topic={topic} /> : null}
+      {topic ? <KindNoteCard topic={topic} /> : null}
       <ConceiveCard view={view} />
       <NudgeToggle />
     </View>

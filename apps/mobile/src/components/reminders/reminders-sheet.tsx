@@ -70,7 +70,7 @@ function NextPeriodCard({ insights }: { insights: CycleInsights | null }) {
           Next period
         </Text>
         <Text
-          className="mt-0.5 font-heading text-[18px] text-ink"
+          className="mt-0.5 font-display text-[18px] text-ink"
           testID="reminders-next-period"
         >
           {insights
@@ -281,7 +281,7 @@ function SheetHeader({ onClose }: { onClose: () => void }) {
         <Text className="font-body-bold text-[11px] uppercase tracking-[1.5px] text-accent">
           Reminders
         </Text>
-        <Text className="mt-1 font-heading text-[22px] leading-7 text-ink">
+        <Text className="mt-1 font-display text-[22px] leading-7 text-ink">
           Period reminders
         </Text>
       </View>

@@ -56,7 +56,7 @@ const MEDICAL_CONDITIONS_LIST: { id: MedicalCondition; label: string }[] = [
 function Avatar({ initial }: { initial: string }) {
   return (
     <View className="size-[58px] items-center justify-center rounded-full bg-accent">
-      <Text className="font-heading text-[24px] text-white">{initial}</Text>
+      <Text className="font-display text-[24px] text-white">{initial}</Text>
     </View>
   );
 }
@@ -130,7 +130,7 @@ export const ProfileHeader = () => {
       >
         <Avatar initial={initial} />
         <View className="flex-1">
-          <Text className="font-heading text-[19px] text-ink" numberOfLines={1}>
+          <Text className="font-display text-[19px] text-ink" numberOfLines={1}>
             {displayName}
           </Text>
           <Text className="mt-0.5 text-[13px] text-tone-700" numberOfLines={1}>
@@ -174,7 +174,7 @@ export const ProfileHeader = () => {
         <View className="flex-1 justify-end bg-black/60">
           <View className="max-h-[90%] rounded-t-3xl bg-surface px-5 pb-8 pt-6">
             <View className="mb-4 flex-row items-center justify-between border-b border-divider pb-3">
-              <Text className="font-heading text-[20px] text-ink">
+              <Text className="font-display text-[20px] text-ink">
                 Personalization Options
               </Text>
 

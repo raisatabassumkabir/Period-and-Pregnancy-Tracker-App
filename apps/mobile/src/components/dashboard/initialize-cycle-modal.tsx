@@ -290,7 +290,7 @@ function SheetHeader({
           <Text className="font-body-bold text-[11px] uppercase tracking-[1.5px] text-accent">
             Cycle setup
           </Text>
-          <Text className="mt-1 font-heading text-[22px] leading-7 text-ink">
+          <Text className="mt-1 font-display text-[22px] leading-7 text-ink">
             When did your last period start?
           </Text>
         </View>

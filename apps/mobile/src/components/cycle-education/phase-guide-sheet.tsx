@@ -85,7 +85,7 @@ function SheetHeader({ onClose }: { onClose: () => void }) {
         <Text className="font-body-bold text-[11px] uppercase tracking-[1.5px] text-accent">
           {translate('cycle_guide.sheet_kicker')}
         </Text>
-        <Text className="mt-1 font-heading text-[22px] leading-7 text-ink">
+        <Text className="mt-1 font-display text-[22px] leading-7 text-ink">
           {translate('cycle_guide.learn_more')}
         </Text>
       </View>

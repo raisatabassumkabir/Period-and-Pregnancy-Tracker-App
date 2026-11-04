@@ -25,6 +25,13 @@ export interface PersonalizationProfile {
   hasCompletedOnboarding?: boolean;
   appIntent?: 'myself' | 'partner';
   partnerCode?: string;
+  /** What a partner account wants help with (partner welcome flow). */
+  partnerGoals?: string[];
+  /** The partner's guess at what she usually gets (partner welcome flow). */
+  partnerSymptoms?: string[];
+  /** Whether the partner already knew about fertile days. */
+  partnerKnewFertileDays?: boolean;
+  partnerIntimacyGoals?: string[];
 }
 
 export const DEFAULT_PERSONALIZATION_PROFILE: PersonalizationProfile = {

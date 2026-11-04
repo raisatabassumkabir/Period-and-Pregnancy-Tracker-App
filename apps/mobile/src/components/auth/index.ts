@@ -8,4 +8,5 @@ export { GoogleConsentSheet } from './google-consent-sheet';
 export { ModeStep } from './mode-step';
 export { PasswordHints } from './password-hints';
 export { PasswordInput } from './password-input';
+export { PrivacyPill } from './privacy-pill';
 export { TermsNotice } from './terms-notice';

@@ -118,7 +118,7 @@ export function PersonalizationOptionsModal({
       <View className="flex-1 justify-end bg-black/60">
         <View className="max-h-[90%] rounded-t-3xl bg-surface px-5 pb-8 pt-6">
           <View className="mb-4 flex-row items-center justify-between border-b border-divider pb-3">
-            <Text className="font-heading text-[20px] text-ink">
+            <Text className="font-display text-[20px] text-ink">
               Personalization Options
             </Text>
             <TouchableOpacity onPress={onClose} className="px-2 py-1">

@@ -131,7 +131,7 @@ export default function SetupProfile() {
           {step === 'goals' && (
             <View className="flex-1">
               {renderProgressBar(0.33)}
-              <Text className="mb-2 text-center font-heading text-[28px] text-ink">
+              <Text className="mb-2 text-center font-display text-[28px] text-ink">
                 What can we help you do?
               </Text>
               <Text className="mb-8 text-center text-[15px] text-tone-600">
@@ -182,7 +182,7 @@ export default function SetupProfile() {
           {step === 'info' && (
             <View className="flex-1">
               {renderProgressBar(0.66)}
-              <Text className="mb-2 text-center font-heading text-[28px] text-ink">
+              <Text className="mb-2 text-center font-display text-[28px] text-ink">
                 Let&apos;s get to know you
               </Text>
               <Text className="mb-8 text-center text-[15px] text-tone-600">
@@ -264,7 +264,7 @@ export default function SetupProfile() {
           {step === 'medical_source' && (
             <View className="flex-1">
               {renderProgressBar(1.0)}
-              <Text className="mb-8 text-center font-heading text-[28px] text-ink">
+              <Text className="mb-8 text-center font-display text-[28px] text-ink">
                 How did you find out about us?
               </Text>
 

@@ -59,7 +59,7 @@ export function MedicalDisclaimerGate({ children }: Props) {
           </View>
           <Text
             tx="medical_disclaimer.title"
-            className="mb-4 font-heading text-[26px] text-ink"
+            className="mb-4 font-display text-[26px] text-ink"
           />
           <MedicalDisclaimerContent />
         </ScrollView>

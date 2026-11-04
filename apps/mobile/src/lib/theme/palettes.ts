@@ -50,6 +50,30 @@ export interface Palette {
 
 export const DEFAULT_PALETTE_ID: PaletteId = 'blossom';
 
+/**
+ * Pastel card tones shared by every palette: peach (food), mint (fertile,
+ * pregnancy), butter (luteal, dates). Each fill has an `-ink` for text on it
+ * that clears AA. Dark mode swaps them for deep tints with light inks, so a
+ * pastel card never glares on a dark ground.
+ */
+const PASTELS_LIGHT: PaletteTokens = {
+  '--color-peach': '255 232 218',
+  '--color-peach-ink': '154 90 51',
+  '--color-mint': '223 243 232',
+  '--color-mint-ink': '47 82 64',
+  '--color-butter': '255 241 201',
+  '--color-butter-ink': '122 90 18',
+};
+
+const PASTELS_DARK: PaletteTokens = {
+  '--color-peach': '58 38 30',
+  '--color-peach-ink': '255 200 168',
+  '--color-mint': '28 50 40',
+  '--color-mint-ink': '170 225 195',
+  '--color-butter': '56 46 22',
+  '--color-butter-ink': '247 217 138',
+};
+
 export const PALETTES: Record<PaletteId, Palette> = {
   /**
    * The default: soft and feminine. Blush-white canvas, petal-pink cards,
@@ -60,34 +84,35 @@ export const PALETTES: Record<PaletteId, Palette> = {
    */
   blossom: {
     label: 'Blossom',
-    swatch: { accent: '#B24C74', accent2: '#8A6CC4', bg: '#FFF8F9' },
+    swatch: { accent: '#C2456B', accent2: '#6B55A8', bg: '#FFF6F8' },
     light: {
-      '--color-bg': '255 248 249',
-      '--color-surface': '252 238 242',
-      '--color-text': '45 27 40',
-      '--color-divider': '236 220 228',
-      '--color-accent': '178 76 116',
-      '--color-accent-2': '138 108 196',
+      ...PASTELS_LIGHT,
+      '--color-bg': '255 246 248',
+      '--color-surface': '255 255 255',
+      '--color-text': '58 46 57',
+      '--color-divider': '243 217 226',
+      '--color-accent': '194 69 107',
+      '--color-accent-2': '107 85 168',
       '--color-neutral-100': '250 244 246',
       '--color-neutral-200': '240 231 235',
       '--color-neutral-300': '224 212 218',
       '--color-neutral-400': '196 182 190',
       '--color-neutral-500': '164 150 158',
-      '--color-neutral-600': '133 120 128',
+      '--color-neutral-600': '122 102 114',
       '--color-neutral-700': '102 90 98',
       '--color-neutral-800': '74 64 71',
       '--color-neutral-900': '48 40 46',
-      '--color-accent-100': '255 242 246',
-      '--color-accent-200': '252 226 235',
+      '--color-accent-100': '252 228 236',
+      '--color-accent-200': '248 208 222',
       '--color-accent-300': '246 199 216',
       '--color-accent-400': '235 160 190',
       '--color-accent-500': '214 121 157',
       '--color-accent-600': '189 92 129',
-      '--color-accent-700': '156 66 101',
+      '--color-accent-700': '158 51 85',
       '--color-accent-800': '116 46 74',
       '--color-accent-900': '74 30 48',
-      '--color-accent-2-100': '246 242 255',
-      '--color-accent-2-200': '234 226 252',
+      '--color-accent-2-100': '238 232 250',
+      '--color-accent-2-200': '224 214 245',
       '--color-accent-2-300': '214 199 247',
       '--color-accent-2-400': '186 163 236',
       '--color-accent-2-500': '157 128 219',
@@ -97,6 +122,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '50 35 84',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '26 17 23',
       '--color-surface': '38 26 34',
       '--color-text': '250 236 243',
@@ -141,6 +167,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Happy Women',
     swatch: { accent: '#FF7A8A', accent2: '#A7F3D0', bg: '#FFF5F2' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '255 245 242',
       '--color-surface': '255 255 255',
       '--color-text': '74 74 104',
@@ -176,6 +203,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '5 70 40',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '18 18 18',
       '--color-surface': '30 30 30',
       '--color-text': '245 245 247',
@@ -215,6 +243,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Organic',
     swatch: { accent: '#c67139', accent2: '#7a8a5e', bg: '#f5ead8' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '245 234 216',
       '--color-surface': '235 221 197',
       '--color-text': '32 30 29',
@@ -250,6 +279,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '39 46 27',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '28 25 23',
       '--color-surface': '41 35 32',
       '--color-text': '243 235 221',
@@ -289,6 +319,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Teal',
     swatch: { accent: '#06625B', accent2: '#B98432', bg: '#f2f8f7' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '242 248 247',
       '--color-surface': '226 239 236',
       '--color-text': '1 17 32',
@@ -324,6 +355,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '57 40 14',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '11 24 23',
       '--color-surface': '21 38 37',
       '--color-text': '232 244 242',
@@ -363,6 +395,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Indigo',
     swatch: { accent: '#6366f1', accent2: '#10b981', bg: '#fafafa' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '250 250 250',
       '--color-surface': '255 255 255',
       '--color-text': '23 23 23',
@@ -398,6 +431,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '0 53 34',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '10 10 11',
       '--color-surface': '24 24 27',
       '--color-text': '250 250 250',
@@ -437,6 +471,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Rose',
     swatch: { accent: '#9f1239', accent2: '#0f766e', bg: '#fff7f7' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '255 247 247',
       '--color-surface': '251 233 236',
       '--color-text': '28 18 20',
@@ -472,6 +507,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '0 51 47',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '23 15 17',
       '--color-surface': '36 26 29',
       '--color-text': '248 234 237',
@@ -511,6 +547,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Amber',
     swatch: { accent: '#b45309', accent2: '#3f6212', bg: '#fdf9f0' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '253 249 240',
       '--color-surface': '246 238 218',
       '--color-text': '31 26 18',
@@ -546,6 +583,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '33 49 15',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '23 19 16',
       '--color-surface': '36 30 24',
       '--color-text': '247 240 226',
@@ -585,6 +623,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     label: 'Slate',
     swatch: { accent: '#3d5a80', accent2: '#b45309', bg: '#f6f8fa' },
     light: {
+      ...PASTELS_LIGHT,
       '--color-bg': '246 248 250',
       '--color-surface': '234 239 244',
       '--color-text': '15 23 42',
@@ -620,6 +659,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       '--color-accent-2-900': '71 30 4',
     },
     dark: {
+      ...PASTELS_DARK,
       '--color-bg': '12 16 23',
       '--color-surface': '23 29 38',
       '--color-text': '238 243 248',

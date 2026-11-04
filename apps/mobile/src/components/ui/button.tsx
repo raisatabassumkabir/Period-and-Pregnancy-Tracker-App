@@ -29,7 +29,14 @@ const button = tv({
   variants: {
     variant: {
       default: {
-        container: 'bg-accent shadow-glow-accent active:opacity-90',
+        // A firm darker edge underneath reads as 'press me' without a glow.
+        container: 'border-b-4 border-accent-700 bg-accent active:opacity-90',
+        label: 'text-white',
+        indicator: 'text-white',
+      },
+      // The partner's screens lead with lilac instead of rose.
+      partner: {
+        container: 'border-b-4 border-accent2-800 bg-accent2 active:opacity-90',
         label: 'text-white',
         indicator: 'text-white',
       },
@@ -77,7 +84,7 @@ const button = tv({
     },
     disabled: {
       true: {
-        container: 'bg-tone-300',
+        container: 'border-tone-300 bg-tone-300',
         label: 'text-tone-600',
         indicator: 'text-tone-600',
       },

@@ -20,7 +20,7 @@ export function OfflineAccountCard() {
         <View className="size-11 items-center justify-center rounded-full bg-accent-200">
           <CloudOff size={ICON_SIZE} color={palette.accent} />
         </View>
-        <Text className="flex-1 font-heading text-[18px] text-ink">
+        <Text className="flex-1 font-display text-[18px] text-ink">
           {translate('partner.offline.title')}
         </Text>
       </View>

@@ -10,6 +10,8 @@ import { resolvePaletteColors } from './use-palette-colors';
 
 const MODES: ThemeMode[] = ['light', 'dark'];
 const STEPS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+const PASTELS = ['peach', 'mint', 'butter'] as const;
+const AA = 4.5;
 
 const EXPECTED_TOKENS = [
   '--color-bg',
@@ -21,6 +23,7 @@ const EXPECTED_TOKENS = [
   ...STEPS.map((s) => `--color-neutral-${s}`),
   ...STEPS.map((s) => `--color-accent-${s}`),
   ...STEPS.map((s) => `--color-accent-2-${s}`),
+  ...PASTELS.flatMap((p) => [`--color-${p}`, `--color-${p}-ink`]),
 ];
 
 function channels(value: string): number[] {
@@ -160,6 +163,21 @@ describe('contrast', () => {
           tokens['--color-accent-2-200']
         ) >= 4.5,
       ]).toEqual([label, true]);
+    });
+  });
+});
+
+describe('pastel cards', () => {
+  it('keeps the text on every pastel card above AA in both modes', () => {
+    eachPalette((tokens, label) => {
+      PASTELS.forEach((pastel) => {
+        const name = `${label} ${pastel}`;
+        const ratio = contrast(
+          tokens[`--color-${pastel}`],
+          tokens[`--color-${pastel}-ink`]
+        );
+        expect([name, ratio >= AA]).toEqual([name, true]);
+      });
     });
   });
 });

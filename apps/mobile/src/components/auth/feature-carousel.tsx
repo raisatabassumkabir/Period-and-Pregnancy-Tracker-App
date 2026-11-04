@@ -101,7 +101,7 @@ function Slide({ feature, index, width, scrollX }: SlideProps) {
           <Icon size={ICON_SIZE} color={palette.accent} strokeWidth={1.75} />
         </View>
         <Text
-          className="mt-6 text-center font-heading text-[26px] text-ink"
+          className="mt-6 text-center font-display text-[26px] text-ink"
           testID={`feature-slide-${feature.id}`}
         >
           {feature.title}

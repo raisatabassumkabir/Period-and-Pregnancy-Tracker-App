@@ -84,20 +84,37 @@ const OPEN_INVITE = {
 };
 
 function givenInvite(invite: typeof OPEN_INVITE | null) {
-  const idle = { mutate: jest.fn(), isPending: false, error: null };
+  const idle = {
+    mutate: jest.fn(),
+    isPending: false,
+    isIdle: true,
+    error: null,
+  };
   mocked(useCreatePartnerInvite).mockReturnValue(idle);
   mocked(useCancelPartnerInvite).mockReturnValue(idle);
-  mocked(useOpenInvite).mockReturnValue({ invite });
+  mocked(useOpenInvite).mockReturnValue({ invite, settled: true });
   return idle;
 }
 
 describe('InviteCard', () => {
-  it('asks for her name and creates a code when she has none', async () => {
+  it('creates her own code by itself when she has none', () => {
     const { mutate } = givenInvite(null);
-    const { user } = setup(<InviteCard />);
-    await user.type(screen.getByTestId('partner-invite-name'), 'Raisa');
-    await user.press(screen.getByTestId('partner-invite-create'));
-    expect(mutate).toHaveBeenCalledWith({ display_name: 'Raisa' });
+    setup(<InviteCard />);
+    expect(screen.getByTestId('partner-invite-preparing')).toBeOnTheScreen();
+    expect(mutate).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for the server before creating a code', () => {
+    const { mutate } = givenInvite(null);
+    mocked(useOpenInvite).mockReturnValue({ invite: null, settled: false });
+    setup(<InviteCard />);
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it('never replaces a code she already has', () => {
+    const { mutate } = givenInvite(OPEN_INVITE);
+    setup(<InviteCard />);
+    expect(mutate).not.toHaveBeenCalled();
   });
 
   it('keeps showing her open code and link with copy and share buttons', () => {
@@ -118,10 +135,12 @@ describe('InviteCard', () => {
     const idle = givenInvite(null);
     mocked(useCreatePartnerInvite).mockReturnValue({
       ...idle,
+      isIdle: false,
       error: { message: 'Network Error' },
     });
     setup(<InviteCard />);
     expect(screen.getByText(/Can't reach Happy Women/)).toBeOnTheScreen();
+    expect(screen.getByTestId('partner-invite-retry')).toBeOnTheScreen();
   });
 });
 

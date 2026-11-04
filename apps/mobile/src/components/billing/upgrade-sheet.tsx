@@ -164,7 +164,7 @@ const PlanOptionCard = ({
         </View>
       )}
       <Text className="font-heading text-[16px] text-ink">{label}</Text>
-      <Text className="mt-1 font-heading text-[18px] text-accent">
+      <Text className="mt-1 font-display text-[18px] text-accent">
         {priceString}
       </Text>
       <Text className="mt-0.5 text-xs text-tone-600">{periodText}</Text>
@@ -256,7 +256,7 @@ const SuccessState = ({ onClose }: SuccessStateProps) => {
           color={colors.accent2Scale[800]}
         />
       </Animated.View>
-      <Text className="text-center font-heading text-[26px] text-ink">
+      <Text className="text-center font-display text-[26px] text-ink">
         You&apos;re Premium!
       </Text>
       <Text className="mt-2 text-center text-[15px] text-tone-700">
@@ -352,7 +352,7 @@ const UpgradeSheetHeader = ({
       </View>
       <Text
         testID="upgrade-sheet-title"
-        className="text-center font-heading text-[24px] text-ink"
+        className="text-center font-display text-[24px] text-ink"
       >
         {title}
       </Text>

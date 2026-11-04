@@ -22,32 +22,29 @@ export function ConceiveCard({ view }: { view: PartnerView }) {
     .join(', ');
 
   return (
-    <View
-      className="rounded-card bg-surface p-5"
-      testID="partner-conceive-card"
-    >
+    <View className="rounded-[28px] bg-mint p-5" testID="partner-conceive-card">
       <View className="flex-row items-center gap-2">
-        <Sparkles size={ICON_SIZE} color={palette.accent} />
-        <Text className="font-body-bold text-[16px] text-ink">
+        <Sparkles size={ICON_SIZE} color={palette.ink} />
+        <Text className="font-display text-[20px] text-ink">
           {translate('partner.ttc.title')}
         </Text>
       </View>
-      <Text className="mt-3 text-[14px] text-ink">
+      <Text className="mt-3 text-[15px] text-ink">
         {translate('partner.ttc.window', {
           start: formatCalendarDate(view.fertileStart),
           end: formatCalendarDate(view.fertileEnd),
         })}
       </Text>
       <Text
-        className="mt-1 font-body-bold text-[14px] text-accent"
+        className="mt-1 font-body-bold text-[14px] text-mint-ink"
         testID="partner-best-days"
       >
         {translate('partner.ttc.best_days', { days: bestDays })}
       </Text>
-      <Text className="mt-3 text-[13px] leading-5 text-tone-700">
+      <Text className="mt-3 text-[13px] leading-5 text-mint-ink">
         {translate('partner.ttc.relax')}
       </Text>
-      <Text className="mt-3 text-[12px] leading-5 text-tone-600">
+      <Text className="mt-3 text-[12px] leading-5 text-mint-ink">
         {translate('partner.ttc.doctor')} {CONTRACEPTION_SAFETY_DISCLAIMER}
       </Text>
     </View>

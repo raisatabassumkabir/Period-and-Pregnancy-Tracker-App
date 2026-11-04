@@ -1,6 +1,9 @@
 import type { AxiosError } from 'axios';
 import { createMutation } from 'react-query-kit';
 
+import { useAuth } from '@/lib/auth';
+import { isDemoToken } from '@/lib/auth/demo-users';
+
 import { client, queryClient } from '../common';
 import type {
   PartnerInviteCreate,
@@ -10,9 +13,9 @@ import type {
   PartnerLinkUpdate,
   ProblemDetail,
 } from '../types';
-import { OPEN_INVITE_KEY } from './use-open-invite';
+import { generateUserInvite, OPEN_INVITE_KEY } from './use-open-invite';
 import { PARTNER_LINKS_KEY } from './use-partner-links';
-import { SHARED_STATUS_KEY } from './use-shared-status';
+import { DEMO_SHARED_STATUS, SHARED_STATUS_KEY } from './use-shared-status';
 
 /**
  * Two rules for every partner mutation, both learned the hard way:
@@ -47,12 +50,19 @@ export const useCreatePartnerInvite = createMutation<
   PartnerInviteCreate,
   AxiosError<ProblemDetail>
 >({
-  mutationFn: (body) =>
-    thenRefresh(
+  mutationFn: (body) => {
+    const token = useAuth.getState().token;
+    if (isDemoToken(token?.access)) {
+      const freshInvite = generateUserInvite(body.display_name);
+      queryClient.setQueryData(OPEN_INVITE_KEY, [freshInvite]);
+      return Promise.resolve(freshInvite);
+    }
+    return thenRefresh(
       client
         .post<PartnerInviteCreated>('partner-invites/', body)
         .then((response) => response.data)
-    ),
+    );
+  },
   retry: NO_RETRY,
 });
 
@@ -62,12 +72,27 @@ export const useRedeemPartnerCode = createMutation<
   PartnerLinkRedeem,
   AxiosError<ProblemDetail>
 >({
-  mutationFn: (body) =>
-    thenRefresh(
+  mutationFn: (body) => {
+    const token = useAuth.getState().token;
+    if (isDemoToken(token?.access)) {
+      const demoLink: PartnerLink = {
+        id: 'demo-link-1',
+        role: 'partner',
+        other_name: 'Claire',
+        share_fertile_window: true,
+        share_pregnancy: true,
+        created_at: new Date().toISOString(),
+      };
+      queryClient.setQueryData(PARTNER_LINKS_KEY, [demoLink]);
+      queryClient.setQueryData(SHARED_STATUS_KEY, [DEMO_SHARED_STATUS]);
+      return Promise.resolve(demoLink);
+    }
+    return thenRefresh(
       client
         .post<PartnerLink>('partner-links/', body)
         .then((response) => response.data)
-    ),
+    );
+  },
   retry: NO_RETRY,
 });
 
@@ -105,7 +130,15 @@ export const useCancelPartnerInvite = createMutation<
   { id: string },
   AxiosError<ProblemDetail>
 >({
-  mutationFn: ({ id }) =>
-    thenRefresh(client.delete(`partner-invites/${id}/`).then(() => undefined)),
+  mutationFn: ({ id }) => {
+    const token = useAuth.getState().token;
+    if (isDemoToken(token?.access)) {
+      queryClient.setQueryData(OPEN_INVITE_KEY, []);
+      return Promise.resolve(undefined);
+    }
+    return thenRefresh(
+      client.delete(`partner-invites/${id}/`).then(() => undefined)
+    );
+  },
   retry: NO_RETRY,
 });

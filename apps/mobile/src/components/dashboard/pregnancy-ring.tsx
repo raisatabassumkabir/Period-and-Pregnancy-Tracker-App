@@ -39,7 +39,7 @@ export function PregnancyRing({ progress, testID }: Props) {
         Week
       </Text>
       <Text
-        className="font-heading text-[56px] leading-[62px] text-ink"
+        className="font-display text-[56px] leading-[62px] text-ink"
         testID="pregnancy-ring-week"
       >
         {progress.week}

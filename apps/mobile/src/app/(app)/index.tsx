@@ -29,6 +29,7 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
+  Sparkle,
   Text,
   View,
 } from '@/components/ui';
@@ -84,7 +85,7 @@ function LogActionButton({ label }: { label: string }) {
       accessibilityRole="button"
       testID="dashboard-log-action"
       onPress={() => router.push(TRACKING_ROUTE)}
-      className="mt-5 h-14 flex-row items-center justify-center gap-2 self-center rounded-pill bg-accent px-8 active:opacity-90"
+      className="mt-5 h-13 flex-row items-center justify-center gap-2 self-center rounded-pill bg-accent px-8 active:opacity-90"
     >
       <Plus size={ACTION_ICON_SIZE} color={ON_ACCENT_COLOR} strokeWidth={3} />
       <Text className="font-body-bold text-[16px] text-white">{label}</Text>
@@ -92,17 +93,26 @@ function LogActionButton({ label }: { label: string }) {
   );
 }
 
-function SectionHeading({ title, isDemo }: { title: string; isDemo: boolean }) {
+interface SectionHeadingProps {
+  title: string;
+  isDemo: boolean;
+  /** Stable test id stem; defaults to the lower-cased title. */
+  pillId?: string;
+}
+
+function SectionHeading({ title, isDemo, pillId }: SectionHeadingProps) {
   return (
     <View className="flex-row items-center justify-between">
       <Kicker>{title}</Kicker>
-      {isDemo && (
+      {isDemo ? (
         <Pill
           label="Demo data"
           tone="accent2-soft"
           badge
-          testID={`${title.toLowerCase()}-demo-pill`}
+          testID={`${pillId ?? title.toLowerCase()}-demo-pill`}
         />
+      ) : (
+        <Sparkle size={18} />
       )}
     </View>
   );
@@ -250,7 +260,7 @@ function CycleSection({
   if (isLoading) {
     return (
       <>
-        <SectionHeading title="Cycle" isDemo={false} />
+        <SectionHeading title="Your cycle" pillId="cycle" isDemo={false} />
         <View className="mt-2">
           <DashboardSkeleton />
         </View>
@@ -261,7 +271,7 @@ function CycleSection({
   if (!insights) {
     return (
       <>
-        <SectionHeading title="Cycle" isDemo={isDemo} />
+        <SectionHeading title="Your cycle" pillId="cycle" isDemo={isDemo} />
         <CycleEmptyCard onStartCycle={firstCyclePrompt.open} />
         <InitializeCycleModal
           visible={firstCyclePrompt.isVisible}
@@ -284,13 +294,16 @@ function CycleSection({
 
   return (
     <>
-      <SectionHeading title="Cycle" isDemo={isDemo} />
-      <View className="mt-4">
-        <CycleRing
-          insights={insights}
-          today={todayInCycle}
-          testID="cycle-ring"
-        />
+      <View className="rounded-[32px] bg-accent-100 px-5 pb-7 pt-6 overflow-hidden">
+        <SectionHeading title="Your cycle" pillId="cycle" isDemo={isDemo} />
+        <View className="mt-4">
+          <CycleRing
+            insights={insights}
+            today={todayInCycle}
+            testID="cycle-ring"
+          />
+        </View>
+        {leads && <LogActionButton label="Log period" />}
       </View>
 
       {medicalInsight.shouldShowLatePeriodCard && (
@@ -305,8 +318,7 @@ function CycleSection({
         </View>
       )}
 
-      {leads && <LogActionButton label="Log Period" />}
-      <View className="mt-5">
+      <View className="mt-4">
         <CycleStatusCards
           insights={insights}
           chance={chance}
@@ -518,7 +530,8 @@ function PendingInvitePrompt() {
 /** A linked partner's home: her shared status and ways to support her. */
 function PartnerHomeScreen() {
   return (
-    <View className="flex-1 bg-canvas" testID="home-screen">
+    // The partner side sits on a faint lilac wash instead of petal pink.
+    <View className="flex-1 bg-accent2-100/50" testID="home-screen">
       <FocusAwareStatusBar />
       <SafeAreaView edges={['top']}>
         <View className="px-4 pt-2">

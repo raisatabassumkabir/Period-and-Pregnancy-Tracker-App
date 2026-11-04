@@ -36,7 +36,13 @@ export const usePendingPartnerCode = create<PendingCodeState>((set, get) => ({
   },
   hydrate: async () => {
     if (get().hydrated) return;
-    const stored = await getItem<string>(STORAGE_KEYS.PENDING_PARTNER_CODE);
+    let stored: string | null = null;
+    try {
+      stored = await getItem<string>(STORAGE_KEYS.PENDING_PARTNER_CODE);
+    } catch (error: unknown) {
+      // Unreadable storage means no saved code; screens waiting on this must still load.
+      console.warn('Could not read the pending partner code:', error);
+    }
     set({
       code: get().code ?? (isPartnerCode(stored) ? stored : null),
       hydrated: true,

@@ -22,12 +22,22 @@ import {
 } from '@/components/ui';
 import { useAuth, useIsFirstTime } from '@/lib';
 import { usePersonalizationProfile } from '@/lib/health/use-personalization-profile';
-import { readPendingPartnerCode, savePendingPartnerCode } from '@/lib/partner';
+import {
+  extractPartnerCode,
+  isPartnerCode,
+  readPendingPartnerCode,
+  savePendingPartnerCode,
+} from '@/lib/partner';
 import { useHealthStore } from '@/store/useHealthStore';
 
 const TOTAL_STEPS = 6;
 const DEFAULT_CYCLE_LENGTH = 28;
 const DEFAULT_PERIOD_DURATION = 5;
+
+function nextLabel(isPartnerFlow: boolean, isLastStep: boolean): string {
+  if (isPartnerFlow) return 'Create account to link';
+  return isLastStep ? 'Complete & Start' : 'Next';
+}
 
 /** Someone who arrived through a partner invite link starts on "I have a code". */
 function usePrefillFromInviteLink(
@@ -49,6 +59,34 @@ function usePrefillFromInviteLink(
       active = false;
     };
   }, [setIntent, setPartnerCode]);
+}
+
+/**
+ * "I have a partner code" before there is an account: keep the code, mark this
+ * phone as a partner's, and go make an account. Pairing (and the "you're
+ * paired" welcome) happens once signed in, when the code is actually redeemed.
+ */
+function usePartnerOnboardingExit() {
+  const router = useRouter();
+  const [, setIsFirstTime] = useIsFirstTime();
+  const { updateProfile } = usePersonalizationProfile();
+  return async (partnerCode: string) => {
+    await savePendingPartnerCode(partnerCode.trim());
+    try {
+      await updateProfile(
+        {
+          hasCompletedOnboarding: true,
+          appIntent: 'partner',
+          partnerCode: partnerCode.trim(),
+        },
+        { silent: true }
+      );
+    } catch (error: unknown) {
+      console.warn('Failed to update local profile:', error);
+    }
+    await setIsFirstTime(false);
+    router.replace('/register');
+  };
 }
 
 export default function Onboarding() {
@@ -79,6 +117,9 @@ export default function Onboarding() {
   const [heightCm, setHeightCm] = useState<string>('');
   const [weightKg, setWeightKg] = useState<string>('');
 
+  const exitAsPartner = usePartnerOnboardingExit();
+  const isPartnerFlow = intent === 'partner';
+
   // Step 2 goal toggle
   const handleToggleGoal = (id: string) => {
     setSelectedGoals((prev) =>
@@ -105,6 +146,7 @@ export default function Onboarding() {
 
   // Step completion validation (Next button is disabled until valid)
   const isCurrentStepValid = (): boolean => {
+    if (isPartnerFlow) return isPartnerCode(extractPartnerCode(partnerCode));
     switch (currentStep) {
       case 1:
         return intent !== null;
@@ -155,11 +197,6 @@ export default function Onboarding() {
       console.warn('Failed to update local profile:', err);
     }
 
-    // Redeemed from Home once signed in (the code needs an account).
-    if (intent === 'partner' && partnerCode.trim()) {
-      await savePendingPartnerCode(partnerCode);
-    }
-
     setHealthMode(isPregnancyGoal ? 'pregnancy' : 'cycle');
     await setIsFirstTime(false);
 
@@ -205,6 +242,15 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
+    if (isPartnerFlow) {
+      setIsSubmitting(true);
+      try {
+        await exitAsPartner(extractPartnerCode(partnerCode) ?? partnerCode);
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -299,7 +345,7 @@ export default function Onboarding() {
         {/* Bottom Action Button */}
         <View className="bg-canvas px-6 pb-6 pt-2">
           <Button
-            label={currentStep === TOTAL_STEPS ? 'Complete & Start' : 'Next'}
+            label={nextLabel(isPartnerFlow, currentStep === TOTAL_STEPS)}
             size="lg"
             className="h-14 rounded-pill"
             disabled={!isCurrentStepValid() || isSubmitting}

@@ -2,6 +2,7 @@ import type { AxiosError } from 'axios';
 import { createQuery } from 'react-query-kit';
 
 import { useAuth } from '@/lib/auth';
+import { isDemoToken } from '@/lib/auth/demo-users';
 
 import { client } from '../common';
 import type { PartnerLink, ProblemDetail } from '../types';
@@ -27,8 +28,9 @@ interface Options {
 
 export function usePartnerLinks(options: Options = {}) {
   const token = useAuth((state) => state.token);
+  const isDemo = isDemoToken(token?.access);
   return _usePartnerLinks({
-    enabled: !!token && (options.enabled ?? true),
+    enabled: !!token && !isDemo && (options.enabled ?? true),
     refetchInterval: options.refetchInterval ?? false,
   });
 }

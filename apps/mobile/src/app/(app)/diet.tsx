@@ -29,7 +29,7 @@ function TodaysMeals() {
         targets={targets}
         isPregnant={stage.kind === 'pregnancy'}
       />
-      <Text className="mb-1 mt-6 font-heading text-[18px] text-ink">
+      <Text className="mb-1 mt-6 font-display text-[18px] text-ink">
         {translate('meal_library.today_title')}
       </Text>
       {plan.meals.map((planned) => (

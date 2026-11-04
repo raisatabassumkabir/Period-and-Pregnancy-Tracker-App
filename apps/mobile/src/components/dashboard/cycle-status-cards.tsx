@@ -53,16 +53,18 @@ export function CycleStatusCards({
     <View testID="cycle-status-cards">
       <View className="flex-row gap-3">
         <StatusCard
-          label="Chances of pregnancy"
+          label="Chance of pregnancy"
           value={CHANCE_LABELS[chance]}
           caption={chanceCaption}
           indicatorColor={CHANCE_COLORS[chance]}
+          tone="mint"
           testID="pregnancy-chance-card"
         />
         <StatusCard
           label="Next period"
           value={formatCalendarDate(insights.nextPeriodDate)}
           caption={describeNextPeriod(insights.daysUntilNextPeriod)}
+          tone="butter"
           testID="next-period-card"
         />
       </View>

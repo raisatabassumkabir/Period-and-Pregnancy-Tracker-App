@@ -2,6 +2,11 @@ import React from 'react';
 import { create } from 'zustand';
 
 import { usePartnerLink, useSharedStatuses } from '@/api/sharing';
+import { DEMO_SHARED_STATUS } from '@/api/sharing/use-shared-status';
+import type { PartnerLink } from '@/api/types';
+import { useAuth } from '@/lib/auth';
+import { isDemoToken } from '@/lib/auth/demo-users';
+import { usePersonalizationProfile } from '@/lib/health';
 import { translate } from '@/lib/i18n';
 import {
   cancelTaggedReminders,
@@ -15,6 +20,16 @@ import {
   planPartnerNudges,
 } from './partner-nudges';
 import { derivePartnerView } from './partner-view';
+
+/** The offline (server unreachable) Daniel session: linked to Claire on the phone only. */
+export const DEMO_PARTNER_LINK: PartnerLink = {
+  id: 'demo-link-daniel-claire',
+  role: 'partner',
+  other_name: 'Claire',
+  share_fertile_window: true,
+  share_pregnancy: true,
+  created_at: '2026-11-01T00:00:00Z',
+};
 
 /** Notification tag: cancelling partner nudges never touches her own reminders. */
 export const PARTNER_NUDGE_TAG = 'partner-nudge';
@@ -52,10 +67,21 @@ export const usePartnerNudgeSettings = create<PartnerNudgeState>(
 
 /** The partner's view of her, or null for anyone who isn't a linked partner. */
 export function usePartnerSide() {
-  const link = usePartnerLink();
+  const serverLink = usePartnerLink();
+  const token = useAuth((state) => state.token);
+  const { profile } = usePersonalizationProfile();
+  const isDemo = isDemoToken(token?.access);
+  const isDemoPartner =
+    isDemo &&
+    (token?.access?.includes('partner') || profile.appIntent === 'partner');
+  const link = serverLink ?? (isDemoPartner ? DEMO_PARTNER_LINK : null);
   const isPartner = link?.role === 'partner';
-  const { data } = useSharedStatuses({ enabled: isPartner });
-  const status = isPartner ? (data?.[0] ?? null) : null;
+  const { data } = useSharedStatuses({ enabled: isPartner && !isDemo });
+  const status = isPartner
+    ? isDemo
+      ? DEMO_SHARED_STATUS
+      : (data?.[0] ?? null)
+    : null;
   return { link, isPartner, status, view: derivePartnerView(status) };
 }
 

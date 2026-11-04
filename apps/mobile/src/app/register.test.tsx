@@ -60,7 +60,7 @@ describe('Register', () => {
 
     expect(screen.getByTestId('auth-brand')).toBeOnTheScreen();
     expect(screen.getByText('Happy Women')).toBeOnTheScreen();
-    expect(screen.getByText('Create your account')).toBeOnTheScreen();
+    expect(screen.getByText("Let's get you set up")).toBeOnTheScreen();
   });
 
   it('ticks each password rule as it is satisfied', async () => {

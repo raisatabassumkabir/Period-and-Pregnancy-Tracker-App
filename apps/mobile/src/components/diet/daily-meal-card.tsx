@@ -30,7 +30,7 @@ export function DailyMealCard({
 
   return (
     <View
-      className="mt-3 rounded-card border border-divider bg-surface p-4"
+      className="mt-3 rounded-[24px] border-2 border-divider bg-surface p-4"
       testID={`daily-meal-${slot}`}
     >
       <View className="flex-row items-center justify-between">
@@ -40,7 +40,7 @@ export function DailyMealCard({
           {translate('meal_library.protein_g')}
         </Text>
       </View>
-      <Text className="mt-2.5 font-heading text-[17px] leading-6 text-ink">
+      <Text className="mt-2.5 font-display text-[19px] leading-[25px] text-ink">
         {translate(planned.nameKey)}
       </Text>
       <View className="mt-2 flex-row flex-wrap gap-1.5">

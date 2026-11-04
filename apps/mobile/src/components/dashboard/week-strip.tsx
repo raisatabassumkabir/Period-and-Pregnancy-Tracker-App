@@ -43,16 +43,17 @@ export function WeekStrip({ today, selectedDate, onSelect }: Props) {
             testID={`week-day-${date}`}
             onPress={() => onSelect(date)}
             // Colour-only toggle; never a runtime-toggled shadow class.
-            className={`h-[68px] w-11 items-center justify-center rounded-pill ${
+            // The 4px bottom edge is constant; only its colour changes.
+            className={`h-[66px] w-11 items-center justify-center rounded-[18px] border-b-4 ${
               selected
-                ? 'bg-accent'
+                ? 'border-accent-700 bg-accent'
                 : isToday
-                  ? 'border border-accent bg-surface'
-                  : 'bg-surface'
+                  ? 'border-accent-300 bg-surface'
+                  : 'border-transparent bg-surface'
             }`}
           >
             <Text
-              className={`font-body-semibold text-[11px] ${
+              className={`font-body-bold text-[12px] ${
                 selected ? 'text-white' : 'text-tone-600'
               }`}
             >

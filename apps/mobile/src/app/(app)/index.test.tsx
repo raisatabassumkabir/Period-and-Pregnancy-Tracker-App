@@ -122,8 +122,10 @@ describe('Home', () => {
     mockUser();
     mockHealthData();
     setup(<Home />);
-    expect(screen.getByText('WELCOME BACK')).toBeOnTheScreen();
-    expect(screen.getByText('Hi, Ada')).toBeOnTheScreen();
+    expect(screen.getByTestId('app-header-kicker')).toHaveTextContent(
+      /^Good (morning|afternoon|evening),$/
+    );
+    expect(screen.getByTestId('app-header-name')).toHaveTextContent('Ada');
   });
 
   it('shows the week strip with today selected and a log action', () => {
@@ -134,7 +136,7 @@ describe('Home', () => {
     setup(<Home />);
     expect(screen.getByTestId('week-strip')).toBeOnTheScreen();
     expect(screen.getByTestId('dashboard-log-action')).toHaveTextContent(
-      'Log Period'
+      'Log period'
     );
   });
 
@@ -161,7 +163,9 @@ describe('Home', () => {
     mockUser(null);
     mockHealthData();
     setup(<Home />);
-    expect(screen.getByText('WELCOME BACK')).toBeOnTheScreen();
+    expect(screen.getByTestId('app-header-kicker')).toHaveTextContent(
+      /^Good (morning|afternoon|evening),$/
+    );
   });
 
   it('shows the premium badge for subscribers', () => {

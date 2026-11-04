@@ -54,7 +54,7 @@ describe('Login', () => {
     expect(screen.getByText('Happy Women')).toBeOnTheScreen();
     expect(screen.getByText('Welcome back')).toBeOnTheScreen();
     expect(screen.getByTestId('login-button-label')).toHaveTextContent(
-      'Continue'
+      'Sign in'
     );
   });
 

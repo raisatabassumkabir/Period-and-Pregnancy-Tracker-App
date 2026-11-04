@@ -24,7 +24,7 @@ export function LoginHeader({ onGoBack }: Props) {
       >
         <ArrowLeft color={colors.ink} />
       </TouchableOpacity>
-      <Text className="flex-1 font-heading text-[22px] text-ink">
+      <Text className="flex-1 font-display text-[22px] text-ink">
         Login with password
       </Text>
     </View>

@@ -76,7 +76,7 @@ export function ModeStep({ value, onChange }: ModeStepProps) {
   return (
     <View className="w-full items-center px-6">
       <Kicker>Personalise</Kicker>
-      <Text className="mt-3 text-center font-heading text-[28px] text-ink">
+      <Text className="mt-3 text-center font-display text-[28px] text-ink">
         How will you use the app?
       </Text>
       <Text className="mb-6 mt-2 max-w-[300px] text-center text-[15px] leading-6 text-tone-700">

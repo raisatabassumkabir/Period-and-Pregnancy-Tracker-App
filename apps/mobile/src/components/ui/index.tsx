@@ -6,6 +6,7 @@ export * from './brand';
 export * from './button';
 export * from './checkbox';
 export { default as colors } from './colors';
+export * from './doodles';
 export * from './error-banner';
 export * from './focus-aware-status-bar';
 export * from './form-field';

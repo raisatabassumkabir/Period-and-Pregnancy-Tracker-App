@@ -25,6 +25,9 @@ export interface PartnerView {
   fertileEnd: string | null;
   bestDays: readonly string[];
   pregnancyWeek: number | null;
+  /** Her shared averages, for drawing the phase bar. */
+  cycleLength: number | null;
+  periodLength: number | null;
 }
 
 export const LUTEAL_PHASE_DAYS = 14;
@@ -46,6 +49,8 @@ const EMPTY: Omit<PartnerView, 'kind'> = {
   fertileEnd: null,
   bestDays: [],
   pregnancyWeek: null,
+  cycleLength: null,
+  periodLength: null,
 };
 
 function pregnancyView(status: SharedStatus, today: Date): PartnerView {
@@ -91,6 +96,8 @@ function cycleView(status: SharedStatus, today: Date): PartnerView {
     phase: cycleDietPhaseFor(Math.min(cycleDay, length), length),
     nextPeriodDate: toDateString(nextPeriod),
     daysUntilPeriod: daysBetween(today, nextPeriod),
+    cycleLength: length,
+    periodLength: status.period_length,
     ...fertileWindow(nextPeriod, status.ovulation_date !== null),
   };
 }

@@ -36,7 +36,7 @@ export function StepMedical({
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 24 }}
     >
-      <Text className="font-heading text-[26px] leading-8 text-ink">
+      <Text className="font-display text-[26px] leading-8 text-ink">
         Do you have any of these health conditions?
       </Text>
       <Text className="mt-2 font-body text-[15px] leading-6 text-tone-600">

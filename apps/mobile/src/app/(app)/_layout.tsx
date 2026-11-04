@@ -15,9 +15,8 @@ import { MedicalDisclaimerGate } from '@/components/legal';
 import { AppErrorBoundary } from '@/components/ui';
 import { useAuth, usePaletteColors } from '@/lib';
 import { FEATURES } from '@/lib/features';
-import { usePersonalizationProfile } from '@/lib/health';
 import { translate } from '@/lib/i18n';
-import { usePartnerNudgeSync, usePartnerSide } from '@/lib/partner';
+import { usePartnerAccount, usePartnerNudgeSync } from '@/lib/partner';
 import { usePeriodReminderSync } from '@/lib/reminders';
 
 const TAB_ICON_SIZE = 23;
@@ -50,10 +49,8 @@ export default function TabLayout() {
   const palette = usePaletteColors();
   // A partner account only sees Home (her status) and Partner; her tracking
   // tabs are hidden, linked or not (same rule as Home).
-  const { isPartner } = usePartnerSide();
-  const { profile } = usePersonalizationProfile();
-  const herTab =
-    isPartner || profile.appIntent === 'partner' ? null : undefined;
+  const partnerAccount = usePartnerAccount();
+  const herTab = partnerAccount ? null : undefined;
 
   if (!status) return null;
   return (
@@ -65,7 +62,10 @@ export default function TabLayout() {
         <CalendarEmojiWarmup />
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: palette.accent,
+            // The partner side leads with lilac, her side with rose.
+            tabBarActiveTintColor: partnerAccount
+              ? palette.accent2
+              : palette.accent,
             tabBarInactiveTintColor: palette.tone[600],
             tabBarStyle: {
               borderTopWidth: 1,

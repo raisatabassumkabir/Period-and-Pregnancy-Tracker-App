@@ -7,6 +7,7 @@ import {
   FocusAwareStatusBar,
   Pressable,
   SafeAreaView,
+  Squiggle,
   Text,
   View,
 } from '@/components/ui';
@@ -20,7 +21,7 @@ const SCROLL_CONTENT = {
 } as const;
 
 interface Props {
-  kicker: string;
+  kicker?: string;
   title: string;
   subtitle: string;
   onGoBack?: () => void;
@@ -81,15 +82,18 @@ export function AuthLayout({
                 .duration(800)
                 .springify()
                 .damping(16)}
-              className="mb-6 px-1"
+              className="mb-7 items-center px-1"
             >
-              <Text className="mb-1 text-left font-body-semibold text-[14px] text-accent">
-                {kicker}
-              </Text>
-              <Text className="text-left font-heading text-[30px] leading-[36px] tracking-tight text-ink">
+              {kicker ? (
+                <Text className="mb-1 text-center font-body-bold text-[14px] text-accent-700">
+                  {kicker}
+                </Text>
+              ) : null}
+              <Text className="text-center font-display text-[32px] leading-[40px] text-ink">
                 {title}
               </Text>
-              <Text className="mt-2 text-left font-body text-[15px] leading-6 text-tone-500">
+              <Squiggle />
+              <Text className="mt-2 text-center font-body text-[16px] leading-6 text-tone-600">
                 {subtitle}
               </Text>
             </Animated.View>

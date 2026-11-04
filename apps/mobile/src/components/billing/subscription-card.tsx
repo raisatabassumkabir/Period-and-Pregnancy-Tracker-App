@@ -49,7 +49,7 @@ function UpgradePrompt() {
         <Sparkles size={ICON_SIZE} color={colors.accentScale[100]} />
       </View>
       <View className="flex-1">
-        <Text className="font-heading text-[18px] text-white">Get Premium</Text>
+        <Text className="font-display text-[18px] text-white">Get Premium</Text>
         <Text className="mt-0.5 text-[13px] text-accent-200">
           Unlock every premium feature
         </Text>
@@ -91,7 +91,7 @@ export const SubscriptionCard = () => {
             <Crown size={ICON_SIZE} color={colors.accent2Scale[100]} />
           </View>
           <View className="flex-1">
-            <Text className="font-heading text-[18px] text-accent2-100">
+            <Text className="font-display text-[18px] text-accent2-100">
               Premium Member
             </Text>
             <Text className="mt-0.5 text-[13px] text-accent2-300">

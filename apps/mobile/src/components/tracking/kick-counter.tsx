@@ -17,7 +17,7 @@ export function KickCounter() {
     <View className="rounded-card bg-surface p-5" testID="kick-counter">
       <View className="flex-row items-center justify-between">
         <View>
-          <Text className="font-heading text-[18px] text-ink">
+          <Text className="font-display text-[18px] text-ink">
             Kick counter
           </Text>
           <Text className="mt-1 text-[13px] text-tone-600">
@@ -44,7 +44,7 @@ export function KickCounter() {
       >
         <Footprints size={KICK_ICON_SIZE} color={palette.accentScale[800]} />
         <Text
-          className="mt-1 font-heading text-[44px] leading-[52px] text-accent-900"
+          className="mt-1 font-display text-[44px] leading-[52px] text-accent-900"
           testID="kick-count"
         >
           {count}

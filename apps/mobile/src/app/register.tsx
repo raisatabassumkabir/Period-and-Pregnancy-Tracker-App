@@ -7,6 +7,8 @@ import {
   EmailInput,
   PasswordHints,
   PasswordInput,
+  PrivacyPill,
+  TermsNotice,
 } from '@/components/auth';
 import { Button, ErrorBanner, FormField, Text, View } from '@/components/ui';
 import { useRegisterLogic } from '@/hooks/use-register-logic';
@@ -23,16 +25,19 @@ export default function Register() {
   return (
     <AuthLayout
       testID="register-screen"
-      kicker="Join Happy Women"
-      title="Create your account"
-      subtitle="Start your personal health journey in a few moments."
+      title="Let's get you set up"
+      subtitle="Takes a minute. You can delete everything anytime."
       footer={
-        <AuthFooter
-          question="Already have an account?"
-          linkLabel="Sign in"
-          href="/login"
-          testID="register-to-login"
-        />
+        <View className="gap-4">
+          <AuthFooter
+            question="Already with us?"
+            linkLabel="Sign in"
+            href="/login"
+            testID="register-to-login"
+          />
+          <PrivacyPill label="Your health data stays private" />
+          <TermsNotice />
+        </View>
       }
     >
       <ErrorBanner message={errors.root?.message} />
@@ -103,13 +108,10 @@ export default function Register() {
       </View>
 
       <Button
-        label="♡ Create my account"
+        label="Create account"
         size="lg"
-        className="my-0 h-14"
-        style={{
-          borderRadius: 16,
-        }}
-        textClassName="font-body-semibold text-[16px] text-white"
+        className="my-0 h-14 rounded-pill"
+        textClassName="font-body-bold text-[17px] text-white"
         loading={isSubmitting}
         onPress={submit}
         testID="register-submit"

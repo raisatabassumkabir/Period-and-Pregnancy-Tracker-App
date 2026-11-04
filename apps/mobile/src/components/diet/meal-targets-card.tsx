@@ -21,8 +21,10 @@ function Stat({
   testID: string;
 }) {
   return (
-    <View className="flex-1 rounded-panel bg-canvas p-3" testID={testID}>
-      <Text className="font-heading text-[20px] text-ink">{value}</Text>
+    <View className="flex-1 rounded-[18px] bg-surface p-3" testID={testID}>
+      <Text className="font-display text-[22px] leading-[28px] text-ink">
+        {value}
+      </Text>
       <Text className="text-[12px] text-tone-600">{label}</Text>
     </View>
   );
@@ -31,8 +33,8 @@ function Stat({
 /** Her targets for today, why these meals, and any gentle nudge. */
 export function MealTargetsCard({ plan, targets, isPregnant }: Props) {
   return (
-    <View className="rounded-card bg-surface p-4" testID="meal-targets-card">
-      <Text className="font-body-bold text-[11px] uppercase tracking-[1.5px] text-accent">
+    <View className="rounded-[28px] bg-peach p-5" testID="meal-targets-card">
+      <Text className="font-display text-[20px] text-ink">
         {translate('meal_library.targets')}
       </Text>
       <View className="mt-3 flex-row gap-2">
@@ -61,13 +63,13 @@ export function MealTargetsCard({ plan, targets, isPregnant }: Props) {
         {translate(plan.focusKey)}
       </Text>
       {targets.isMinor ? (
-        <Text className="mt-2 text-[12px] leading-5 text-tone-700">
+        <Text className="mt-2 text-[12px] leading-5 text-peach-ink">
           {translate('meal_library.teen_note')}
         </Text>
       ) : null}
       {!targets.isPersonal && !targets.isMinor ? (
         <Text
-          className="mt-2 text-[12px] leading-5 text-tone-700"
+          className="mt-2 text-[12px] leading-5 text-peach-ink"
           testID="meal-add-metrics"
         >
           {translate('meal_library.add_metrics')}
@@ -75,18 +77,18 @@ export function MealTargetsCard({ plan, targets, isPregnant }: Props) {
       ) : null}
       {plan.proteinShortfallG > 0 ? (
         <Text
-          className="mt-2 text-[12px] leading-5 text-tone-700"
+          className="mt-2 text-[12px] leading-5 text-peach-ink"
           testID="meal-protein-boost"
         >
           {translate('meal_library.protein_boost')}
         </Text>
       ) : null}
       {isPregnant ? (
-        <Text className="mt-2 text-[12px] text-tone-600">
+        <Text className="mt-2 text-[12px] text-peach-ink">
           {translate('meal_library.pregnancy_safe')}
         </Text>
       ) : null}
-      <Text className="mt-2 text-[12px] text-tone-500">
+      <Text className="mt-2 text-[12px] text-peach-ink">
         {translate('meal_library.new_tomorrow')}
       </Text>
     </View>

@@ -23,7 +23,7 @@ export function StepIntent({
   const palette = usePaletteColors();
   return (
     <View className="flex-1 px-6 pt-4">
-      <Text className="font-heading text-[26px] leading-8 text-ink">
+      <Text className="font-display text-[26px] leading-8 text-ink">
         Are you using Happy Women for yourself?
       </Text>
       <Text className="mt-2 font-body text-[15px] leading-6 text-tone-600">
@@ -119,17 +119,21 @@ export function StepIntent({
         {intent === 'partner' && (
           <View className="rounded-[24px] border border-accent2-300 bg-surface p-5">
             <Text className="font-body-bold text-[14px] text-ink">
-              Enter Partner Sync Code
+              Enter your partner code
             </Text>
             <TextInput
               value={partnerCode}
               onChangeText={onChangePartnerCode}
-              placeholder="e.g. HW-7294"
+              placeholder="HW-XXXX-XXXX"
               placeholderTextColor={palette.tone[500]}
               autoCapitalize="characters"
               testID="partner-code-input"
               className="mt-3 h-12 rounded-full border border-divider bg-canvas px-4 font-mono text-[16px] text-ink"
             />
+            <Text className="mt-3 text-[12px] leading-[18px] text-tone-600">
+              Next you&apos;ll create your account, then we link you to your
+              partner.
+            </Text>
           </View>
         )}
       </View>

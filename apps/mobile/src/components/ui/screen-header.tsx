@@ -34,7 +34,7 @@ export function ScreenHeader({ title, onBack, right }: ScreenHeaderProps) {
         </TouchableOpacity>
       )}
       <Text
-        className="flex-1 font-heading text-[22px] text-ink"
+        className="flex-1 font-display text-[22px] text-ink"
         numberOfLines={1}
       >
         {title}

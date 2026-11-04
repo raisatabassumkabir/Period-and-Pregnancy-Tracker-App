@@ -1,3 +1,4 @@
+export * from './baby-size';
 export * from './calendar-days';
 export * from './cycle-insights';
 export * from './cycle-phase';

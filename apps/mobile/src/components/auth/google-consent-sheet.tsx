@@ -9,7 +9,7 @@ import { GoogleIcon } from './google-button';
 import { TermsNotice } from './terms-notice';
 
 /** Handle + title + body + terms + two buttons; measured on a Pixel-size screen. */
-const LOGO_MARK_SIZE = 37; // BrandMark renders at 1.5x, so this matches the 56px Google badge.
+const LOGO_MARK_SIZE = 56; // Matches the Google badge beside it.
 const SHEET_CONTENT_HEIGHT = 380;
 const SHEET_RADIUS = 28;
 
@@ -28,7 +28,7 @@ function SheetHeader() {
         <View className="h-px w-6 bg-tone-300" />
         <BrandMark size={LOGO_MARK_SIZE} />
       </View>
-      <Text className="mt-5 text-center font-heading text-[22px] leading-7 text-ink">
+      <Text className="mt-5 text-center font-display text-[22px] leading-7 text-ink">
         Sign in to Happy Women
       </Text>
       <Text className="mt-2 text-center text-[14px] leading-5 text-tone-600">

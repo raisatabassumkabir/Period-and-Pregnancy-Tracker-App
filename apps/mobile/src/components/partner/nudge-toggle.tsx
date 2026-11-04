@@ -24,7 +24,7 @@ export function NudgeToggle() {
 
   return (
     <View
-      className="flex-row items-center rounded-card bg-surface p-5"
+      className="flex-row items-center rounded-[28px] border-2 border-accent2-200 bg-surface p-5"
       testID="partner-nudge-toggle"
     >
       <View className="flex-1 pr-4">
@@ -38,7 +38,7 @@ export function NudgeToggle() {
       <Switch
         value={enabled}
         onValueChange={toggle}
-        trackColor={{ false: palette.tone[300], true: palette.accent }}
+        trackColor={{ false: palette.tone[300], true: palette.accent2 }}
         thumbColor="#FFFFFF"
         accessibilityLabel={translate('partner.nudges.title')}
         testID="partner-nudge-switch"

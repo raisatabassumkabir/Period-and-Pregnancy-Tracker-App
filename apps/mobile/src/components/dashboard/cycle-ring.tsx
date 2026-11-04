@@ -77,11 +77,9 @@ export function CycleRing({ insights, today, testID }: Props) {
       testID={testID}
     >
       <UterusGlyph size={GLYPH_SIZE} color={palette.accent} />
-      <Text className="mt-1 font-body-semibold text-[13px] uppercase tracking-wider text-tone-600">
-        Day
-      </Text>
+      <Text className="mt-1 font-body-bold text-[14px] text-tone-600">Day</Text>
       <Text
-        className="font-heading text-[56px] leading-[62px] text-ink"
+        className="font-display text-[60px] leading-[68px] text-ink"
         testID="cycle-ring-day"
       >
         {insights.currentDay}
